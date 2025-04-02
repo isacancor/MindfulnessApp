@@ -1,0 +1,26 @@
+# Root-level ignores
+.env
+*.log
+
+# Node / Frontend
+/frontend/node_modules/
+/frontend/dist/
+/frontend/.env
+/frontend/logs/
+/frontend/npm-debug.log*
+
+# Python / Backend
+/backend/__pycache__/
+/backend/*.pyc
+/backend/db.sqlite3
+/backend/.env
+/backend/env/
+/backend/venv/
+/backend/.migrations/
+
+# VS Code
+.vscode/
+
+# OS-specific
+.DS_Store
+Thumbs.db
