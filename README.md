@@ -70,7 +70,7 @@ Antes de comenzar, asegúrate de tener instalados los siguientes programas en tu
 5. **Realiza las migraciones de la base de datos:**:
 
    ```bash
-   python manage.py makemigration
+   python manage.py makemigrations
    python manage.py migrate
    ```
 
