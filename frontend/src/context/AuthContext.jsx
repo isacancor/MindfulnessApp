@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../config/axios';
 import { ROLES, PERMISSIONS, ROLE_PERMISSIONS } from '../config/auth';
+import { mapUserData } from '../utils/userMapper';
 
 const AuthContext = createContext();
 
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }) => {
                 }
 
                 const response = await api.get('/auth/me');
-                setUser(response.data);
+                setUser(mapUserData(response.data));
             } catch (err) {
                 localStorage.removeItem('token');
                 setError(err.response?.data?.message || 'Error al cargar el usuario');
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }) => {
             const { token, user } = response.data;
 
             localStorage.setItem('token', token);
-            setUser(user);
+            setUser(mapUserData(user));
 
             // Redirigir
             if (user.role === ROLES.INVESTIGADOR) {
@@ -85,7 +86,7 @@ export const AuthProvider = ({ children }) => {
             const { token, user } = response.data;
 
             localStorage.setItem('token', token);
-            setUser(user);
+            setUser(mapUserData(user));
 
             // Redirigir
             if (user.role === ROLES.INVESTIGADOR) {
@@ -117,7 +118,7 @@ export const AuthProvider = ({ children }) => {
             const response = await api.put('/auth/profile', profileData, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
-            setUser(response.data);
+            setUser(mapUserData(response.data));
         } catch (err) {
             setError(err.response?.data?.message || 'Error al actualizar perfil');
             throw err;

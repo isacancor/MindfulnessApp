@@ -16,10 +16,11 @@ import {
     Trash2,
     Eye
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const InvestigadorDashboard = () => {
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
     const [activeSection, setActiveSection] = useState('dashboard');
 
     // Datos de ejemplo - En una implementación real vendrían de una API
@@ -57,8 +58,8 @@ const InvestigadorDashboard = () => {
             {/* Sidebar */}
             <aside className="w-64 bg-white shadow-md hidden md:flex flex-col fixed h-full">
                 <div className="p-6">
-                    <h2 className="text-2xl font-bold text-gray-800">MindfulnessApp</h2>
-                    <p className="text-sm text-gray-600 mt-1">Panel de Investigador</p>
+                    <h2 className="text-2xl font-bold text-gray-800">Mindfluence Research</h2>
+                    <p className="text-sm text-gray-600 mt-1">Menú de Investigador</p>
                 </div>
 
                 <nav className="flex-1 px-4">
@@ -68,7 +69,7 @@ const InvestigadorDashboard = () => {
                             className={getNavButtonClass('dashboard')}
                         >
                             <BarChart2 size={20} />
-                            <span>Dashboard</span>
+                            <span>Panel</span>
                         </button>
 
                         <button
@@ -103,13 +104,13 @@ const InvestigadorDashboard = () => {
                             <span>Cuestionarios</span>
                         </button>
 
-                        <button
-                            onClick={() => setActiveSection('perfil')}
+                        <Link
+                            to="/perfil"
                             className={getNavButtonClass('perfil')}
                         >
                             <Settings size={20} />
                             <span>Mi Perfil</span>
-                        </button>
+                        </Link>
                     </div>
                 </nav>
 
@@ -129,7 +130,7 @@ const InvestigadorDashboard = () => {
                 {activeSection === 'dashboard' && (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
+                            <h1 className="text-2xl font-bold text-gray-800">Panel de Investigador</h1>
                             <button
                                 onClick={() => setActiveSection('programas')}
                                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -234,12 +235,6 @@ const InvestigadorDashboard = () => {
                     </div>
                 )}
 
-                {activeSection === 'perfil' && (
-                    <div className="space-y-6">
-                        <h1 className="text-2xl font-bold text-gray-800">Mi Perfil</h1>
-                        {/* Aquí irá la gestión del perfil */}
-                    </div>
-                )}
             </main>
         </div>
     );

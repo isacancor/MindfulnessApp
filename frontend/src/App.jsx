@@ -11,7 +11,7 @@ import Register from '@/pages/auth/Register';
 import RegisterInvestigador from '@/pages/auth/RegisterInvestigador';
 import RegisterParticipante from '@/pages/auth/RegisterParticipante';
 import Unauthorized from './pages/Unauthorized';
-
+import Perfil from './pages/Perfil';
 function App() {
   return (
     <AuthProvider>
@@ -23,6 +23,8 @@ function App() {
         <Route path="/register/investigador" element={<RegisterInvestigador />} />
         <Route path="/register/participante" element={<RegisterParticipante />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
+
+        <Route path="/perfil" element={<Perfil />} />
 
         {/* Rutas protegidas para investigadores */}
         <Route element={<PrivateRoute roles={[ROLES.INVESTIGADOR]} />}>
@@ -50,8 +52,6 @@ function App() {
           {/* Gestión de participantes */}
           <Route path="/programas/:id/participantes" element={<div>Gestión de Participantes</div>} />
 
-          {/* Perfil de investigador */}
-          <Route path="/perfil" element={<div>Mi Perfil</div>} />
         </Route>
 
         {/* Rutas protegidas para participantes */}
@@ -62,7 +62,6 @@ function App() {
           <Route path="/programas/:id" element={<div>Detalle Programa</div>} />
           <Route path="/programas/:id/:sesionId" element={<div>Realizar Sesión</div>} />
           <Route path="/programas/:id/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
-          <Route path="/perfil" element={<div>Mi Perfil</div>} />
         </Route>
 
         {/* Rutas protegidas para admin */}

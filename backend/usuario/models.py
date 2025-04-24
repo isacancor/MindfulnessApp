@@ -43,7 +43,7 @@ class Usuario(AbstractUser):
         choices=RoleUsuario.choices,
         default=RoleUsuario.PARTICIPANTE
     )
-    fecha_nacimiento = models.DateField(null=True)
+    fechaNacimiento = models.DateField(null=True)
     genero = models.CharField(
         max_length=20,
         choices=[
@@ -55,15 +55,22 @@ class Usuario(AbstractUser):
         default='prefiero_no_decir'
     )
     date_joined = models.DateTimeField(default=timezone.now, editable=False)
+    
 
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
+    nombre = models.CharField(_("first name"), max_length=150, blank=True)
+    apellidos = models.CharField(_("last name"), max_length=150, blank=True)
+    first_name = None
+    last_name = None
+
+
+    REQUIRED_FIELDS = ['email', 'nombre', 'apellidos']
 
     def __str__(self):
         return self.email
 
     @property
     def nombre_completo(self):
-        return f"{self.first_name} {self.last_name}"
+        return f"{self.nombre} {self.apellidos}"
 
     def is_investigador(self):
         return self.role == RoleUsuario.INVESTIGADOR
@@ -78,14 +85,14 @@ class Investigador(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_investigador')
     telefono = models.CharField(max_length=20, blank=True)
     ocupacion = models.CharField(max_length=100, blank=True)
-    nivel_educativo = models.CharField(
+    nivelEducativo = models.CharField(
         max_length=50,
         choices=NivelEducativo.choices,
         default=NivelEducativo.UNIVERSIDAD,
         blank=True
     )
-    areas_interes = models.JSONField(default=list, blank=True)
-    experiencia_investigacion = models.CharField(
+    areasInteres = models.JSONField(default=list, blank=True)
+    experienciaInvestigacion = models.CharField(
         max_length=20,
         choices=[
             ('Sí', _('Sí')),
@@ -103,19 +110,19 @@ class Investigador(models.Model):
 class Participante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_participante')
     ocupacion = models.CharField(max_length=100, blank=True)
-    nivel_educativo = models.CharField(
+    nivelEducativo = models.CharField(
         max_length=50,
         choices=NivelEducativo.choices,
         default=NivelEducativo.UNIVERSIDAD,
         blank=True
     )
-    experiencia_mindfulness = models.CharField(
+    experienciaMindfulness = models.CharField(
         max_length=20,
         choices=ExperienciaMindfulness.choices,
         default=ExperienciaMindfulness.NINGUNA,
         blank=True
     )
-    condiciones_salud = models.TextField(blank=True)
+    condicionesSalud = models.TextField(blank=True)
 
     def __str__(self):
         return f"Participante: {self.usuario.nombre_completo}"
