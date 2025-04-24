@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const RegisterInvestigador = () => {
+    const { register, loading, error } = useAuth();
     const [formData, setFormData] = useState({
         nombre: '',
         apellidos: '',
@@ -14,7 +16,8 @@ const RegisterInvestigador = () => {
         nivelEducativo: '',
         areasInteres: [],
         experienciaInvestigacion: '',
-        ubicacion: ''
+        ubicacion: '',
+        role: 'investigador'
     });
 
     const [errorEdad, setErrorEdad] = useState('');
@@ -80,13 +83,16 @@ const RegisterInvestigador = () => {
         }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (errorEdad) {
             return;
         }
-        // Aquí irá la lógica de registro
-        console.log(formData);
+        try {
+            await register(formData);
+        } catch (error) {
+            console.error('Error en el registro:', error);
+        }
     };
 
     return (
@@ -103,6 +109,11 @@ const RegisterInvestigador = () => {
                         </Link>
                     </p>
                 </div>
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <span className="block sm:inline">{error}</span>
+                    </div>
+                )}
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
@@ -114,6 +125,7 @@ const RegisterInvestigador = () => {
                                 placeholder="Nombre"
                                 value={formData.nombre}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -125,6 +137,7 @@ const RegisterInvestigador = () => {
                                 placeholder="Apellidos"
                                 value={formData.apellidos}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -136,6 +149,7 @@ const RegisterInvestigador = () => {
                                 placeholder="Correo electrónico"
                                 value={formData.email}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -147,6 +161,7 @@ const RegisterInvestigador = () => {
                                 placeholder="Contraseña"
                                 value={formData.password}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -157,6 +172,7 @@ const RegisterInvestigador = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                                 value={formData.fechaNacimiento}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                             {errorEdad && (
                                 <p className="mt-1 text-sm text-red-600">{errorEdad}</p>
@@ -169,6 +185,7 @@ const RegisterInvestigador = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                                 value={formData.genero}
                                 onChange={handleChange}
+                                disabled={loading}
                             >
                                 <option value="">Selecciona tu género</option>
                                 <option value="masculino">Masculino</option>
@@ -185,6 +202,7 @@ const RegisterInvestigador = () => {
                                 placeholder="Teléfono (opcional)"
                                 value={formData.telefono}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -195,6 +213,7 @@ const RegisterInvestigador = () => {
                                 placeholder="Ocupación (opcional)"
                                 value={formData.ocupacion}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -203,6 +222,7 @@ const RegisterInvestigador = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                                 value={formData.nivelEducativo}
                                 onChange={handleChange}
+                                disabled={loading}
                             >
                                 <option value="">Nivel educativo (opcional)</option>
                                 {nivelesEducativos.map((nivel) => (
@@ -225,6 +245,7 @@ const RegisterInvestigador = () => {
                                                 checked={formData.areasInteres.includes(area)}
                                                 onChange={handleChange}
                                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                                disabled={loading}
                                             />
                                             <span className="text-sm text-gray-700">{area}</span>
                                         </label>
@@ -238,6 +259,7 @@ const RegisterInvestigador = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                                 value={formData.experienciaInvestigacion}
                                 onChange={handleChange}
+                                disabled={loading}
                             >
                                 <option value="">¿Tienes experiencia previa en investigación? (opcional)</option>
                                 <option value="Sí">Sí</option>
@@ -253,6 +275,7 @@ const RegisterInvestigador = () => {
                                 placeholder="Ubicación (país o ciudad, opcional)"
                                 value={formData.ubicacion}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                     </div>
@@ -260,9 +283,11 @@ const RegisterInvestigador = () => {
                     <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            disabled={loading}
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'
+                                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                         >
-                            Registrarse como Investigador
+                            {loading ? 'Registrando...' : 'Registrarse como Investigador'}
                         </button>
                     </div>
                 </form>

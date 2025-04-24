@@ -68,7 +68,7 @@ function App() {
         {/* Rutas protegidas para admin */}
         {/** 
         <Route element={<PrivateRoute roles={[ROLES.ADMIN]} />}>
-          <Route path="/admin" element={<div>Panel Admin</div>} />
+          <Route path="/dashboard" element={<div>Panel Admin</div>} />
           <Route path="/admin/usuarios" element={<div>Gestión de Usuarios</div>} />
           <Route path="/admin/programas" element={<div>Gestión de Programas</div>} />
         </Route>

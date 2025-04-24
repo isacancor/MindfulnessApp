@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const RegisterParticipante = () => {
+    const { register, loading, error } = useAuth();
     const [formData, setFormData] = useState({
         nombre: '',
         apellidos: '',
@@ -13,6 +15,7 @@ const RegisterParticipante = () => {
         nivelEducativo: '',
         experienciaMindfulness: '',
         condicionesSalud: '',
+        role: 'participante'
     });
 
     const [errorEdad, setErrorEdad] = useState('');
@@ -35,14 +38,6 @@ const RegisterParticipante = () => {
         '6 meses - 1 año',
         '1 - 2 años',
         'Más de 2 años'
-    ];
-
-    const disponibilidadOptions = [
-        'Mañanas',
-        'Tardes',
-        'Noches',
-        'Fines de semana',
-        'Flexible'
     ];
 
     const validarEdad = (fechaNacimiento) => {
@@ -75,13 +70,16 @@ const RegisterParticipante = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (errorEdad) {
             return;
         }
-        // Aquí irá la lógica de registro
-        console.log(formData);
+        try {
+            await register(formData);
+        } catch (error) {
+            console.error('Error en el registro:', error);
+        }
     };
 
     return (
@@ -98,6 +96,11 @@ const RegisterParticipante = () => {
                         </Link>
                     </p>
                 </div>
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <span className="block sm:inline">{error}</span>
+                    </div>
+                )}
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div>
@@ -109,6 +112,7 @@ const RegisterParticipante = () => {
                                 placeholder="Nombre"
                                 value={formData.nombre}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -120,6 +124,7 @@ const RegisterParticipante = () => {
                                 placeholder="Apellidos"
                                 value={formData.apellidos}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -131,6 +136,7 @@ const RegisterParticipante = () => {
                                 placeholder="Correo electrónico"
                                 value={formData.email}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -142,6 +148,7 @@ const RegisterParticipante = () => {
                                 placeholder="Contraseña"
                                 value={formData.password}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -152,6 +159,7 @@ const RegisterParticipante = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                                 value={formData.fechaNacimiento}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                             {errorEdad && (
                                 <p className="mt-1 text-sm text-red-600">{errorEdad}</p>
@@ -164,6 +172,7 @@ const RegisterParticipante = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                                 value={formData.genero}
                                 onChange={handleChange}
+                                disabled={loading}
                             >
                                 <option value="">Selecciona tu género</option>
                                 <option value="masculino">Masculino</option>
@@ -181,6 +190,7 @@ const RegisterParticipante = () => {
                                 placeholder="Ocupación"
                                 value={formData.ocupacion}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -190,6 +200,7 @@ const RegisterParticipante = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                                 value={formData.nivelEducativo}
                                 onChange={handleChange}
+                                disabled={loading}
                             >
                                 <option value="">Selecciona tu nivel educativo</option>
                                 {nivelesEducativos.map((nivel) => (
@@ -204,6 +215,7 @@ const RegisterParticipante = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                                 value={formData.experienciaMindfulness}
                                 onChange={handleChange}
+                                disabled={loading}
                             >
                                 <option value="">¿Tienes experiencia previa con mindfulness?</option>
                                 {experienciaMindfulnessOptions.map((opcion) => (
@@ -218,6 +230,7 @@ const RegisterParticipante = () => {
                                 placeholder="Condiciones de salud relevantes (opcional)"
                                 value={formData.condicionesSalud}
                                 onChange={handleChange}
+                                disabled={loading}
                             />
                         </div>
                     </div>
@@ -225,9 +238,11 @@ const RegisterParticipante = () => {
                     <div>
                         <button
                             type="submit"
-                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                            disabled={loading}
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${loading ? 'bg-green-400' : 'bg-green-600 hover:bg-green-700'
+                                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}
                         >
-                            Registrarse como Participante
+                            {loading ? 'Registrando...' : 'Registrarse como Participante'}
                         </button>
                     </div>
                 </form>
