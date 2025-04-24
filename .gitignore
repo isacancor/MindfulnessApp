@@ -1,6 +1,8 @@
 # Root-level ignores
 .env
 *.log
+*.bat
+docs/
 
 # Node / Frontend
 /frontend/node_modules/

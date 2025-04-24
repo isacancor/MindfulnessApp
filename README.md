@@ -51,7 +51,7 @@ Antes de comenzar, asegúrate de tener instalados los siguientes programas en tu
    ```bash
    python -m venv venv
    source venv/bin/activate   # En Linux/Mac
-   venv\Scripts\Activate      # En Windows
+   venv/Scripts/Activate      # En Windows
    ```
 
 3. **Instala las dependencias de Python:**:
