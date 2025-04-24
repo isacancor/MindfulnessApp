@@ -15,7 +15,7 @@ from datetime import date, timedelta
 def run():
     print("📦 Poblando base de datos...")
 
-    # Crear usuario investigador
+    # Crear usuario investigador 1
     user_inv, _ = Usuario.objects.get_or_create(
         email="investigador@demo.com",
         defaults={
@@ -28,6 +28,20 @@ def run():
     user_inv.set_password("1234")
     user_inv.save()
     inv, _ = Investigador.objects.get_or_create(usuario=user_inv)
+
+    # Crear usuario investigador 2
+    user_inv, _ = Usuario.objects.get_or_create(
+        email="bea@gmail.com",
+        defaults={
+            "username": "bea",
+            "role": "INVESTIGADOR",
+            "is_staff": True,
+            "is_superuser": True,
+        }
+    )
+    user_inv.set_password("12")
+    user_inv.save()
+    inv2, _ = Investigador.objects.get_or_create(usuario=user_inv)
 
     # Crear participantes
     for i in range(1, 3):
@@ -44,6 +58,19 @@ def run():
         Participante.objects.get_or_create(usuario=user)
 
     participantes = Participante.objects.all()
+
+
+    # Crear usuario participante 2
+    user_part, _ = Usuario.objects.get_or_create(
+        email="isabel@gmail.com",
+        defaults={
+            "username": "isabel",
+            "role": "PARTICIPANTE",
+        }
+    )
+    user_part.set_password("12")
+    user_part.save()
+    part2, _ = Investigador.objects.get_or_create(usuario=user_part)
 
     # Crear programas
     for i in range(1, 3):
