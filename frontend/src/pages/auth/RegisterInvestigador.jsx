@@ -18,7 +18,7 @@ const RegisterInvestigador = () => {
         areasInteres: [],
         experienciaInvestigacion: '',
         ubicacion: '',
-        role: 'investigador'
+        role: 'INVESTIGADOR'
     });
 
     const [errorEdad, setErrorEdad] = useState('');

@@ -48,6 +48,7 @@ export const mapUserData = (user) => {
         } : null,
         perfil_investigador: user.perfil_investigador ? {
             ...user.perfil_investigador,
+            nivelEducativo: nivelEducativoMap[user.perfil_investigador.nivelEducativo] || user.perfil_investigador.nivelEducativo,
             experienciaInvestigacion: experienciaInvestigacionMap[user.perfil_investigador.experienciaInvestigacion] || user.perfil_investigador.experienciaInvestigacion
         } : null
     };

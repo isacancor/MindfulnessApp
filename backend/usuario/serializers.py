@@ -95,9 +95,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             if field in validated_data:
                 perfil_data[field] = validated_data.pop(field)
 
+        email = validated_data.pop('email')
+
         # Crear usuario
         usuario = Usuario.objects.create_user(
-            email=validated_data['email'],
+            email=email,
             **validated_data
         )
 

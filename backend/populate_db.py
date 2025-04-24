@@ -70,7 +70,7 @@ def run():
     )
     user_part.set_password("12")
     user_part.save()
-    part2, _ = Investigador.objects.get_or_create(usuario=user_part)
+    part2, _ = Participante.objects.get_or_create(usuario=user_part)
 
     # Crear programas
     for i in range(1, 3):

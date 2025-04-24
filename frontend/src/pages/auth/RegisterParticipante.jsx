@@ -16,7 +16,7 @@ const RegisterParticipante = () => {
         nivelEducativo: '',
         experienciaMindfulness: '',
         condicionesSalud: '',
-        role: 'participante'
+        role: 'PARTICIPANTE'
     });
 
     const [errorEdad, setErrorEdad] = useState('');
