@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000/api',
+    baseURL: 'http://localhost:8000/api',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -13,6 +13,11 @@ api.interceptors.request.use(
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+        }
+
+        // Agregar '/' al final si falta (y si no hay parámetros como query strings)
+        if (config.url && !config.url.includes('?') && !config.url.endsWith('/')) {
+            config.url += '/';
         }
         return config;
     },
@@ -33,4 +38,4 @@ api.interceptors.response.use(
     }
 );
 
-export default api; 
+export default api;

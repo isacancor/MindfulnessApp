@@ -8,6 +8,7 @@ const RegisterParticipante = () => {
         nombre: '',
         apellidos: '',
         email: '',
+        username: '',
         password: '',
         fechaNacimiento: '',
         genero: '',
@@ -123,6 +124,18 @@ const RegisterParticipante = () => {
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
                                 placeholder="Apellidos"
                                 value={formData.apellidos}
+                                onChange={handleChange}
+                                disabled={loading}
+                            />
+                        </div>
+                        <div>
+                            <input
+                                name="username"
+                                type="text"
+                                required
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                                placeholder="Nombre de usuario"
+                                value={formData.username}
                                 onChange={handleChange}
                                 disabled={loading}
                             />

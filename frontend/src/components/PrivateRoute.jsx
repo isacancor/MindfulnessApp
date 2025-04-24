@@ -1,6 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { ROLES } from '@/context/AuthContext';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 const PrivateRoute = ({ roles = [] }) => {

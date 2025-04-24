@@ -63,7 +63,11 @@ export const AuthProvider = ({ children }) => {
             setUser(user);
 
             // Redirigir
-            navigate('/dashboard');
+            if (user.role === ROLES.INVESTIGADOR) {
+                navigate('/dashboard');
+            } else {
+                navigate('/home');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Error al iniciar sesión');
             throw err;
@@ -84,7 +88,11 @@ export const AuthProvider = ({ children }) => {
             setUser(user);
 
             // Redirigir
-            navigate('/dashboard');
+            if (user.role === ROLES.INVESTIGADOR) {
+                navigate('/dashboard');
+            } else {
+                navigate('/home');
+            }
         } catch (err) {
             setError(err.response?.data?.message || 'Error al registrarse');
             throw err;
@@ -96,6 +104,7 @@ export const AuthProvider = ({ children }) => {
     // Función de logout
     const logout = () => {
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
         setUser(null);
         navigate('/');
     };

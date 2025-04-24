@@ -19,6 +19,8 @@ docs/
 /backend/env/
 /backend/venv/
 /backend/.migrations/
+/backend/.venv/
+**/__pycache__/
 
 # VS Code
 .vscode/

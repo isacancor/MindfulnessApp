@@ -5,7 +5,7 @@ import {
     Play,
     ClipboardList,
     Calendar,
-    Bell,
+    LogOut,
     BookOpen,
     User,
     ChevronRight,
@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const ParticipanteDashboard = () => {
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const [proximaSesion] = useState({
         titulo: "Meditación Mindfulness",
         fecha: "Hoy",
@@ -138,20 +138,18 @@ const ParticipanteDashboard = () => {
                     <ChevronRight className="h-5 w-5 text-gray-400" />
                 </Link>
 
-                <div className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-200">
+                <button
+                    onClick={logout}
+                    className="flex items-center justify-between w-full text-left p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-red-300 transition-colors"
+                >
                     <div className="flex items-center">
-                        <Bell className="h-6 w-6 text-blue-600 mr-3" />
+                        <LogOut className="h-6 w-6 text-red-600 mr-3" />
                         <div>
-                            <h3 className="font-medium text-gray-900">Recordatorios</h3>
-                            <p className="text-sm text-gray-500">Activados para tus sesiones</p>
+                            <h3 className="font-medium text-gray-900">Cerrar Sesión</h3>
                         </div>
                     </div>
-                    <button
-                        className="px-3 py-1 text-sm text-blue-600 border border-blue-200 rounded-md hover:bg-blue-50"
-                    >
-                        Configurar
-                    </button>
-                </div>
+                </button>
+
             </div>
         </div>
     );

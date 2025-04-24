@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
     LogOut,
     PlusCircle,
@@ -18,6 +19,7 @@ import {
 
 const InvestigadorDashboard = () => {
     const navigate = useNavigate();
+    const { logout } = useAuth();
     const [activeSection, setActiveSection] = useState('dashboard');
 
     // Datos de ejemplo - En una implementación real vendrían de una API
@@ -43,11 +45,6 @@ const InvestigadorDashboard = () => {
         participantesActivos: 42,
         sesionesCompletadas: 128,
         cuestionariosRespondidos: 256
-    };
-
-    const handleLogout = () => {
-        // Implementar lógica de logout
-        navigate('/login');
     };
 
     const getNavButtonClass = (section) => {
@@ -118,7 +115,7 @@ const InvestigadorDashboard = () => {
 
                 <div className="p-4 border-t">
                     <button
-                        onClick={handleLogout}
+                        onClick={() => logout()}
                         className="flex items-center space-x-3 w-full px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
                     >
                         <LogOut size={20} />

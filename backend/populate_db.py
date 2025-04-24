@@ -20,7 +20,7 @@ def run():
         email="investigador@demo.com",
         defaults={
             "username": "investigador",
-            "rol": "INVESTIGADOR",
+            "role": "INVESTIGADOR",
             "is_staff": True,
             "is_superuser": True,
         }
@@ -36,7 +36,7 @@ def run():
             email=email,
             defaults={
                 "username": f"participante{i}",
-                "rol": "PARTICIPANTE"
+                "role": "PARTICIPANTE"
             }
         )
         user.set_password("1234")

@@ -1,7 +1,7 @@
 export const ROLES = {
-    INVESTIGADOR: 'investigador',
-    PARTICIPANTE: 'participante',
-    ADMIN: 'admin',
+    INVESTIGADOR: 'INVESTIGADOR',
+    PARTICIPANTE: 'PARTICIPANTE',
+    ADMIN: 'ADMIN',
 };
 
 export const PERMISSIONS = {

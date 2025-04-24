@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { ROLES } from '@/context/AuthContext';
+import { ROLES } from '@/config/auth';
 import './main.css';
 import { AuthProvider } from '@/context/AuthContext';
 import Landing from './pages/Landing';
@@ -56,7 +56,7 @@ function App() {
 
         {/* Rutas protegidas para participantes */}
         <Route element={<PrivateRoute roles={[ROLES.PARTICIPANTE]} />}>
-          <Route path="/dashboard" element={<ParticipanteDashboard />} />
+          <Route path="/home" element={<ParticipanteDashboard />} />
           <Route path="/programas" element={<div>Mis Programas</div>} />
           <Route path="/programas/activos" element={<div>Programas Activos</div>} />
           <Route path="/programas/:id" element={<div>Detalle Programa</div>} />
