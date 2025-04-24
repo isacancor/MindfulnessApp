@@ -7,24 +7,79 @@ const RegisterParticipante = () => {
         apellidos: '',
         email: '',
         password: '',
-        confirmPassword: '',
         fechaNacimiento: '',
         genero: '',
-        telefono: '',
         ocupacion: '',
         nivelEducativo: '',
-        intereses: '',
+        experienciaMindfulness: '',
+        condicionesSalud: '',
     });
 
+    const [errorEdad, setErrorEdad] = useState('');
+
+    const nivelesEducativos = [
+        'Sin Estudios',
+        'Primaria',
+        'Secundaria',
+        'Bachillerato',
+        'Formación Profesional',
+        'Universidad',
+        'Master',
+        'Doctorado',
+        'Otros'
+    ];
+
+    const experienciaMindfulnessOptions = [
+        'Ninguna',
+        'Menos de 6 meses',
+        '6 meses - 1 año',
+        '1 - 2 años',
+        'Más de 2 años'
+    ];
+
+    const disponibilidadOptions = [
+        'Mañanas',
+        'Tardes',
+        'Noches',
+        'Fines de semana',
+        'Flexible'
+    ];
+
+    const validarEdad = (fechaNacimiento) => {
+        const hoy = new Date();
+        const fechaNac = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - fechaNac.getFullYear();
+        const mes = hoy.getMonth() - fechaNac.getMonth();
+
+        if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+            edad--;
+        }
+
+        return edad >= 18;
+    };
+
     const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        if (name === 'fechaNacimiento') {
+            if (!validarEdad(value)) {
+                setErrorEdad('Debes ser mayor de 18 años para registrarte');
+            } else {
+                setErrorEdad('');
+            }
+        }
+
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [name]: value,
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (errorEdad) {
+            return;
+        }
         // Aquí irá la lógica de registro
         console.log(formData);
     };
@@ -91,17 +146,6 @@ const RegisterParticipante = () => {
                         </div>
                         <div>
                             <input
-                                name="confirmPassword"
-                                type="password"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                                placeholder="Confirmar contraseña"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <input
                                 name="fechaNacimiento"
                                 type="date"
                                 required
@@ -109,6 +153,9 @@ const RegisterParticipante = () => {
                                 value={formData.fechaNacimiento}
                                 onChange={handleChange}
                             />
+                            {errorEdad && (
+                                <p className="mt-1 text-sm text-red-600">{errorEdad}</p>
+                            )}
                         </div>
                         <div>
                             <select
@@ -124,17 +171,6 @@ const RegisterParticipante = () => {
                                 <option value="otro">Otro</option>
                                 <option value="prefiero_no_decir">Prefiero no decir</option>
                             </select>
-                        </div>
-                        <div>
-                            <input
-                                name="telefono"
-                                type="tel"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                                placeholder="Teléfono"
-                                value={formData.telefono}
-                                onChange={handleChange}
-                            />
                         </div>
                         <div>
                             <input
@@ -156,20 +192,31 @@ const RegisterParticipante = () => {
                                 onChange={handleChange}
                             >
                                 <option value="">Selecciona tu nivel educativo</option>
-                                <option value="primaria">Primaria</option>
-                                <option value="secundaria">Secundaria</option>
-                                <option value="bachillerato">Bachillerato</option>
-                                <option value="universidad">Universidad</option>
-                                <option value="posgrado">Posgrado</option>
+                                {nivelesEducativos.map((nivel) => (
+                                    <option key={nivel} value={nivel.toLowerCase()}>{nivel}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <select
+                                name="experienciaMindfulness"
+                                required
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                                value={formData.experienciaMindfulness}
+                                onChange={handleChange}
+                            >
+                                <option value="">¿Tienes experiencia previa con mindfulness?</option>
+                                {experienciaMindfulnessOptions.map((opcion) => (
+                                    <option key={opcion} value={opcion.toLowerCase()}>{opcion}</option>
+                                ))}
                             </select>
                         </div>
                         <div>
                             <textarea
-                                name="intereses"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
-                                placeholder="Intereses (separados por comas)"
-                                value={formData.intereses}
+                                name="condicionesSalud"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm"
+                                placeholder="Condiciones de salud relevantes (opcional)"
+                                value={formData.condicionesSalud}
                                 onChange={handleChange}
                             />
                         </div>

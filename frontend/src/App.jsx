@@ -7,7 +7,7 @@ import InvestigadorDashboard from './pages/InvestigadorDashboard';
 import ParticipanteDashboard from './pages/ParticipanteDashboard';
 import PrivateRoute from './components/PrivateRoute';
 import Login from '@/pages/auth/Login';
-import Register from '@/pages/Register';
+import Register from '@/pages/auth/Register';
 import RegisterInvestigador from '@/pages/auth/RegisterInvestigador';
 import RegisterParticipante from '@/pages/auth/RegisterParticipante';
 import Unauthorized from './pages/Unauthorized';

@@ -7,23 +7,84 @@ const RegisterInvestigador = () => {
         apellidos: '',
         email: '',
         password: '',
-        confirmPassword: '',
-        institucion: '',
-        departamento: '',
-        cargo: '',
-        especialidad: '',
+        fechaNacimiento: '',
+        genero: '',
         telefono: '',
+        ocupacion: '',
+        nivelEducativo: '',
+        areasInteres: [],
+        experienciaInvestigacion: '',
+        ubicacion: ''
     });
 
+    const [errorEdad, setErrorEdad] = useState('');
+
+    const areasInteresOptions = [
+        'Mindfulness',
+        'Neurociencia',
+        'Psicología',
+        'Educación',
+        'Tecnología',
+        'Meditación',
+        'Bienestar'
+    ];
+
+    const nivelesEducativos = [
+        'Sin Estudios',
+        'Primaria',
+        'Secundaria',
+        'Bachillerato',
+        'Formación Profesional',
+        'Universidad',
+        'Master',
+        'Doctorado',
+        'Otros'
+    ];
+
+    const validarEdad = (fechaNacimiento) => {
+        const hoy = new Date();
+        const fechaNac = new Date(fechaNacimiento);
+        let edad = hoy.getFullYear() - fechaNac.getFullYear();
+        const mes = hoy.getMonth() - fechaNac.getMonth();
+
+        if (mes < 0 || (mes === 0 && hoy.getDate() < fechaNac.getDate())) {
+            edad--;
+        }
+
+        return edad >= 18;
+    };
+
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+        const { name, value, type, checked } = e.target;
+
+        if (name === 'fechaNacimiento') {
+            if (!validarEdad(value)) {
+                setErrorEdad('Debes ser mayor de 18 años para registrarte');
+            } else {
+                setErrorEdad('');
+            }
+        }
+
+        if (type === 'checkbox') {
+            setFormData(prev => ({
+                ...prev,
+                areasInteres: checked
+                    ? [...prev.areasInteres, value]
+                    : prev.areasInteres.filter(area => area !== value)
+            }));
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value,
+            });
+        }
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (errorEdad) {
+            return;
+        }
         // Aquí irá la lógica de registro
         console.log(formData);
     };
@@ -90,67 +151,107 @@ const RegisterInvestigador = () => {
                         </div>
                         <div>
                             <input
-                                name="confirmPassword"
-                                type="password"
+                                name="fechaNacimiento"
+                                type="date"
                                 required
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Confirmar contraseña"
-                                value={formData.confirmPassword}
+                                value={formData.fechaNacimiento}
                                 onChange={handleChange}
                             />
+                            {errorEdad && (
+                                <p className="mt-1 text-sm text-red-600">{errorEdad}</p>
+                            )}
                         </div>
                         <div>
-                            <input
-                                name="institucion"
-                                type="text"
+                            <select
+                                name="genero"
                                 required
                                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Institución"
-                                value={formData.institucion}
+                                value={formData.genero}
                                 onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <input
-                                name="departamento"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Departamento"
-                                value={formData.departamento}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <input
-                                name="cargo"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Cargo"
-                                value={formData.cargo}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div>
-                            <input
-                                name="especialidad"
-                                type="text"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Especialidad"
-                                value={formData.especialidad}
-                                onChange={handleChange}
-                            />
+                            >
+                                <option value="">Selecciona tu género</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="femenino">Femenino</option>
+                                <option value="otro">Otro</option>
+                                <option value="prefiero_no_decir">Prefiero no decir</option>
+                            </select>
                         </div>
                         <div>
                             <input
                                 name="telefono"
                                 type="tel"
-                                required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Teléfono"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                placeholder="Teléfono (opcional)"
                                 value={formData.telefono}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <input
+                                name="ocupacion"
+                                type="text"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                placeholder="Ocupación (opcional)"
+                                value={formData.ocupacion}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <select
+                                name="nivelEducativo"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                value={formData.nivelEducativo}
+                                onChange={handleChange}
+                            >
+                                <option value="">Nivel educativo (opcional)</option>
+                                {nivelesEducativos.map((nivel) => (
+                                    <option key={nivel} value={nivel.toLowerCase()}>{nivel}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <div className="p-3 border border-gray-300 rounded-md">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Áreas de interés (opcional)
+                                </label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {areasInteresOptions.map((area) => (
+                                        <label key={area} className="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                name="areasInteres"
+                                                value={area}
+                                                checked={formData.areasInteres.includes(area)}
+                                                onChange={handleChange}
+                                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                            />
+                                            <span className="text-sm text-gray-700">{area}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <select
+                                name="experienciaInvestigacion"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                value={formData.experienciaInvestigacion}
+                                onChange={handleChange}
+                            >
+                                <option value="">¿Tienes experiencia previa en investigación? (opcional)</option>
+                                <option value="Sí">Sí</option>
+                                <option value="No">No</option>
+                                <option value="En parte">En parte</option>
+                            </select>
+                        </div>
+                        <div>
+                            <input
+                                name="ubicacion"
+                                type="text"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                placeholder="Ubicación (país o ciudad, opcional)"
+                                value={formData.ubicacion}
                                 onChange={handleChange}
                             />
                         </div>
