@@ -12,6 +12,7 @@ import RegisterInvestigador from '@/pages/auth/RegisterInvestigador';
 import RegisterParticipante from '@/pages/auth/RegisterParticipante';
 import Unauthorized from './pages/Unauthorized';
 import Perfil from './pages/Perfil';
+
 function App() {
   return (
     <AuthProvider>

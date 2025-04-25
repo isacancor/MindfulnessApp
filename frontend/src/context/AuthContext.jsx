@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../config/axios';
 import { ROLES, PERMISSIONS, ROLE_PERMISSIONS } from '../config/auth';
 import { mapUserData } from '../utils/userMapper';
@@ -14,7 +14,9 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const location = useLocation();
     const navigate = useNavigate();
+    const resetError = () => setError(null);
 
     // Verificar si el usuario tiene un permiso específico
     const hasPermission = (permission) => {
@@ -27,6 +29,10 @@ export const AuthProvider = ({ children }) => {
         if (!user) return false;
         return user.role === role;
     };
+
+    useEffect(() => {
+        setError(null); // Limpia el error cada vez que cambia la ruta
+    }, [location.pathname]);
 
     // Cargar el estado de autenticación al iniciar
     useEffect(() => {
@@ -58,10 +64,12 @@ export const AuthProvider = ({ children }) => {
             setLoading(true);
             setError(null);
             const response = await api.post('/auth/login', credentials);
-            const { token, user } = response.data;
 
+            // TODO: Add token
+            const { token, user } = response.data;
             localStorage.setItem('token', token);
             setUser(mapUserData(user));
+            setError(null);
 
             // Redirigir
             if (user.role === ROLES.INVESTIGADOR) {
@@ -70,8 +78,8 @@ export const AuthProvider = ({ children }) => {
                 navigate('/home');
             }
         } catch (err) {
+            console.error("Error en el login: ", err);
             setError(err.response?.data?.message || 'Error al iniciar sesión');
-            throw err;
         } finally {
             setLoading(false);
         }
@@ -87,6 +95,7 @@ export const AuthProvider = ({ children }) => {
 
             localStorage.setItem('token', token);
             setUser(mapUserData(user));
+            setError(null);
 
             // Redirigir
             if (user.role === ROLES.INVESTIGADOR) {
@@ -95,8 +104,8 @@ export const AuthProvider = ({ children }) => {
                 navigate('/home');
             }
         } catch (err) {
+            console.error('Error en el registro:', error);
             setError(err.response?.data?.message || 'Error al registrarse');
-            throw err;
         } finally {
             setLoading(false);
         }
@@ -153,7 +162,8 @@ export const AuthProvider = ({ children }) => {
         updateProfile,
         changePassword,
         hasPermission,
-        hasRole
+        hasRole,
+        resetError
     };
 
     return (

@@ -89,11 +89,7 @@ const RegisterInvestigador = () => {
         if (errorEdad) {
             return;
         }
-        try {
-            await register(formData);
-        } catch (error) {
-            console.error('Error en el registro:', error);
-        }
+        await register(formData);
     };
 
     return (

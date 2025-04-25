@@ -122,7 +122,7 @@ const InvestigadorDashboard = () => {
                 {activeSection === 'dashboard' && (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h1 className="text-2xl font-bold text-gray-800">Welcome, {user.nombre}</h1>
+                            <h1 className="text-2xl font-bold text-gray-800">Bienvenido, {user.nombre}</h1>
                             <button
                                 onClick={() => setActiveSection('programas')}
                                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

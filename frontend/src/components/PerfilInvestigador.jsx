@@ -24,7 +24,7 @@ const PerfilInvestigador = () => {
 
     return (
         <div className="bg-white rounded-2xl overflow-hidden max-w-4xl mx-auto my-8 shadow-xl">
-            {/* Header del perfil con botón de retroceso */}
+            {/* Header del perfil*/}
             <div className="bg-gradient-to-br from-blue-600 to-indigo-500 px-6 py-8 relative">
                 <button
                     onClick={() => navigate(-1)}
