@@ -69,7 +69,7 @@ const InvestigadorDashboard = () => {
                             className={getNavButtonClass('dashboard')}
                         >
                             <BarChart2 size={20} />
-                            <span>Panel</span>
+                            <span>Inicio</span>
                         </button>
 
                         <button
@@ -78,14 +78,6 @@ const InvestigadorDashboard = () => {
                         >
                             <FileText size={20} />
                             <span>Mis Programas</span>
-                        </button>
-
-                        <button
-                            onClick={() => setActiveSection('participantes')}
-                            className={getNavButtonClass('participantes')}
-                        >
-                            <Users size={20} />
-                            <span>Participantes</span>
                         </button>
 
                         <button
@@ -130,7 +122,7 @@ const InvestigadorDashboard = () => {
                 {activeSection === 'dashboard' && (
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h1 className="text-2xl font-bold text-gray-800">Panel de Investigador</h1>
+                            <h1 className="text-2xl font-bold text-gray-800">Welcome, {user.nombre}</h1>
                             <button
                                 onClick={() => setActiveSection('programas')}
                                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -147,7 +139,7 @@ const InvestigadorDashboard = () => {
                                 <p className="text-3xl font-bold text-gray-800 mt-2">{estadisticas.totalProgramas}</p>
                             </div>
                             <div className="bg-white p-6 rounded-xl shadow-sm">
-                                <h3 className="text-gray-500 text-sm font-medium">Participantes Activos</h3>
+                                <h3 className="text-gray-500 text-sm font-medium">Participantes</h3>
                                 <p className="text-3xl font-bold text-gray-800 mt-2">{estadisticas.participantesActivos}</p>
                             </div>
                             <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -160,10 +152,10 @@ const InvestigadorDashboard = () => {
                             </div>
                         </div>
 
-                        {/* Programas Activos */}
+                        {/* Programas */}
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-xl font-semibold text-gray-800">Programas Activos</h2>
+                                <h2 className="text-xl font-semibold text-gray-800">Mis Programas</h2>
                                 <button
                                     onClick={() => setActiveSection('programas')}
                                     className="text-blue-600 hover:text-blue-700 text-sm font-medium"
@@ -187,9 +179,6 @@ const InvestigadorDashboard = () => {
                                             <button className="p-2 text-gray-400 hover:text-blue-600">
                                                 <Eye size={18} />
                                             </button>
-                                            <button className="p-2 text-gray-400 hover:text-green-600">
-                                                <Edit size={18} />
-                                            </button>
                                             <button className="p-2 text-gray-400 hover:text-red-600">
                                                 <Trash2 size={18} />
                                             </button>
@@ -211,13 +200,6 @@ const InvestigadorDashboard = () => {
                             </button>
                         </div>
                         {/* Aquí irá la lista completa de programas */}
-                    </div>
-                )}
-
-                {activeSection === 'participantes' && (
-                    <div className="space-y-6">
-                        <h1 className="text-2xl font-bold text-gray-800">Gestión de Participantes</h1>
-                        {/* Aquí irá la gestión de participantes */}
                     </div>
                 )}
 

@@ -2,6 +2,7 @@
 .env
 *.log
 *.bat
+*.ps1
 docs/
 
 # Node / Frontend

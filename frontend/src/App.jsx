@@ -49,19 +49,15 @@ function App() {
           <Route path="/programas/:id/cuestionarios/crear" element={<div>Crear Cuestionario</div>} />
           <Route path="/programas/:id/cuestionarios/:cuestionarioId" element={<div>Detalle de Cuestionario</div>} />
 
-          {/* Gestión de participantes */}
-          <Route path="/programas/:id/participantes" element={<div>Gestión de Participantes</div>} />
-
         </Route>
 
         {/* Rutas protegidas para participantes */}
         <Route element={<PrivateRoute roles={[ROLES.PARTICIPANTE]} />}>
           <Route path="/home" element={<ParticipanteDashboard />} />
-          <Route path="/programas" element={<div>Mis Programas</div>} />
-          <Route path="/programas/activos" element={<div>Programas Activos</div>} />
-          <Route path="/programas/:id" element={<div>Detalle Programa</div>} />
-          <Route path="/programas/:id/:sesionId" element={<div>Realizar Sesión</div>} />
-          <Route path="/programas/:id/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
+          <Route path="/misprogramas" element={<div>Mis Programas</div>} />
+          <Route path="/misprogramas/:id" element={<div>Detalle Programa</div>} />
+          <Route path="/misprogramas/:id/:sesionId" element={<div>Realizar Sesión</div>} />
+          <Route path="/misprogramas/:id/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
         </Route>
 
         {/* Rutas protegidas para admin */}

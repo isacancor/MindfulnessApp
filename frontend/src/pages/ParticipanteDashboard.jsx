@@ -104,7 +104,7 @@ const ParticipanteDashboard = () => {
                         <BookOpen className="h-6 w-6 text-blue-600 mr-3" />
                         <div>
                             <h3 className="font-medium text-gray-900">Mis Programas</h3>
-                            <p className="text-sm text-gray-500">Ver todos mis programas activos</p>
+                            <p className="text-sm text-gray-500">Ver todos mis programas</p>
                         </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-gray-400" />
@@ -118,7 +118,7 @@ const ParticipanteDashboard = () => {
                         <User className="h-6 w-6 text-blue-600 mr-3" />
                         <div>
                             <h3 className="font-medium text-gray-900">Mi Perfil</h3>
-                            <p className="text-sm text-gray-500">Ver y editar mi información</p>
+                            <p className="text-sm text-gray-500">Ver mi información</p>
                         </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-gray-400" />

@@ -48,16 +48,16 @@ export default function Landing() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
-                            to="/dashboard"
+                            to="/login"
                             className="flex items-center justify-center gap-2 bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-all hover:shadow-lg"
                         >
-                            Acceder al Dashboard <ArrowRight size={18} />
+                            Acceder ya <ArrowRight size={18} />
                         </Link>
                         <Link
-                            to="/login"
+                            to="/about"
                             className="flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white/10 transition-all"
                         >
-                            Accede ya
+                            Conoce más
                         </Link>
                     </div>
                 </div>
