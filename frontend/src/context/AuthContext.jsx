@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../config/axios';
 import { ROLES, PERMISSIONS, ROLE_PERMISSIONS } from '../config/auth';
-import { mapUserData } from '../utils/userMapper';
 
 const AuthContext = createContext();
 
@@ -46,7 +45,7 @@ export const AuthProvider = ({ children }) => {
                 }
 
                 const response = await api.get('/auth/me');
-                setUser(mapUserData(response.data));
+                setUser(response.data);
             } catch (err) {
                 localStorage.removeItem('token');
                 setError(err.response?.data?.message || 'Error al cargar el usuario');
@@ -68,7 +67,7 @@ export const AuthProvider = ({ children }) => {
             // TODO: Add token
             const { token, user } = response.data;
             localStorage.setItem('token', token);
-            setUser(mapUserData(user));
+            setUser(user);
             setError(null);
 
             // Redirigir
@@ -79,7 +78,7 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (err) {
             console.error("Error en el login: ", err);
-            setError(err.response?.data?.message || 'Error al iniciar sesión');
+            setError(err.response?.data?.error || 'Error al iniciar sesión');
         } finally {
             setLoading(false);
         }
@@ -90,11 +89,15 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             setError(null);
+            console.log("userData", userData)
+
             const response = await api.post('/auth/register', userData);
+            console.log("response", response)
+
             const { token, user } = response.data;
 
             localStorage.setItem('token', token);
-            setUser(mapUserData(user));
+            setUser(user);
             setError(null);
 
             // Redirigir
@@ -104,7 +107,7 @@ export const AuthProvider = ({ children }) => {
                 navigate('/home');
             }
         } catch (err) {
-            console.error('Error en el registro:', error);
+            console.error('Error en el registro:', err);
             setError(err.response?.data?.message || 'Error al registrarse');
         } finally {
             setLoading(false);
@@ -115,6 +118,7 @@ export const AuthProvider = ({ children }) => {
     const logout = () => {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+        console.log("Logout. Token eliminado")
         setUser(null);
         navigate('/');
     };
@@ -127,7 +131,7 @@ export const AuthProvider = ({ children }) => {
             const response = await api.put('/auth/profile', profileData, {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
-            setUser(mapUserData(response.data));
+            setUser(response.data);
         } catch (err) {
             setError(err.response?.data?.message || 'Error al actualizar perfil');
             throw err;

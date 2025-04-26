@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 const PerfilInvestigador = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    console.log(user);
 
     // Función para formatear la fecha de registro
     const formatDate = (dateString) => {
@@ -20,6 +19,60 @@ const PerfilInvestigador = () => {
             return `${user.nombre} ${user.apellidos}`;
         }
         return user.username || 'Usuario';
+    };
+
+    // Función para formatear el género
+    const formatGenero = (genero) => {
+        const generos = {
+            'masculino': 'Masculino',
+            'femenino': 'Femenino',
+            'otro': 'Otro',
+            'prefiero_no_decir': 'Prefiero no decir'
+        };
+        return generos[genero] || 'No especificado';
+    };
+
+    // Función para formatear el nivel educativo
+    const formatNivelEducativo = (nivel) => {
+        const niveles = {
+            'sin_estudios': 'Sin Estudios',
+            'primaria': 'Primaria',
+            'secundaria': 'Secundaria',
+            'bachillerato': 'Bachillerato',
+            'formacion_profesional': 'Formación Profesional',
+            'universidad': 'Universidad',
+            'master': 'Master',
+            'doctorado': 'Doctorado',
+            'otros': 'Otros'
+        };
+        return niveles[nivel] || 'No especificado';
+    };
+
+    // Función para formatear la experiencia en investigación
+    const formatExperienciaInvestigacion = (experiencia) => {
+        const experiencias = {
+            'Sí': 'Sí',
+            'No': 'No',
+            'En parte': 'En parte'
+        };
+        return experiencias[experiencia] || 'No especificada';
+    };
+
+    // Función para formatear las áreas de interés
+    const formatAreasInteres = (areas) => {
+        if (!areas || areas.length === 0) return 'No especificadas';
+        return areas.map(area => {
+            const areasFormateadas = {
+                'Mindfulness': 'Mindfulness',
+                'Neurociencia': 'Neurociencia',
+                'Psicología': 'Psicología',
+                'Educación': 'Educación',
+                'Tecnología': 'Tecnología',
+                'Meditación': 'Meditación',
+                'Bienestar': 'Bienestar'
+            };
+            return areasFormateadas[area] || area;
+        }).join(', ');
     };
 
     return (
@@ -64,11 +117,11 @@ const PerfilInvestigador = () => {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Teléfono</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_investigador?.telefono || 'No disponible'}</p>
+                                <p className="text-gray-800 font-medium">{user.telefono || 'No disponible'}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Ubicación</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_investigador?.ubicacion || 'No disponible'}</p>
+                                <p className="text-gray-800 font-medium">{user.ubicacion || 'No disponible'}</p>
                             </div>
                         </div>
                     </div>
@@ -81,15 +134,15 @@ const PerfilInvestigador = () => {
                         <div className="space-y-4">
                             <div>
                                 <p className="text-sm text-gray-500">Nivel Educativo</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_investigador?.nivelEducativo || 'No especificado'}</p>
+                                <p className="text-gray-800 font-medium">{formatNivelEducativo(user.nivelEducativo)}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Experiencia en Investigación</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_investigador?.experienciaInvestigacion || 'No especificada'}</p>
+                                <p className="text-gray-800 font-medium">{formatExperienciaInvestigacion(user.perfil_investigador?.experienciaInvestigacion)}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Ocupación</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_investigador?.ocupacion || 'No especificada'}</p>
+                                <p className="text-gray-800 font-medium">{user.ocupacion || 'No especificada'}</p>
                             </div>
                         </div>
                     </div>
@@ -104,7 +157,7 @@ const PerfilInvestigador = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <p className="text-sm text-gray-500">Género</p>
-                            <p className="text-gray-800 font-medium">{user.genero || 'No especificado'}</p>
+                            <p className="text-gray-800 font-medium">{formatGenero(user.genero)}</p>
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Fecha de Nacimiento</p>

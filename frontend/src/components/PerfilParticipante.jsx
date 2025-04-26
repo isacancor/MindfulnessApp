@@ -21,6 +21,45 @@ const PerfilParticipante = () => {
         return user.username || 'Usuario';
     };
 
+    // Función para formatear el género
+    const formatGenero = (genero) => {
+        const generos = {
+            'masculino': 'Masculino',
+            'femenino': 'Femenino',
+            'otro': 'Otro',
+            'prefiero_no_decir': 'Prefiero no decir'
+        };
+        return generos[genero] || 'No especificado';
+    };
+
+    // Función para formatear el nivel educativo
+    const formatNivelEducativo = (nivel) => {
+        const niveles = {
+            'sin_estudios': 'Sin Estudios',
+            'primaria': 'Primaria',
+            'secundaria': 'Secundaria',
+            'bachillerato': 'Bachillerato',
+            'formacion_profesional': 'Formación Profesional',
+            'universidad': 'Universidad',
+            'master': 'Master',
+            'doctorado': 'Doctorado',
+            'otros': 'Otros'
+        };
+        return niveles[nivel] || 'No especificado';
+    };
+
+    // Función para formatear la experiencia en mindfulness
+    const formatExperienciaMindfulness = (experiencia) => {
+        const experiencias = {
+            'ninguna': 'Ninguna',
+            'menos_de_6_meses': 'Menos de 6 meses',
+            '6_meses_1_ano': '6 meses - 1 año',
+            '1_2_anos': '1 - 2 años',
+            'mas_de_2_anos': 'Más de 2 años'
+        };
+        return experiencias[experiencia] || 'No especificada';
+    };
+
     return (
         <div className="bg-white rounded-2xl overflow-hidden max-w-4xl mx-auto my-8 shadow-xl">
             {/* Header del perfil con botón de retroceso */}
@@ -63,11 +102,11 @@ const PerfilParticipante = () => {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Teléfono</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_participante?.telefono || 'No disponible'}</p>
+                                <p className="text-gray-800 font-medium">{user.telefono || 'No disponible'}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Ubicación</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_participante?.ubicacion || 'No disponible'}</p>
+                                <p className="text-gray-800 font-medium">{user.ubicacion || 'No disponible'}</p>
                             </div>
                         </div>
                     </div>
@@ -80,15 +119,15 @@ const PerfilParticipante = () => {
                         <div className="space-y-4">
                             <div>
                                 <p className="text-sm text-gray-500">Nivel Educativo</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_participante?.nivelEducativo || 'No especificado'}</p>
+                                <p className="text-gray-800 font-medium">{formatNivelEducativo(user.nivelEducativo)}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Experiencia en Mindfulness</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_participante?.experienciaMindfulness || 'No especificada'}</p>
+                                <p className="text-gray-800 font-medium">{formatExperienciaMindfulness(user.perfil_participante?.experienciaMindfulness)}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Ocupación</p>
-                                <p className="text-gray-800 font-medium">{user.perfil_participante?.ocupacion || 'No especificada'}</p>
+                                <p className="text-gray-800 font-medium">{user.ocupacion || 'No especificada'}</p>
                             </div>
                         </div>
                     </div>
@@ -103,7 +142,7 @@ const PerfilParticipante = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <p className="text-sm text-gray-500">Género</p>
-                            <p className="text-gray-800 font-medium">{user.genero || 'No especificado'}</p>
+                            <p className="text-gray-800 font-medium">{formatGenero(user.genero)}</p>
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Fecha de Nacimiento</p>

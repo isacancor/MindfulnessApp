@@ -29,24 +29,41 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        fields = ('id', 'email', 'username', 'nombre', 'apellidos', 'role', 
-                 'fechaNacimiento', 'genero', 'perfil_investigador', 
-                 'perfil_participante', 'date_joined')
+        fields = ('id', 'nombre', 'apellidos', 'username', 'password', 'email', 
+                 'telefono', 'genero', 'fechaNacimiento', 'ubicacion', 
+                 'ocupacion', 'nivelEducativo', 'perfil_investigador', 
+                 'perfil_participante', 'date_joined', 'role')
         read_only_fields = ('id', 'date_joined')
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     username = serializers.CharField(required=True)
     
-    # Campos de perfil investigador
-    telefono = serializers.CharField(required=False, allow_blank=True)
+    # Campos base comunes
+    telefono = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    fechaNacimiento = serializers.DateField(required=False, allow_null=True)
+    genero = serializers.ChoiceField(
+        choices=[
+            ('masculino', 'Masculino'),
+            ('femenino', 'Femenino'),
+            ('otro', 'Otro'),
+            ('prefiero_no_decir', 'Prefiero no decir'),
+        ],
+        required=False,
+        allow_blank=True
+    )
+    ubicacion = serializers.CharField(required=False, allow_blank=True)
     ocupacion = serializers.CharField(required=False, allow_blank=True)
     nivelEducativo = serializers.ChoiceField(
         choices=NivelEducativo.choices,
         required=False,
         allow_blank=True
     )
-    areasInteres = serializers.JSONField(required=False)
+    
+    # Campos específicos de investigador
     experienciaInvestigacion = serializers.ChoiceField(
         choices=[
             ('Sí', 'Sí'),
@@ -56,9 +73,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         required=False,
         allow_blank=True
     )
-    ubicacion = serializers.CharField(required=False, allow_blank=True)
+    areasInteres = serializers.JSONField(required=False)
     
-    # Campos de perfil participante
+    # Campos específicos de participante
     experienciaMindfulness = serializers.ChoiceField(
         choices=ExperienciaMindfulness.choices,
         required=False,
@@ -68,10 +85,11 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        fields = ('email', 'username', 'password', 'nombre', 'apellidos',
-                 'role', 'fechaNacimiento', 'genero', 'telefono', 'ocupacion',
-                 'nivelEducativo', 'areasInteres', 'experienciaInvestigacion',
-                 'ubicacion', 'experienciaMindfulness', 'condicionesSalud')
+        fields = ('nombre', 'apellidos', 'username', 'password', 'email', 
+                 'telefono', 'genero', 'fechaNacimiento', 'ubicacion', 
+                 'experienciaInvestigacion', 'experienciaMindfulness',
+                 'ocupacion', 'nivelEducativo',  
+                 'areasInteres', 'condicionesSalud', 'role')
 
     def validate(self, attrs):
         try:
@@ -85,11 +103,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         perfil_data = {}
         
         if validated_data['role'] == 'INVESTIGADOR':
-            perfil_fields = ['telefono', 'ocupacion', 'nivelEducativo', 
-                           'areasInteres', 'experienciaInvestigacion', 'ubicacion']
+            perfil_fields = ['experienciaInvestigacion', 'areasInteres']
         else:
-            perfil_fields = ['ocupacion', 'nivelEducativo', 'experienciaMindfulness', 
-                           'condicionesSalud']
+            perfil_fields = ['experienciaMindfulness', 'condicionesSalud']
         
         for field in perfil_fields:
             if field in validated_data:
@@ -117,8 +133,9 @@ class UpdateUsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        fields = ('nombre', 'apellidos', 'fechaNacimiento', 'genero',
-                 'perfil_investigador', 'perfil_participante')
+        fields = ('nombre', 'apellidos', 'username', 'email', 'telefono', 'genero',
+                 'fechaNacimiento', 'ubicacion', 'ocupacion', 
+                 'nivelEducativo', 'perfil_investigador', 'perfil_participante')
 
     def update(self, instance, validated_data):
         perfil_investigador = validated_data.pop('perfil_investigador', None)

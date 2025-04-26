@@ -22,13 +22,15 @@ class NivelEducativo(models.TextChoices):
 
 class ExperienciaMindfulness(models.TextChoices):
     NINGUNA = 'ninguna', _('Ninguna')
-    MENOS_6_MESES = 'menos de 6 meses', _('Menos de 6 meses')
-    ENTRE_6_12_MESES = '6 meses - 1 año', _('6 meses - 1 año')
-    ENTRE_1_2_ANOS = '1 - 2 años', _('1 - 2 años')
-    MAS_2_ANOS = 'más de 2 años', _('Más de 2 años')
+    MENOS_6_MESES = 'menos_de_6_meses', _('Menos de 6 meses')
+    ENTRE_6_12_MESES = '6_meses_1_ano', _('6 meses - 1 año')
+    ENTRE_1_2_ANOS = '1_2_anos', _('1 - 2 años')
+    MAS_2_ANOS = 'mas_de_2_anos', _('Más de 2 años')
 
 class Usuario(AbstractUser):
-    email = models.EmailField(unique=True)
+    # Campos base comunes
+    nombre = models.CharField(_("first name"), max_length=150, blank=True)
+    apellidos = models.CharField(_("last name"), max_length=150, blank=True)
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -38,12 +40,9 @@ class Usuario(AbstractUser):
             'unique': "A user with that username already exists.",
         },
     )
-    role = models.CharField(
-        max_length=20, 
-        choices=RoleUsuario.choices,
-        default=RoleUsuario.PARTICIPANTE
-    )
-    fechaNacimiento = models.DateField(null=True)
+    password = models.CharField(_("password"), max_length=128)
+    email = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
     genero = models.CharField(
         max_length=20,
         choices=[
@@ -54,14 +53,23 @@ class Usuario(AbstractUser):
         ],
         default='prefiero_no_decir'
     )
+    fechaNacimiento = models.DateField(null=True)
+    ubicacion = models.CharField(max_length=100, blank=True)
+    ocupacion = models.CharField(max_length=100, blank=True)
+    nivelEducativo = models.CharField(
+        max_length=50,
+        choices=NivelEducativo.choices,
+        default=NivelEducativo.UNIVERSIDAD,
+        blank=True
+    )
+    role = models.CharField(
+        max_length=20, 
+        choices=RoleUsuario.choices,
+        default=RoleUsuario.PARTICIPANTE
+    )
     date_joined = models.DateTimeField(default=timezone.now, editable=False)
-    
-
-    nombre = models.CharField(_("first name"), max_length=150, blank=True)
-    apellidos = models.CharField(_("last name"), max_length=150, blank=True)
     first_name = None
     last_name = None
-
 
     REQUIRED_FIELDS = ['email', 'nombre', 'apellidos']
 
@@ -83,15 +91,6 @@ class Usuario(AbstractUser):
 
 class Investigador(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_investigador')
-    telefono = models.CharField(max_length=20, blank=True)
-    ocupacion = models.CharField(max_length=100, blank=True)
-    nivelEducativo = models.CharField(
-        max_length=50,
-        choices=NivelEducativo.choices,
-        default=NivelEducativo.UNIVERSIDAD,
-        blank=True
-    )
-    areasInteres = models.JSONField(default=list, blank=True)
     experienciaInvestigacion = models.CharField(
         max_length=20,
         choices=[
@@ -102,20 +101,13 @@ class Investigador(models.Model):
         default='No',
         blank=True
     )
-    ubicacion = models.CharField(max_length=100, blank=True)
+    areasInteres = models.JSONField(default=list, blank=True)
 
     def __str__(self):
         return f"Investigador: {self.usuario.nombre_completo}"
 
 class Participante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_participante')
-    ocupacion = models.CharField(max_length=100, blank=True)
-    nivelEducativo = models.CharField(
-        max_length=50,
-        choices=NivelEducativo.choices,
-        default=NivelEducativo.UNIVERSIDAD,
-        blank=True
-    )
     experienciaMindfulness = models.CharField(
         max_length=20,
         choices=ExperienciaMindfulness.choices,
