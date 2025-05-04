@@ -137,12 +137,12 @@ const PerfilInvestigador = () => {
                                 <p className="text-gray-800 font-medium">{formatNivelEducativo(user.nivelEducativo)}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-500">Experiencia en Investigación</p>
-                                <p className="text-gray-800 font-medium">{formatExperienciaInvestigacion(user.perfil_investigador?.experienciaInvestigacion)}</p>
-                            </div>
-                            <div>
                                 <p className="text-sm text-gray-500">Ocupación</p>
                                 <p className="text-gray-800 font-medium">{user.ocupacion || 'No especificada'}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Experiencia en Investigación</p>
+                                <p className="text-gray-800 font-medium">{formatExperienciaInvestigacion(user.perfil_investigador?.experienciaInvestigacion)}</p>
                             </div>
                         </div>
                     </div>

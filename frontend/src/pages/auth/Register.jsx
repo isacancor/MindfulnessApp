@@ -1,15 +1,28 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, Users, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useEffect } from 'react';
 
 const Register = () => {
     const navigate = useNavigate();
+    const { isAuthenticated, user } = useAuth();
+
+    useEffect(() => {
+        if (isAuthenticated()) {
+            if (user.role === 'INVESTIGADOR') {
+                navigate('/dashboard');
+            } else {
+                navigate('/home');
+            }
+        }
+    }, [isAuthenticated, user, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
             <div className="w-full max-w-lg">
                 <div className="bg-white p-8 rounded-2xl shadow-xl relative">
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate('/')}
                         className="absolute top-6 left-6 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-indigo-600 border border-gray-300/30 hover:border-indigo-300 bg-white/90 hover:bg-indigo-100 focus:outline-none shadow-sm"
                         aria-label="Volver atrás"
                     >

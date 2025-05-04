@@ -29,8 +29,13 @@ export const AuthProvider = ({ children }) => {
         return user.role === role;
     };
 
+    // Verificar si el usuario está autenticado
+    const isAuthenticated = () => {
+        return !!user;
+    };
+
     useEffect(() => {
-        setError(null); // Limpia el error cada vez que cambia la ruta
+        setError(null);
     }, [location.pathname]);
 
     // Cargar el estado de autenticación al iniciar
@@ -62,15 +67,18 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             setError(null);
-            const response = await api.post('/auth/login', credentials);
 
-            // TODO: Add token
-            const { token, user } = response.data;
-            localStorage.setItem('token', token);
+            const response = await api.post('/auth/login', credentials);
+            const { access, refresh, user } = response.data;
+
+            localStorage.setItem('token', access);
+            localStorage.setItem('refresh', refresh);
+            localStorage.setItem('user', JSON.stringify(user));
+
             setUser(user);
             setError(null);
 
-            // Redirigir
+            // Redirigir según el rol
             if (user.role === ROLES.INVESTIGADOR) {
                 navigate('/dashboard');
             } else {
@@ -89,18 +97,18 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             setError(null);
-            console.log("userData", userData)
 
             const response = await api.post('/auth/register', userData);
-            console.log("response", response)
+            const { access, refresh, user } = response.data;
 
-            const { token, user } = response.data;
+            localStorage.setItem('token', access);
+            localStorage.setItem('refresh', refresh);
+            localStorage.setItem('user', JSON.stringify(user));
 
-            localStorage.setItem('token', token);
             setUser(user);
             setError(null);
 
-            // Redirigir
+            // Redirigir según el rol
             if (user.role === ROLES.INVESTIGADOR) {
                 navigate('/dashboard');
             } else {
@@ -116,11 +124,11 @@ export const AuthProvider = ({ children }) => {
 
     // Función de logout
     const logout = () => {
-        localStorage.removeItem('user');
         localStorage.removeItem('token');
-        console.log("Logout. Token eliminado")
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('user');
         setUser(null);
-        navigate('/');
+        navigate('/login');
     };
 
     // Función para actualizar el perfil del usuario
@@ -128,9 +136,7 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             setError(null);
-            const response = await api.put('/auth/profile', profileData, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
+            const response = await api.put('/auth/profile', profileData);
             setUser(response.data);
         } catch (err) {
             setError(err.response?.data?.message || 'Error al actualizar perfil');
@@ -145,9 +151,7 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             setError(null);
-            await api.put('/auth/password', passwordData, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
+            await api.put('/auth/password', passwordData);
         } catch (err) {
             setError(err.response?.data?.message || 'Error al cambiar contraseña');
             throw err;
@@ -167,7 +171,8 @@ export const AuthProvider = ({ children }) => {
         changePassword,
         hasPermission,
         hasRole,
-        resetError
+        resetError,
+        isAuthenticated
     };
 
     return (

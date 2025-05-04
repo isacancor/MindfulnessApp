@@ -39,7 +39,7 @@ class LoginView(APIView):
         
         if not user:
             return Response(
-                {'error': 'Credenciales inválidas'},
+                {'error': 'El nombre de usuario o la contraseña no son correctos'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
 

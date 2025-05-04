@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
     LogOut,
@@ -17,33 +16,35 @@ import {
     Eye
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import api from '../config/axios';
 
 const InvestigadorDashboard = () => {
-    const navigate = useNavigate();
     const { user, logout } = useAuth();
     const [activeSection, setActiveSection] = useState('dashboard');
+    const [programas, setProgramas] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchProgramas = async () => {
+            try {
+                const response = await api.get('/programas');
+                setProgramas(response.data);
+            } catch (err) {
+                setError('Error al cargar los programas');
+                console.error('Error:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchProgramas();
+    }, []);
 
     // Datos de ejemplo - En una implementación real vendrían de una API
-    const programas = [
-        {
-            id: 1,
-            nombre: 'Programa de Mindfulness para Reducción de Estrés',
-            participantes: 15,
-            sesiones: 8,
-            estado: 'activo'
-        },
-        {
-            id: 2,
-            nombre: 'Meditación para Profesionales de la Salud',
-            participantes: 12,
-            sesiones: 6,
-            estado: 'activo'
-        }
-    ];
-
     const estadisticas = {
-        totalProgramas: 5,
-        participantesActivos: 42,
+        totalProgramas: programas.length,
+        participantesActivos: programas.reduce((acc, p) => acc + (p.participantes?.length || 0), 0),
         sesionesCompletadas: 128,
         cuestionariosRespondidos: 256
     };
@@ -52,6 +53,14 @@ const InvestigadorDashboard = () => {
         return `flex items-center space-x-3 w-full px-4 py-2 text-gray-700 rounded-lg ${activeSection === section ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'
             }`;
     };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="flex min-h-screen bg-gray-50">
@@ -72,13 +81,13 @@ const InvestigadorDashboard = () => {
                             <span>Inicio</span>
                         </button>
 
-                        <button
-                            onClick={() => setActiveSection('programas')}
+                        <Link
+                            to="/programas"
                             className={getNavButtonClass('programas')}
                         >
                             <FileText size={20} />
                             <span>Mis Programas</span>
-                        </button>
+                        </Link>
 
                         <button
                             onClick={() => setActiveSection('sesiones')}
@@ -123,14 +132,21 @@ const InvestigadorDashboard = () => {
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
                             <h1 className="text-2xl font-bold text-gray-800">Bienvenido, {user.nombre}</h1>
-                            <button
-                                onClick={() => setActiveSection('programas')}
+
+                            <Link
+                                to="/programas/crear"
                                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                             >
                                 <PlusCircle size={20} />
                                 <span>Nuevo Programa</span>
-                            </button>
+                            </Link>
                         </div>
+
+                        {error && (
+                            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                                <p className="text-red-700">{error}</p>
+                            </div>
+                        )}
 
                         {/* Estadísticas */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -156,15 +172,15 @@ const InvestigadorDashboard = () => {
                         <div className="bg-white rounded-xl shadow-sm p-6">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-semibold text-gray-800">Mis Programas</h2>
-                                <button
-                                    onClick={() => setActiveSection('programas')}
+                                <Link
+                                    to="/programas"
                                     className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                                 >
                                     Ver todos
-                                </button>
+                                </Link>
                             </div>
                             <div className="space-y-4">
-                                {programas.map((programa) => (
+                                {programas.slice(0, 3).map((programa) => (
                                     <div
                                         key={programa.id}
                                         className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
@@ -172,14 +188,28 @@ const InvestigadorDashboard = () => {
                                         <div>
                                             <h3 className="font-medium text-gray-800">{programa.nombre}</h3>
                                             <p className="text-sm text-gray-500">
-                                                {programa.participantes} participantes · {programa.sesiones} sesiones
+                                                {programa.participantes?.length || 0} participantes · {programa.duracion_semanas} sesiones
                                             </p>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <button className="p-2 text-gray-400 hover:text-blue-600">
+                                            <Link
+                                                to={`/programas/${programa.id}`}
+                                                className="p-2 text-gray-400 hover:text-blue-600"
+                                            >
                                                 <Eye size={18} />
-                                            </button>
-                                            <button className="p-2 text-gray-400 hover:text-red-600">
+                                            </Link>
+                                            <button
+                                                onClick={() => {
+                                                    if (window.confirm('¿Estás seguro de que quieres eliminar este programa?')) {
+                                                        api.delete(`/programa/${programa.id}/`)
+                                                            .then(() => {
+                                                                setProgramas(programas.filter(p => p.id !== programa.id));
+                                                            })
+                                                            .catch(err => console.error('Error:', err));
+                                                    }
+                                                }}
+                                                className="p-2 text-gray-400 hover:text-red-600"
+                                            >
                                                 <Trash2 size={18} />
                                             </button>
                                         </div>
@@ -187,19 +217,6 @@ const InvestigadorDashboard = () => {
                                 ))}
                             </div>
                         </div>
-                    </div>
-                )}
-
-                {activeSection === 'programas' && (
-                    <div className="space-y-6">
-                        <div className="flex justify-between items-center">
-                            <h1 className="text-2xl font-bold text-gray-800">Mis Programas</h1>
-                            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                                <PlusCircle size={20} />
-                                <span>Crear Programa</span>
-                            </button>
-                        </div>
-                        {/* Aquí irá la lista completa de programas */}
                     </div>
                 )}
 
@@ -216,7 +233,6 @@ const InvestigadorDashboard = () => {
                         {/* Aquí irá la gestión de cuestionarios */}
                     </div>
                 )}
-
             </main>
         </div>
     );

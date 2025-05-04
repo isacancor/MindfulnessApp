@@ -12,6 +12,8 @@ import RegisterInvestigador from '@/pages/auth/RegisterInvestigador';
 import RegisterParticipante from '@/pages/auth/RegisterParticipante';
 import Unauthorized from './pages/Unauthorized';
 import Perfil from './pages/Perfil';
+import CrearPrograma from './pages/programas/CrearPrograma';
+import ListaProgramas from './pages/programas/ListaProgramas';
 
 function App() {
   return (
@@ -32,8 +34,8 @@ function App() {
           <Route path="/dashboard" element={<InvestigadorDashboard />} />
 
           {/* Gestión de programas */}
-          <Route path="/programas" element={<div>Mis Programas</div>} />
-          <Route path="/programas/crear" element={<div>Crear Programa</div>} />
+          <Route path="/programas" element={<ListaProgramas />} />
+          <Route path="/programas/crear" element={<CrearPrograma />} />
           <Route path="/programas/:id" element={<div>Ver Detalle Programa</div>} />
           <Route path="/programas/:id/editar" element={<div>Editar Programa</div>} />
 

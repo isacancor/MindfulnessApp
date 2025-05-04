@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Users } from 'lucide-react';
 
 const RegisterParticipante = () => {
-    const { register, loading, error } = useAuth();
+    const { register, loading, error, isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nombre: '',
@@ -82,6 +82,16 @@ const RegisterParticipante = () => {
         }
         await register(formData);
     };
+
+    useEffect(() => {
+        if (isAuthenticated()) {
+            if (user.role === 'INVESTIGADOR') {
+                navigate('/dashboard');
+            } else {
+                navigate('/home');
+            }
+        }
+    }, [isAuthenticated, user, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
@@ -210,6 +220,7 @@ const RegisterParticipante = () => {
                                     id="telefono"
                                     name="telefono"
                                     type="tel"
+                                    required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
                                     placeholder="Tu teléfono"
                                     value={formData.telefono}
@@ -266,6 +277,7 @@ const RegisterParticipante = () => {
                                     id="ubicacion"
                                     name="ubicacion"
                                     type="text"
+                                    required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
                                     placeholder="País o ciudad"
                                     value={formData.ubicacion}
@@ -339,6 +351,7 @@ const RegisterParticipante = () => {
                                     id="condicionesSalud"
                                     name="condicionesSalud"
                                     rows="3"
+                                    required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
                                     placeholder="Describe cualquier condición de salud relevante (opcional)"
                                     value={formData.condicionesSalud}

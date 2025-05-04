@@ -1,21 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft } from 'lucide-react';
 
 const Login = () => {
-    const { login, loading, error } = useAuth();
+    const { login, loading, error, resetError, isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         username: '',
         password: '',
     });
 
+    useEffect(() => {
+        if (isAuthenticated()) {
+            if (user.role === 'INVESTIGADOR') {
+                navigate('/dashboard');
+            } else {
+                navigate('/home');
+            }
+        }
+    }, [isAuthenticated, user, navigate]);
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value,
         });
+        resetError();
     };
 
     const handleSubmit = async (e) => {
@@ -29,7 +40,7 @@ const Login = () => {
             <div className="w-full max-w-md">
                 <div className="bg-white p-8 rounded-2xl shadow-xl relative">
                     <button
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate('/')}
                         className="absolute top-6 left-6 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-indigo-600 border border-gray-300/30 hover:border-indigo-300 bg-white/90 hover:bg-indigo-100 focus:outline-none shadow-sm"
                         aria-label="Volver atrás"
                     >

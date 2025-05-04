@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .api import ProgramaViewSet
 
 router = DefaultRouter()
-router.register(r'', ProgramaViewSet)
+router.register(r'', ProgramaViewSet, basename='programas')
 
 urlpatterns = [
     path('', include(router.urls)),
