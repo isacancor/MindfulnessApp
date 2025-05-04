@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { PlusCircle } from 'lucide-react';
 import api from '../../config/axios';
 import ProgramaCard from '../../components/ProgramaCard';
+import InvestigadorLayout from '../../components/InvestigadorLayout';
 
 const ListaProgramas = () => {
     const navigate = useNavigate();
@@ -49,12 +50,12 @@ const ListaProgramas = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-7xl mx-auto">
-                <div className="flex justify-between items-center mb-8">
+        <InvestigadorLayout>
+            <div className="space-y-6">
+                <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Mis Programas</h1>
-                        <p className="mt-2 text-gray-600">
+                        <h1 className="text-2xl font-bold text-gray-800">Mis Programas</h1>
+                        <p className="text-gray-600 mt-1">
                             Gestiona tus programas de mindfulness
                         </p>
                     </div>
@@ -68,7 +69,7 @@ const ListaProgramas = () => {
                 </div>
 
                 {error && (
-                    <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                    <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
                         <p className="text-red-700">{error}</p>
                     </div>
                 )}
@@ -95,7 +96,7 @@ const ListaProgramas = () => {
                     </div>
                 )}
             </div>
-        </div>
+        </InvestigadorLayout>
     );
 };
 
