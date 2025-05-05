@@ -27,16 +27,8 @@ const ListaProgramas = () => {
         fetchProgramas();
     }, []);
 
-    const handleDelete = async (programaId) => {
-        if (window.confirm('¿Estás seguro de que quieres eliminar este programa?')) {
-            try {
-                await api.delete(`/programas/${programaId}`);
-                setProgramas(programas.filter(p => p.id !== programaId));
-            } catch (err) {
-                console.error('Error al eliminar programa:', err);
-                setError('Error al eliminar el programa');
-            }
-        }
+    const handleDelete = (programaId) => {
+        setProgramas(programas.filter(p => p.id !== programaId));
     };
 
     if (loading) {

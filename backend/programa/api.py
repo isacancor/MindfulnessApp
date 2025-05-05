@@ -9,7 +9,7 @@ from .serializers import ProgramaSerializer
 def programa_list_create(request):
     if request.method == 'GET':
         if request.user.is_investigador():
-            programas = Programa.objects.filter(creado_por=request.user.perfil_investigador)
+            programas = Programa.objects.filter(creado_por=request.user)
         else:
             programas = Programa.objects.filter(estado_publicacion=EstadoPublicacion.PUBLICADO)
         serializer = ProgramaSerializer(programas, many=True)
@@ -22,7 +22,8 @@ def programa_list_create(request):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        investigador = request.user.perfil_investigador
+        # usuario investigador
+        investigador = request.user
         if not investigador:
             return Response(
                 {'error': 'El usuario no tiene un perfil de investigador configurado'},
@@ -95,7 +96,7 @@ def programa_publicar(request, pk):
     except Programa.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if not request.user.is_investigador() or programa.creado_por != request.user.perfil_investigador:
+    if not request.user.is_investigador() or programa.creado_por != request.user:
         return Response(
             {'error': 'No tienes permiso para publicar este programa'},
             status=status.HTTP_403_FORBIDDEN
@@ -109,3 +110,40 @@ def programa_publicar(request, pk):
 
     programa.publicar()
     return Response({'status': 'Programa publicado exitosamente'})
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_enrolar(request, pk):
+    try:
+        programa = Programa.objects.get(pk=pk)
+    except Programa.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if not request.user.is_participante():
+        return Response(
+            {'error': 'Solo los participantes pueden enrolarse en programas'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    if programa.estado_publicacion != EstadoPublicacion.PUBLICADO:
+        return Response(
+            {'error': 'No se puede enrolar en un programa que no está publicado'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    participante = request.user.perfil_participante
+    if not participante:
+        return Response(
+            {'error': 'El usuario no tiene un perfil de participante configurado'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Verificar si el participante ya está enrolado en algún programa
+    if participante.programas_inscritos.exists():
+        return Response(
+            {'error': 'Ya estás enrolado en un programa'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    programa.participantes.add(participante)
+    return Response({'status': 'Enrolamiento exitoso'})

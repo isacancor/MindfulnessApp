@@ -87,9 +87,18 @@ const ParticipanteDashboard = () => {
                                 ></div>
                             </div>
                         </div>
-                        <p className="text-green-600 font-medium">
-                            ¡Has meditado {progreso.minutosCompletados} minutos en total! 🎉
-                        </p>
+                        <div className="flex justify-between items-center">
+                            <p className="text-green-600 font-medium">
+                                ¡Has meditado {progreso.minutosCompletados} minutos en total! 🎉
+                            </p>
+                            <Link
+                                to="/miprograma"
+                                className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                                Ver detalles de mi programa
+                                <ChevronRight className="h-4 w-4 ml-2" />
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -97,14 +106,14 @@ const ParticipanteDashboard = () => {
             {/* Acciones principales - Botones grandes y claros */}
             <div className="max-w-3xl mx-auto grid gap-4 sm:grid-cols-2">
                 <Link
-                    to="/programas"
+                    to="/explorar"
                     className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 transition-colors"
                 >
                     <div className="flex items-center">
                         <BookOpen className="h-6 w-6 text-blue-600 mr-3" />
                         <div>
-                            <h3 className="font-medium text-gray-900">Mis Programas</h3>
-                            <p className="text-sm text-gray-500">Ver todos mis programas</p>
+                            <h3 className="font-medium text-gray-900">Explorar Programas</h3>
+                            <p className="text-sm text-gray-500">Ver programas disponibles</p>
                         </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-gray-400" />

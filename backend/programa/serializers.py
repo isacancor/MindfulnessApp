@@ -1,9 +1,9 @@
 from rest_framework import serializers
 from .models import Programa, TipoContexto, EnfoqueMetodologico, Escala, EstadoPublicacion
-from usuario.serializers import InvestigadorSerializer
+from usuario.serializers import UsuarioSerializer
 
 class ProgramaSerializer(serializers.ModelSerializer):
-    creado_por = InvestigadorSerializer(read_only=True)
+    creado_por = UsuarioSerializer(read_only=True)
     participantes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     
     tipo_contexto = serializers.ChoiceField(choices=TipoContexto.choices)

@@ -16,6 +16,7 @@ import CrearPrograma from './pages/programas/CrearPrograma';
 import EditarPrograma from './pages/programas/EditarPrograma';
 import ListaProgramas from './pages/programas/ListaProgramas';
 import DetallePrograma from './pages/programas/DetallePrograma';
+import ExplorarProgramas from './pages/programas/ExplorarProgramas';
 
 function App() {
   return (
@@ -59,10 +60,10 @@ function App() {
         {/* Rutas protegidas para participantes */}
         <Route element={<PrivateRoute roles={[ROLES.PARTICIPANTE]} />}>
           <Route path="/home" element={<ParticipanteDashboard />} />
-          <Route path="/misprogramas" element={<div>Mis Programas</div>} />
-          <Route path="/misprogramas/:id" element={<div>Detalle Programa</div>} />
-          <Route path="/misprogramas/:id/:sesionId" element={<div>Realizar Sesión</div>} />
-          <Route path="/misprogramas/:id/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
+          <Route path="/explorar" element={<ExplorarProgramas />} />
+          <Route path="/miprograma" element={<div>Detalle Programa Activo</div>} />
+          <Route path="/miprogramas/:sesionId" element={<div>Realizar Sesión</div>} />
+          <Route path="/miprogramas/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
         </Route>
 
         {/* Rutas protegidas para admin */}

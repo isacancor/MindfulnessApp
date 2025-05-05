@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/AuthContext';
-import PerfilInvestigador from '../components/PerfilInvestigador';
-import PerfilParticipante from '../components/PerfilParticipante';
+import PerfilInvestigador from '../components/perfiles/PerfilInvestigador';
+import PerfilParticipante from '../components/perfiles/PerfilParticipante';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Perfil = () => {

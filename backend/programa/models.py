@@ -1,5 +1,5 @@
 from django.db import models
-from usuario.models import Investigador, Participante
+from usuario.models import Usuario, Participante
 from django.utils import timezone
 
 class TipoContexto(models.TextChoices):
@@ -67,7 +67,7 @@ class Programa(models.Model):
     )
     
     # Relaciones
-    creado_por = models.ForeignKey(Investigador, on_delete=models.CASCADE, related_name='programas')
+    creado_por = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='programas')
     participantes = models.ManyToManyField(Participante, related_name='programas_inscritos', blank=True)
     
     # Metadatos
