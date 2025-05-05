@@ -177,11 +177,11 @@ const PerfilInvestigador = () => {
                     </div>
                 </div>
 
-                {/* Estudios activos */}
+                {/* Programas activos */}
                 <div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                         <Briefcase className="h-5 w-5 text-blue-600 mr-2" />
-                        Estudios Activos
+                        Programas Activos
                     </h3>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         {user.perfil_investigador?.estudiosActivos?.length > 0 ? (
@@ -204,7 +204,7 @@ const PerfilInvestigador = () => {
                             </div>
                         ) : (
                             <div className="text-center py-6">
-                                <p className="text-gray-500">No hay estudios activos en este momento.</p>
+                                <p className="text-gray-500">No hay programas activos en este momento.</p>
                             </div>
                         )}
                     </div>

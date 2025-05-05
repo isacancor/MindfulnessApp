@@ -181,17 +181,17 @@ const PerfilParticipante = () => {
                             ))
                         ) : (
                             <div className="text-center py-6">
-                                <p className="text-gray-500">No hay estudios activos en este momento.</p>
+                                <p className="text-gray-500">No hay programas activos en este momento.</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Historial de estudios */}
+                {/* Historial de programas */}
                 <div>
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                         <Heart className="h-5 w-5 text-teal-600 mr-2" />
-                        Estudios Completados
+                        Programas Completados
                     </h3>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         {user.perfil_participante?.estudiosCompletados?.length > 0 ? (
@@ -214,7 +214,7 @@ const PerfilParticipante = () => {
                             </div>
                         ) : (
                             <div className="text-center py-6">
-                                <p className="text-gray-500">No hay estudios completados.</p>
+                                <p className="text-gray-500">No hay programas completados.</p>
                             </div>
                         )}
                     </div>

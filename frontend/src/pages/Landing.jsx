@@ -44,7 +44,7 @@ export default function Landing() {
                         Investigación de Mindfulness <span className="text-emerald-300">Basada en Evidencia</span>
                     </h1>
                     <p className="text-lg md:text-xl text-indigo-100 max-w-3xl mx-auto mb-8">
-                        Plataforma integral para diseñar estudios científicos sobre mindfulness en entornos académicos y laborales.
+                        Plataforma integral para diseñar programas de mindfulness en entornos académicos y laborales.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link

@@ -107,7 +107,7 @@ const DetallePrograma = () => {
                     {/* Encabezado */}
                     <div className="flex items-center justify-between mb-8">
                         <button
-                            onClick={() => navigate('/programas')}
+                            onClick={() => navigate(-1)}
                             className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
                         >
                             <ArrowLeft className="h-5 w-5 mr-2" />

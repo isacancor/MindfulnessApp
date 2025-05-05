@@ -113,20 +113,6 @@ const InvestigadorDashboard = () => {
                                     >
                                         <Eye size={18} />
                                     </Link>
-                                    <button
-                                        onClick={() => {
-                                            if (window.confirm('¿Estás seguro de que quieres eliminar este programa?')) {
-                                                api.delete(`/programa/${programa.id}/`)
-                                                    .then(() => {
-                                                        setProgramas(programas.filter(p => p.id !== programa.id));
-                                                    })
-                                                    .catch(err => console.error('Error:', err));
-                                            }
-                                        }}
-                                        className="p-2 text-gray-400 hover:text-red-600"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
                                 </div>
                             </div>
                         ))}
