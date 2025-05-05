@@ -17,10 +17,11 @@ const ListaProgramas = () => {
         const fetchProgramas = async () => {
             try {
                 const response = await api.get('/programas');
+                console.log('Datos recibidos:', response.data);
                 setProgramas(response.data);
             } catch (err) {
-                setError('Error al cargar los programas');
-                console.error('Error:', err);
+                console.error('Error al cargar programas:', err);
+                setError('Error al cargar los programas. Por favor, intenta nuevamente.');
             } finally {
                 setLoading(false);
             }
@@ -32,20 +33,22 @@ const ListaProgramas = () => {
     const handleDelete = async (programaId) => {
         if (window.confirm('¿Estás seguro de que quieres eliminar este programa?')) {
             try {
-                await api.delete(`/programa/${programaId}/`);
+                await api.delete(`/programas/${programaId}`);
                 setProgramas(programas.filter(p => p.id !== programaId));
             } catch (err) {
+                console.error('Error al eliminar programa:', err);
                 setError('Error al eliminar el programa');
-                console.error('Error:', err);
             }
         }
     };
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
+            <InvestigadorLayout>
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+            </InvestigadorLayout>
         );
     }
 

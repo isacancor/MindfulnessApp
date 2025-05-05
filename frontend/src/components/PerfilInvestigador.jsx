@@ -58,23 +58,6 @@ const PerfilInvestigador = () => {
         return experiencias[experiencia] || 'No especificada';
     };
 
-    // Función para formatear las áreas de interés
-    const formatAreasInteres = (areas) => {
-        if (!areas || areas.length === 0) return 'No especificadas';
-        return areas.map(area => {
-            const areasFormateadas = {
-                'Mindfulness': 'Mindfulness',
-                'Neurociencia': 'Neurociencia',
-                'Psicología': 'Psicología',
-                'Educación': 'Educación',
-                'Tecnología': 'Tecnología',
-                'Meditación': 'Meditación',
-                'Bienestar': 'Bienestar'
-            };
-            return areasFormateadas[area] || area;
-        }).join(', ');
-    };
-
     return (
         <div className="bg-white rounded-2xl overflow-hidden max-w-4xl mx-auto my-8 shadow-xl">
             {/* Header del perfil*/}

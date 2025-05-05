@@ -3,7 +3,7 @@ import { LogOut, FileText, BarChart2, Calendar, ClipboardList, Settings } from '
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
-    const { logout, user } = useAuth();
+    const { logout } = useAuth();
     const location = useLocation();
 
     const getNavButtonClass = (path) => {

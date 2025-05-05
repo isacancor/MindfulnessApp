@@ -1,37 +1,62 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import api_view, permission_classes
 from .models import Programa
 from .serializers import ProgramaSerializer
 
-class ProgramaViewSet(viewsets.ModelViewSet):
-    queryset = Programa.objects.all()
-    serializer_class = ProgramaSerializer
-    permission_classes = [permissions.IsAuthenticated]
+@api_view(['GET', 'POST'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_list_create(request):
 
-    def get_queryset(self):
-        # Si el usuario es investigador, solo muestra sus programas
-        if hasattr(self.request.user, 'investigador'):
-            return Programa.objects.filter(creado_por=self.request.user.investigador)
-        return Programa.objects.none()
-
-    def perform_create(self, serializer):
-        # Verificar si el usuario es investigador y tiene perfil
-        if not self.request.user.is_investigador():
-            raise PermissionError("Solo los investigadores pueden crear programas")
+    if request.method == 'GET':
+        if request.user.is_investigador():
+            programas = Programa.objects.filter(creado_por=request.user.perfil_investigador)
+            serializer = ProgramaSerializer(programas, many=True)
+            return Response(serializer.data)
+        return Response([], status=status.HTTP_200_OK)
+    
+    elif request.method == 'POST':
+        if not request.user.is_investigador():
+            return Response(
+                {'error': 'Solo los investigadores pueden crear programas'},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
-        # Obtener el perfil de investigador
-        investigador = self.request.user.perfil_investigador
+        investigador = request.user.perfil_investigador
         if not investigador:
-            raise ValueError("El usuario no tiene un perfil de investigador configurado")
+            return Response(
+                {'error': 'El usuario no tiene un perfil de investigador configurado'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
-        # Asignar el investigador al programa
-        serializer.save(creado_por=investigador)
+        serializer = ProgramaSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(creado_por=investigador)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, *args, **kwargs):
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_detail(request, pk):
+    try:
+        programa = Programa.objects.get(pk=pk)
+    except Programa.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = ProgramaSerializer(programa)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = ProgramaSerializer(programa, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
         try:
-            instance = self.get_object()
-            self.perform_destroy(instance)
+            programa.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response(
@@ -39,11 +64,15 @@ class ProgramaViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    @action(detail=True, methods=['get'])
-    def participantes(self, request, pk=None):
-        programa = self.get_object()
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_participantes(request, pk):
+    try:
+        programa = Programa.objects.get(pk=pk)
         participantes = programa.participantes.all()
         return Response({
             'total': participantes.count(),
             'participantes': [p.id for p in participantes]
         })
+    except Programa.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
