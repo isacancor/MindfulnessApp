@@ -103,7 +103,7 @@ const InvestigadorDashboard = () => {
                                 <div>
                                     <h3 className="font-medium text-gray-800">{programa.nombre}</h3>
                                     <p className="text-sm text-gray-500">
-                                        {programa.participantes?.length || 0} participantes · {programa.duracion_semanas} sesiones
+                                        {programa.participantes?.length || 0} participantes · {programa.duracion_semanas} semanas
                                     </p>
                                 </div>
                                 <div className="flex items-center space-x-2">

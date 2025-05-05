@@ -1,5 +1,6 @@
 from django.db import models
 from usuario.models import Investigador, Participante
+from django.utils import timezone
 
 class TipoContexto(models.TextChoices):
     ACADEMICO = 'académico', 'Académico'
@@ -25,6 +26,10 @@ class Escala(models.TextChoices):
     ESTRES = 'estres', 'PSS (estrés) [0–4]'
     COMPROMISO = 'compromiso', 'UWES-3 (compromiso) [1–5]'
     BIENESTAR = 'bienestar', 'VAS (bienestar general) [0–10]'
+
+class EstadoPublicacion(models.TextChoices):
+    BORRADOR = 'borrador', 'Borrador'
+    PUBLICADO = 'publicado', 'Publicado'
 
 class Programa(models.Model):
     # Identificación y Metadatos Generales
@@ -54,6 +59,13 @@ class Programa(models.Model):
         default=Escala.EMOCIONAL
     )
     
+    # Estado de publicación
+    estado_publicacion = models.CharField(
+        max_length=20,
+        choices=EstadoPublicacion.choices,
+        default=EstadoPublicacion.BORRADOR
+    )
+    
     # Relaciones
     creado_por = models.ForeignKey(Investigador, on_delete=models.CASCADE, related_name='programas')
     participantes = models.ManyToManyField(Participante, related_name='programas_inscritos', blank=True)
@@ -61,9 +73,29 @@ class Programa(models.Model):
     # Metadatos
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
+    fecha_publicacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre
+
+    def publicar(self):
+        if self.estado_publicacion == EstadoPublicacion.BORRADOR:
+            self.estado_publicacion = EstadoPublicacion.PUBLICADO
+            self.fecha_publicacion = timezone.now()
+            self.save()
+
+    def puede_ser_publicado(self):
+        campos_requeridos = [
+            self.nombre,
+            self.descripcion,
+            self.tipo_contexto,
+            self.enfoque_metodologico,
+            self.poblacion_objetivo,
+            self.duracion_semanas,
+            self.escala,
+            self.creado_por
+        ]
+        return all(campos_requeridos)
 
     class Meta:
         ordering = ['-fecha_creacion']

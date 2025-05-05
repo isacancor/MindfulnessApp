@@ -1,11 +1,21 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Users, FileText, Edit, Trash2 } from 'lucide-react';
+import { Calendar, Users, FileText, Edit, Trash2, Send } from 'lucide-react';
+import api from '../config/axios';
 
-const ProgramaCard = ({ programa, onDelete }) => {
+const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('es-ES', options);
+    };
+
+    const handlePublicar = async () => {
+        try {
+            await api.post(`/programas/${programa.id}/publicar`);
+            onUpdate();
+        } catch (error) {
+            console.error('Error al publicar el programa:', error);
+        }
     };
 
     return (
@@ -18,19 +28,41 @@ const ProgramaCard = ({ programa, onDelete }) => {
                     </p>
                 </div>
                 <div className="flex space-x-2">
-                    <Link
-                        to={`/programas/editar/${programa.id}`}
-                        className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
-                    >
-                        <Edit size={18} />
-                    </Link>
-                    <button
-                        onClick={() => onDelete(programa.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                    >
-                        <Trash2 size={18} />
-                    </button>
+                    {programa.estado_publicacion === 'borrador' && (
+                        <button
+                            onClick={handlePublicar}
+                            className="p-2 text-gray-400 hover:text-green-600 transition-colors"
+                            title="Publicar programa"
+                        >
+                            <Send size={18} />
+                        </button>
+                    )}
+                    {programa.estado_publicacion === 'borrador' && (
+                        <Link
+                            to={`/programas/${programa.id}/editar`}
+                            className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                        >
+                            <Edit size={18} />
+                        </Link>
+                    )}
+                    {programa.estado_publicacion === 'borrador' && (
+                        <button
+                            onClick={() => onDelete(programa.id)}
+                            className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        >
+                            <Trash2 size={18} />
+                        </button>
+                    )}
                 </div>
+            </div>
+
+            <div className="mb-4">
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${programa.estado_publicacion === 'publicado'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                    {programa.estado_publicacion === 'publicado' ? 'Publicado' : 'Borrador'}
+                </span>
             </div>
 
             <p className="text-gray-600 mb-4 line-clamp-2">{programa.descripcion}</p>

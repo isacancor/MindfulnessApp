@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import api from '../../config/axios';
 import { ensureHttps } from '../../utils/url';
 
-const CrearPrograma = () => {
+const EditarPrograma = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
     const { user, loading: authLoading, error: authError } = useAuth();
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [formData, setFormData] = useState({
         nombre: '',
@@ -52,6 +53,26 @@ const CrearPrograma = () => {
         { value: 'otro', label: 'Otro' }
     ];
 
+    useEffect(() => {
+        const fetchPrograma = async () => {
+            try {
+                const response = await api.get(`/programas/${id}/`);
+                if (response.data.estado_publicacion === 'publicado') {
+                    navigate('/programas');
+                    return;
+                }
+                setFormData(response.data);
+            } catch (err) {
+                setError('Error al cargar el programa');
+                console.error('Error:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPrograma();
+    }, [id, navigate]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
@@ -72,19 +93,27 @@ const CrearPrograma = () => {
         };
 
         try {
-            await api.post('programas', dataToSend);
+            await api.put(`/programas/${id}/`, dataToSend);
             navigate('/programas');
         } catch (error) {
-            console.error('Error al crear el programa:', error);
+            console.error('Error al actualizar el programa:', error);
             if (error.response?.data?.error) {
                 setError(error.response.data.error);
             } else {
-                setError('Ha ocurrido un error al crear el programa');
+                setError('Ha ocurrido un error al actualizar el programa');
             }
         } finally {
             setLoading(false);
         }
     };
+
+    if (loading || authLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 sm:px-6 lg:px-8">
@@ -105,10 +134,10 @@ const CrearPrograma = () => {
                             </div>
                         </div>
                         <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                            Crear Nuevo Programa
+                            Editar Programa
                         </h2>
                         <p className="text-gray-500">
-                            Completa los detalles del programa de mindfulness
+                            Modifica los detalles del programa de mindfulness
                         </p>
                     </div>
 
@@ -274,7 +303,7 @@ const CrearPrograma = () => {
                                 <input
                                     id="cuestionario_post"
                                     name="cuestionario_post"
-                                    //type="url"
+                                    //"
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
                                     placeholder="https://forms.google.com/..."
                                     value={formData.cuestionario_post}
@@ -304,9 +333,9 @@ const CrearPrograma = () => {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Creando...
+                                        Guardando...
                                     </span>
-                                ) : 'Crear borrador de Programa'}
+                                ) : 'Guardar Cambios'}
                             </button>
                         </div>
                     </form>
@@ -316,4 +345,4 @@ const CrearPrograma = () => {
     );
 };
 
-export default CrearPrograma;
+export default EditarPrograma; 

@@ -13,7 +13,9 @@ import RegisterParticipante from '@/pages/auth/RegisterParticipante';
 import Unauthorized from './pages/Unauthorized';
 import Perfil from './pages/Perfil';
 import CrearPrograma from './pages/programas/CrearPrograma';
+import EditarPrograma from './pages/programas/EditarPrograma';
 import ListaProgramas from './pages/programas/ListaProgramas';
+import DetallePrograma from './pages/programas/DetallePrograma';
 
 function App() {
   return (
@@ -36,8 +38,8 @@ function App() {
           {/* Gestión de programas */}
           <Route path="/programas" element={<ListaProgramas />} />
           <Route path="/programas/crear" element={<CrearPrograma />} />
-          <Route path="/programas/:id" element={<div>Ver Detalle Programa</div>} />
-          <Route path="/programas/:id/editar" element={<div>Editar Programa</div>} />
+          <Route path="/programas/:id" element={<DetallePrograma />} />
+          <Route path="/programas/:id/editar" element={<EditarPrograma />} />
 
           {/** 
           <Route path="/programas/:id/analisis" element={<div>Análisis Programa</div>} />

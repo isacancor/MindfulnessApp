@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import { PlusCircle } from 'lucide-react';
 import api from '../../config/axios';
 import ProgramaCard from '../../components/ProgramaCard';
@@ -8,25 +7,23 @@ import InvestigadorLayout from '../../components/InvestigadorLayout';
 
 const ListaProgramas = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
     const [programas, setProgramas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchProgramas = async () => {
-            try {
-                const response = await api.get('/programas');
-                console.log('Datos recibidos:', response.data);
-                setProgramas(response.data);
-            } catch (err) {
-                console.error('Error al cargar programas:', err);
-                setError('Error al cargar los programas. Por favor, intenta nuevamente.');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchProgramas = async () => {
+        try {
+            const response = await api.get('/programas');
+            setProgramas(response.data);
+        } catch (err) {
+            console.error('Error al cargar programas:', err);
+            setError('Error al cargar los programas. Por favor, intenta nuevamente.');
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchProgramas();
     }, []);
 
@@ -94,6 +91,7 @@ const ListaProgramas = () => {
                                 key={programa.id}
                                 programa={programa}
                                 onDelete={handleDelete}
+                                onUpdate={fetchProgramas}
                             />
                         ))}
                     </div>
