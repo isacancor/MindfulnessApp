@@ -17,6 +17,7 @@ import EditarPrograma from './pages/programas/EditarPrograma';
 import ListaProgramas from './pages/programas/ListaProgramas';
 import DetallePrograma from './pages/programas/DetallePrograma';
 import ExplorarProgramas from './pages/programas/ExplorarProgramas';
+import MiPrograma from './pages/programas/MiPrograma';
 
 function App() {
   return (
@@ -61,7 +62,7 @@ function App() {
         <Route element={<PrivateRoute roles={[ROLES.PARTICIPANTE]} />}>
           <Route path="/home" element={<ParticipanteDashboard />} />
           <Route path="/explorar" element={<ExplorarProgramas />} />
-          <Route path="/miprograma" element={<div>Detalle Programa Activo</div>} />
+          <Route path="/miprograma" element={<MiPrograma />} />
           <Route path="/miprogramas/:sesionId" element={<div>Realizar Sesión</div>} />
           <Route path="/miprogramas/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
         </Route>

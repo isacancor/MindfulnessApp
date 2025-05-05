@@ -1,6 +1,7 @@
 from django.db import models
 from usuario.models import Usuario, Participante
 from django.utils import timezone
+from datetime import datetime, timedelta
 
 class TipoContexto(models.TextChoices):
     ACADEMICO = 'académico', 'Académico'
@@ -99,3 +100,29 @@ class Programa(models.Model):
 
     class Meta:
         ordering = ['-fecha_creacion']
+
+class ProgramaParticipante(models.Model):
+    programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='inscripciones')
+    participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='inscripciones')
+    fecha_inicio = models.DateTimeField(auto_now_add=True)
+    fecha_fin = models.DateTimeField(null=True, blank=True)
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('programa', 'participante')
+        ordering = ['-fecha_inicio']
+
+    def __str__(self):
+        return f"{self.participante} - {self.programa}"
+
+    def calcular_fecha_fin(self):
+        if not self.fecha_fin:
+            self.fecha_fin = self.fecha_inicio + timedelta(weeks=self.programa.duracion_semanas)
+            self.save()
+        return self.fecha_fin
+
+    def esta_activo(self):
+        if not self.activo:
+            return False
+        fecha_fin = self.calcular_fecha_fin()
+        return timezone.now() <= fecha_fin

@@ -1,7 +1,7 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from .models import Programa, EstadoPublicacion
+from .models import Programa, EstadoPublicacion, ProgramaParticipante
 from .serializers import ProgramaSerializer
 
 @api_view(['GET', 'POST'])
@@ -111,6 +111,26 @@ def programa_publicar(request, pk):
     programa.publicar()
     return Response({'status': 'Programa publicado exitosamente'})
 
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def mi_programa(request):
+    if not request.user.is_participante():
+        return Response(
+            {'error': 'Solo los participantes pueden acceder a esta vista'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        inscripcion = ProgramaParticipante.objects.get(
+            participante=request.user.perfil_participante,
+            activo=True
+        )
+        programa = inscripcion.programa
+        serializer = ProgramaSerializer(programa)
+        return Response(serializer.data)
+    except ProgramaParticipante.DoesNotExist:
+        return Response(None)
+
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def programa_enrolar(request, pk):
@@ -138,12 +158,21 @@ def programa_enrolar(request, pk):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Verificar si el participante ya está enrolado en algún programa
-    if participante.programas_inscritos.exists():
+    # Verificar si el participante ya está enrolado en algún programa activo
+    if ProgramaParticipante.objects.filter(participante=participante, activo=True).exists():
         return Response(
-            {'error': 'Ya estás enrolado en un programa'},
+            {'error': 'Ya estás enrolado en un programa activo'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
+    # Crear la inscripción
+    inscripcion = ProgramaParticipante.objects.create(
+        programa=programa,
+        participante=participante
+    )
+    inscripcion.calcular_fecha_fin()
+
+    # Agregar al participante al programa
     programa.participantes.add(participante)
+    
     return Response({'status': 'Enrolamiento exitoso'})

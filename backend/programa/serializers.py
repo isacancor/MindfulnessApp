@@ -1,10 +1,21 @@
 from rest_framework import serializers
-from .models import Programa, TipoContexto, EnfoqueMetodologico, Escala, EstadoPublicacion
+from .models import Programa, TipoContexto, EnfoqueMetodologico, Escala, EstadoPublicacion, ProgramaParticipante
 from usuario.serializers import UsuarioSerializer
+from sesion.serializers import SesionSerializer
+
+class ProgramaParticipanteSerializer(serializers.ModelSerializer):
+    fecha_fin = serializers.DateTimeField(read_only=True)
+    esta_activo = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = ProgramaParticipante
+        fields = ['fecha_inicio', 'fecha_fin', 'activo', 'esta_activo']
 
 class ProgramaSerializer(serializers.ModelSerializer):
     creado_por = UsuarioSerializer(read_only=True)
     participantes = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    sesiones = SesionSerializer(many=True, read_only=True)
+    inscripcion = ProgramaParticipanteSerializer(read_only=True)
     
     tipo_contexto = serializers.ChoiceField(choices=TipoContexto.choices)
     enfoque_metodologico = serializers.ChoiceField(choices=EnfoqueMetodologico.choices)
@@ -20,7 +31,8 @@ class ProgramaSerializer(serializers.ModelSerializer):
             'poblacion_objetivo', 'duracion_semanas',
             'cuestionario_pre', 'cuestionario_post',
             'escala', 'estado_publicacion', 'creado_por', 'participantes',
-            'fecha_creacion', 'fecha_actualizacion', 'fecha_publicacion', 'puede_ser_publicado'
+            'fecha_creacion', 'fecha_actualizacion', 'fecha_publicacion', 'puede_ser_publicado',
+            'sesiones', 'inscripcion'
         ]
         read_only_fields = ['fecha_creacion', 'fecha_actualizacion', 'fecha_publicacion']
 

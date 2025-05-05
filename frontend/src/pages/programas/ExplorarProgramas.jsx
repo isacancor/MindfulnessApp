@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { BookOpen, Calendar, Users, Clock, FileText, ArrowRight, Loader2, ArrowLeft } from 'lucide-react';
+import { BookOpen, Calendar, Users, Clock, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
 import api from '../../config/axios';
 
 const ExplorarProgramas = () => {
@@ -11,6 +11,8 @@ const ExplorarProgramas = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [enrolando, setEnrolando] = useState(false);
+    const [miProgramaId, setMiProgramaId] = useState(null);
+    const [yaEnrolado, setYaEnrolado] = useState(false);
 
     const fetchProgramas = async () => {
         try {
@@ -24,8 +26,31 @@ const ExplorarProgramas = () => {
         }
     };
 
+    const verificarEnrolamiento = async () => {
+        try {
+            const response = await api.get('/programas/mi-programa/');
+            if (response.data && response.data.id) {
+                setMiProgramaId(response.data.id);
+                setYaEnrolado(true);
+            }
+        } catch (err) {
+            // Si hay un error 404, significa que no está enrolado en ningún programa
+            if (err.response && err.response.status === 404) {
+                setYaEnrolado(false);
+            } else {
+                console.error('Error al verificar enrolamiento:', err);
+            }
+        }
+    };
+
     useEffect(() => {
-        fetchProgramas();
+        const inicializarDatos = async () => {
+            setLoading(true);
+            await verificarEnrolamiento();
+            await fetchProgramas();
+        };
+
+        inicializarDatos();
     }, []);
 
     const handleEnrolar = async (programaId) => {
@@ -82,6 +107,14 @@ const ExplorarProgramas = () => {
                     </div>
                 )}
 
+                {yaEnrolado && (
+                    <div className="max-w-3xl mx-auto mb-8">
+                        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg shadow-sm">
+                            <p className="text-blue-700 font-medium">Ya estás enrolado en un programa. Solo puedes estar en un programa a la vez.</p>
+                        </div>
+                    </div>
+                )}
+
                 {programas.length === 0 ? (
                     <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8 text-center">
                         <div className="bg-gray-50 p-6 rounded-lg">
@@ -95,7 +128,6 @@ const ExplorarProgramas = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {programas.map((programa) => (
-                            console.log(programa),
                             <div
                                 key={programa.id}
                                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col" // flex-col para organizar el contenido verticalmente
@@ -134,23 +166,40 @@ const ExplorarProgramas = () => {
 
                                 {/* Botón posicionado al fondo de la tarjeta */}
                                 <div className="p-6 pt-0 mt-auto"> {/* mt-auto para pegarlo al fondo */}
-                                    <button
-                                        onClick={() => handleEnrolar(programa.id)}
-                                        disabled={enrolando}
-                                        className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-70 disabled:cursor-not-allowed transition-colors duration-200"
-                                    >
-                                        {enrolando ? (
-                                            <>
-                                                <Loader2 className="animate-spin mr-2 h-4 w-4" />
-                                                Procesando...
-                                            </>
-                                        ) : (
-                                            <>
-                                                Unirme ahora
-                                                <ArrowRight className="ml-2 h-4 w-4" />
-                                            </>
-                                        )}
-                                    </button>
+                                    {programa.id === miProgramaId ? (
+                                        <button
+                                            onClick={() => navigate('/miprograma')}
+                                            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200"
+                                        >
+                                            <CheckCircle className="mr-2 h-4 w-4" />
+                                            Programa actual
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleEnrolar(programa.id)}
+                                            disabled={enrolando || yaEnrolado}
+                                            className={`w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white ${yaEnrolado
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                                                } disabled:opacity-70 disabled:cursor-not-allowed transition-colors duration-200`}
+                                        >
+                                            {enrolando ? (
+                                                <>
+                                                    <Loader2 className="animate-spin mr-2 h-4 w-4" />
+                                                    Procesando...
+                                                </>
+                                            ) : yaEnrolado ? (
+                                                <>
+                                                    Ya estás en otro programa
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Unirme ahora
+                                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                                </>
+                                            )}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
