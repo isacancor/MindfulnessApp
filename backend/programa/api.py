@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from .models import Programa, EstadoPublicacion, ProgramaParticipante
 from .serializers import ProgramaSerializer
+from sesion.models import Sesion, EtiquetaPractica, TipoContenido
 
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -32,7 +33,7 @@ def programa_list_create(request):
         
         serializer = ProgramaSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(creado_por=investigador)
+            programa = serializer.save(creado_por=investigador)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -54,9 +55,10 @@ def programa_detail(request, pk):
                 {'error': 'No se puede modificar un programa publicado'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
         serializer = ProgramaSerializer(programa, data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            programa_actualizado = serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

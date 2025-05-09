@@ -7,6 +7,8 @@ const api = axios.create({
     },
 });
 
+export const API_URL = 'http://localhost:8000/api';
+
 // Interceptor para agregar el token a las solicitudes
 api.interceptors.request.use(
     (config) => {

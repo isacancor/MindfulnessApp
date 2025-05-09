@@ -18,6 +18,8 @@ import ListaProgramas from './pages/programas/ListaProgramas';
 import DetallePrograma from './pages/programas/DetallePrograma';
 import ExplorarProgramas from './pages/programas/ExplorarProgramas';
 import MiPrograma from './pages/programas/MiPrograma';
+import CrearSesion from './pages/sesiones/CrearSesion';
+import EditarSesion from './pages/sesiones/EditarSesion';
 
 function App() {
   return (
@@ -37,7 +39,7 @@ function App() {
         <Route element={<PrivateRoute roles={[ROLES.INVESTIGADOR]} />}>
           <Route path="/dashboard" element={<InvestigadorDashboard />} />
 
-          {/* Gestión de programas */}
+          {/* Programas */}
           <Route path="/programas" element={<ListaProgramas />} />
           <Route path="/programas/crear" element={<CrearPrograma />} />
           <Route path="/programas/:id" element={<DetallePrograma />} />
@@ -48,14 +50,13 @@ function App() {
           <Route path="/programas/:id/exportar" element={<div>Exportar Programa</div>} />
           */}
 
-          {/* Gestión de sesiones */}
-          <Route path="/programas/:id/sesiones/crear" element={<div>Crear Sesión</div>} />
-          <Route path="/programas/:id/sesiones/:sesionId" element={<div>Detalle de Sesión</div>} />
+          {/* Sesiones */}
+          <Route path="/programas/:id/sesiones/nueva" element={<CrearSesion />} />
+          <Route path="/programas/:id/sesiones/:sesionId/editar" element={<EditarSesion />} />
 
-          {/* Gestión de cuestionarios */}
+          {/* Cuestionarios */}
           <Route path="/programas/:id/cuestionarios/crear" element={<div>Crear Cuestionario</div>} />
           <Route path="/programas/:id/cuestionarios/:cuestionarioId" element={<div>Detalle de Cuestionario</div>} />
-
         </Route>
 
         {/* Rutas protegidas para participantes */}
@@ -63,8 +64,8 @@ function App() {
           <Route path="/home" element={<ParticipanteDashboard />} />
           <Route path="/explorar" element={<ExplorarProgramas />} />
           <Route path="/miprograma" element={<MiPrograma />} />
-          <Route path="/miprogramas/:sesionId" element={<div>Realizar Sesión</div>} />
-          <Route path="/miprogramas/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
+          <Route path="/miprograma/:id" element={<div>Detalle de Sesión</div>} />
+          <Route path="/miprograma/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
         </Route>
 
         {/* Rutas protegidas para admin */}
@@ -75,6 +76,7 @@ function App() {
           <Route path="/admin/programas" element={<div>Gestión de Programas</div>} />
         </Route>
         */}
+
       </Routes>
     </AuthProvider>
   );

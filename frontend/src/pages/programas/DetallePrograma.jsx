@@ -1,52 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, BookOpen, Calendar, Users, Clock, FileText, Link, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Users, Clock, FileText, Link, Edit, Trash2, Plus, Timer, Music, Video } from 'lucide-react';
 import api from '../../config/axios';
 
 const DetallePrograma = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, hasRole, isInvestigador } = useAuth();
     const [programa, setPrograma] = useState(null);
+    const [sesiones, setSesiones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // Datos de prueba para las sesiones
-    const sesionesPrueba = [
-        {
-            id: 1,
-            titulo: "Introducción al Mindfulness",
-            descripcion: "Primera sesión introductoria al programa de mindfulness",
-            duracion: 60,
-            fecha: "2024-05-10",
-            completada: true
-        },
-        {
-            id: 2,
-            titulo: "Atención Plena en la Respiración",
-            descripcion: "Práctica de atención plena enfocada en la respiración",
-            duracion: 45,
-            fecha: "2024-05-17",
-            completada: false
-        },
-        {
-            id: 3,
-            titulo: "Escaneo Corporal",
-            descripcion: "Práctica de escaneo corporal para desarrollar la conciencia corporal",
-            duracion: 50,
-            fecha: "2024-05-24",
-            completada: false
-        }
-    ];
 
     useEffect(() => {
         const fetchPrograma = async () => {
             try {
                 const response = await api.get(`/programas/${id}/`);
                 setPrograma(response.data);
+                setSesiones(response.data.sesiones)
             } catch (err) {
-                setError('Error al cargar el programa');
+                setError('Error al cargar los datos');
                 console.error('Error:', err);
             } finally {
                 setLoading(false);
@@ -69,12 +43,26 @@ const DetallePrograma = () => {
     };
 
     const handleEliminar = async () => {
-        if (window.confirm('¿Estás seguro de que deseas eliminar este programa?')) {
+        try {
+            await api.delete(`/programas/${id}/`);
+            navigate('/programas');
+        } catch (error) {
+            console.error('Error al eliminar el programa:', error);
+        }
+    };
+
+    const handleNuevaSesion = () => {
+        navigate(`/programas/${id}/sesiones/nueva`);
+    };
+
+    const handleEliminarSesion = async (sesionId) => {
+        if (window.confirm('¿Estás seguro de que deseas eliminar esta sesión?')) {
             try {
-                await api.delete(`/programas/${id}/`);
-                navigate('/programas');
+                await api.delete(`/sesiones/${sesionId}/`);
+                // Actualizar la lista de sesiones
+                setSesiones(sesiones.filter(s => s.id !== sesionId));
             } catch (error) {
-                console.error('Error al eliminar el programa:', error);
+                console.error('Error al eliminar la sesión:', error);
                 if (error.response?.data?.error) {
                     setError(error.response.data.error);
                 }
@@ -107,7 +95,7 @@ const DetallePrograma = () => {
                     {/* Encabezado */}
                     <div className="flex items-center justify-between mb-8">
                         <button
-                            onClick={() => navigate(-1)}
+                            onClick={() => navigate('/programas')}
                             className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
                         >
                             <ArrowLeft className="h-5 w-5 mr-2" />
@@ -118,7 +106,7 @@ const DetallePrograma = () => {
                                 <Clock className="h-5 w-5 mr-2" />
                                 {programa.duracion_semanas} semanas
                             </span>
-                            {user?.is_investigador && programa?.estado_publicacion === 'borrador' && (
+                            {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
                                 <div className="flex space-x-4">
                                     <button
                                         onClick={() => navigate(`/programas/${id}/editar`)}
@@ -244,33 +232,96 @@ const DetallePrograma = () => {
                             </div>
                         </div>
 
+                        {/**************************************************************** */}
                         {/* Sesiones */}
                         <div>
-                            <h2 className="text-xl font-semibold text-gray-900 mb-4">Sesiones del Programa</h2>
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-semibold text-gray-900">Sesiones del Programa</h2>
+                                {isInvestigador() && programa?.estado_publicacion === 'borrador' && sesiones.length < programa.duracion_semanas && (
+                                    <button
+                                        onClick={handleNuevaSesion}
+                                        className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                                    >
+                                        <Plus className="h-5 w-5 mr-2" />
+                                        Nueva Sesión
+                                    </button>
+                                )}
+                            </div>
                             <div className="space-y-4">
-                                {sesionesPrueba.map((sesion) => (
-                                    <div key={sesion.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                                        <div className="flex justify-between items-start">
+                                {sesiones.length == 0 ? (
+                                    <p className="text-gray-500">No hay sesiones creadas todavía.</p>
+                                ) : (sesiones.map((sesion) => (
+                                    <div key={sesion.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                                        <div className="flex items-center space-x-4">
+                                            <div className="flex items-center justify-center w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full font-semibold">
+                                                {sesion.semana}
+                                            </div>
                                             <div>
                                                 <h3 className="text-lg font-medium text-gray-900">{sesion.titulo}</h3>
                                                 <p className="text-gray-600 mt-1">{sesion.descripcion}</p>
                                                 <div className="flex items-center mt-2 text-sm text-gray-500">
                                                     <Clock className="h-4 w-4 mr-1" />
-                                                    <span>{sesion.duracion} minutos</span>
+                                                    <span>{sesion.duracion_estimada} minutos</span>
                                                     <span className="mx-2">•</span>
-                                                    <Calendar className="h-4 w-4 mr-1" />
-                                                    <span>{new Date(sesion.fecha).toLocaleDateString()}</span>
+                                                    {sesion.tipo_contenido === 'temporizador' && (
+                                                        <div className="flex items-center">
+                                                            <Timer className="h-4 w-4 mr-1 text-blue-500" />
+                                                            <span>Temporizador</span>
+                                                        </div>
+                                                    )}
+                                                    {sesion.tipo_contenido === 'enlace' && (
+                                                        <div className="flex items-center">
+                                                            <Link className="h-4 w-4 mr-1 text-green-500" />
+                                                            <span>Enlace</span>
+                                                        </div>
+                                                    )}
+                                                    {sesion.tipo_contenido === 'audio' && (
+                                                        <div className="flex items-center">
+                                                            <Music className="h-4 w-4 mr-1 text-purple-500" />
+                                                            <span>Audio</span>
+                                                        </div>
+                                                    )}
+                                                    {sesion.tipo_contenido === 'video' && (
+                                                        <div className="flex items-center">
+                                                            <Video className="h-4 w-4 mr-1 text-red-500" />
+                                                            <span>Video</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${sesion.completada
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-yellow-100 text-yellow-800'
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${sesion.tipo_practica === 'focus_attention' ? 'bg-blue-100 text-blue-800' :
+                                                sesion.tipo_practica === 'open_monitoring' ? 'bg-green-100 text-green-800' :
+                                                    sesion.tipo_practica === 'loving_kindness' ? 'bg-purple-100 text-purple-800' :
+                                                        sesion.tipo_practica === 'body_scan' ? 'bg-yellow-100 text-yellow-800' :
+                                                            sesion.tipo_practica === 'mindful_movement' ? 'bg-red-100 text-red-800' :
+                                                                sesion.tipo_practica === 'self_compassion' ? 'bg-pink-100 text-pink-800' :
+                                                                    'bg-gray-100 text-gray-800'
                                                 }`}>
-                                                {sesion.completada ? 'Completada' : 'Pendiente'}
+                                                {sesion.tipo_practica_display}
                                             </span>
+                                            {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => navigate(`/programas/${id}/sesiones/${sesion.id}/editar`)}
+                                                        className="p-2 text-gray-600 hover:text-indigo-600 transition-colors"
+                                                        title="Editar sesión"
+                                                    >
+                                                        <Edit className="h-5 w-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleEliminarSesion(sesion.id)}
+                                                        className="p-2 text-gray-600 hover:text-red-600 transition-colors"
+                                                        title="Eliminar sesión"
+                                                    >
+                                                        <Trash2 className="h-5 w-5" />
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
-                                ))}
+                                )))}
                             </div>
                         </div>
                     </div>

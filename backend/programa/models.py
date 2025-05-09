@@ -96,7 +96,12 @@ class Programa(models.Model):
             self.escala,
             self.creado_por
         ]
-        return all(campos_requeridos)
+        
+        # Verificar que tenga todas las sesiones necesarias
+        sesiones_requeridas = set(range(1, self.duracion_semanas + 1))
+        sesiones_existentes = set(self.sesiones.values_list('semana', flat=True))
+        
+        return all(campos_requeridos) and sesiones_requeridas == sesiones_existentes
 
     class Meta:
         ordering = ['-fecha_creacion']

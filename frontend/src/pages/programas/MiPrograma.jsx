@@ -21,6 +21,7 @@ const MiPrograma = () => {
             try {
                 const response = await api.get('/programas/mi-programa/');
                 setPrograma(response.data);
+
                 // Calcular progreso basado en las sesiones completadas
                 const sesionesCompletadas = response.data.sesiones?.filter(s => s.completada).length || 0;
                 const totalSesiones = response.data.sesiones?.length || 0;

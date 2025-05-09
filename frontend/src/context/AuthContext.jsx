@@ -29,6 +29,24 @@ export const AuthProvider = ({ children }) => {
         return user.role === role;
     };
 
+    // Verificar si el usuario es un investigador
+    const isInvestigador = () => {
+        if (!user) return false;
+        return user.role === ROLES.INVESTIGADOR;
+    };
+
+    // Verificar si el usuario es un participante
+    const isParticipante = () => {
+        if (!user) return false;
+        return user.role === ROLES.PARTICIPANTE;
+    };
+
+    // Verificar si el usuario es un administrador
+    const isAdministrador = () => {
+        if (!user) return false;
+        return user.role === ROLES.ADMIN;
+    };
+
     // Verificar si el usuario está autenticado
     const isAuthenticated = () => {
         return !!user;
@@ -172,7 +190,10 @@ export const AuthProvider = ({ children }) => {
         hasPermission,
         hasRole,
         resetError,
-        isAuthenticated
+        isAuthenticated,
+        isInvestigador,
+        isParticipante,
+        isAdministrador
     };
 
     return (
