@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Clock } from 'lucide-react';
 import api from '../../config/axios';
-import { ensureHttps } from '../../utils/url';
+import { prepareSessionFormData } from '../../utils/formData';
 
 const CrearSesion = () => {
     const navigate = useNavigate();
@@ -77,19 +77,8 @@ const CrearSesion = () => {
         setLoading(true);
         setError(null);
 
-        const dataToSend = {
-            ...formData,
-            contenido_url: ensureHttps(formData.contenido_url)
-        };
-
-        const formDataToSend = new FormData();
-        Object.keys(dataToSend).forEach(key => {
-            if (dataToSend[key] !== null) {
-                formDataToSend.append(key, dataToSend[key]);
-            }
-        });
-
         try {
+            const formDataToSend = prepareSessionFormData(formData);
             await api.post('sesiones', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -326,7 +315,7 @@ const CrearSesion = () => {
                                     id="contenido_video"
                                     name="contenido_video"
                                     type="file"
-                                    accept="video/*"
+                                    accept="video/mp4"
                                     required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
                                     onChange={handleFileChange}

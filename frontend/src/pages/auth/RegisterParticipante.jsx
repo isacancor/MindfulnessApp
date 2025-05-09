@@ -351,7 +351,6 @@ const RegisterParticipante = () => {
                                     id="condicionesSalud"
                                     name="condicionesSalud"
                                     rows="3"
-                                    required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
                                     placeholder="Describe cualquier condición de salud relevante (opcional)"
                                     value={formData.condicionesSalud}

@@ -57,6 +57,7 @@ const EditarPrograma = () => {
         const fetchPrograma = async () => {
             try {
                 const response = await api.get(`/programas/${id}/`);
+                console.log(response.data);
                 if (response.data.estado_publicacion === 'publicado') {
                     navigate('/programas');
                     return;
@@ -85,6 +86,13 @@ const EditarPrograma = () => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        // Comprobar si el nuevo numero de semanas es menor que el numero de sesiones existentes
+        if (formData.duracion_semanas < formData.sesiones.length) {
+            setError('El número de semanas no puede ser menor que el número de sesiones existentes');
+            setLoading(false);
+            return;
+        }
 
         const dataToSend = {
             ...formData,

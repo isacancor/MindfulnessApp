@@ -20,6 +20,7 @@ import ExplorarProgramas from './pages/programas/ExplorarProgramas';
 import MiPrograma from './pages/programas/MiPrograma';
 import CrearSesion from './pages/sesiones/CrearSesion';
 import EditarSesion from './pages/sesiones/EditarSesion';
+import HacerSesion from './pages/sesiones/HacerSesion';
 
 function App() {
   return (
@@ -64,7 +65,7 @@ function App() {
           <Route path="/home" element={<ParticipanteDashboard />} />
           <Route path="/explorar" element={<ExplorarProgramas />} />
           <Route path="/miprograma" element={<MiPrograma />} />
-          <Route path="/miprograma/:id" element={<div>Detalle de Sesión</div>} />
+          <Route path="/miprograma/sesion/:sesionId" element={<HacerSesion />} />
           <Route path="/miprograma/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
         </Route>
 

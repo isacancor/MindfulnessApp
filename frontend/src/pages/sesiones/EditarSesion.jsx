@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Clock } from 'lucide-react';
 import api from '../../config/axios';
-import { ensureHttps } from '../../utils/url';
+import { prepareSessionFormData } from '../../utils/formData';
 
 const EditarSesion = () => {
     const navigate = useNavigate();
@@ -12,6 +12,7 @@ const EditarSesion = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [programa, setPrograma] = useState(null);
+    const [originalData, setOriginalData] = useState(null);
     const [formData, setFormData] = useState({
         programa: id,
         titulo: '',
@@ -51,8 +52,10 @@ const EditarSesion = () => {
                     api.get(`/sesiones/${sesionId}/`)
                 ]);
                 setPrograma(programaResponse.data);
+                const sesionData = sesionResponse.data;
+                setOriginalData(sesionData);
                 setFormData({
-                    ...sesionResponse.data,
+                    ...sesionData,
                     programa: id
                 });
             } catch (error) {
@@ -84,19 +87,8 @@ const EditarSesion = () => {
         setLoading(true);
         setError(null);
 
-        const dataToSend = {
-            ...formData,
-            contenido_url: ensureHttps(formData.contenido_url)
-        };
-
-        const formDataToSend = new FormData();
-        Object.keys(dataToSend).forEach(key => {
-            if (dataToSend[key] !== null) {
-                formDataToSend.append(key, dataToSend[key]);
-            }
-        });
-
         try {
+            const formDataToSend = prepareSessionFormData(formData, originalData);
             await api.put(`/sesiones/${sesionId}/`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -311,12 +303,16 @@ const EditarSesion = () => {
                                 <label htmlFor="contenido_audio" className="block text-sm font-medium text-gray-700 mb-1">
                                     Archivo de Audio *
                                 </label>
+                                {formData.contenido_audio && typeof formData.contenido_audio === 'string' && (
+                                    <div className="mb-2 p-2 bg-gray-50 rounded-lg">
+                                        <p className="text-sm text-gray-600">Archivo actual: {formData.contenido_audio.split('/').pop()}</p>
+                                    </div>
+                                )}
                                 <input
                                     id="contenido_audio"
                                     name="contenido_audio"
                                     type="file"
                                     accept="audio/*"
-                                    required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
                                     onChange={handleFileChange}
                                     disabled={loading}
@@ -329,12 +325,16 @@ const EditarSesion = () => {
                                 <label htmlFor="contenido_video" className="block text-sm font-medium text-gray-700 mb-1">
                                     Archivo de Video *
                                 </label>
+                                {formData.contenido_video && typeof formData.contenido_video === 'string' && (
+                                    <div className="mb-2 p-2 bg-gray-50 rounded-lg">
+                                        <p className="text-sm text-gray-600">Archivo actual: {formData.contenido_video.split('/').pop()}</p>
+                                    </div>
+                                )}
                                 <input
                                     id="contenido_video"
                                     name="contenido_video"
                                     type="file"
-                                    accept="video/*"
-                                    required
+                                    accept="video/mp4"
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
                                     onChange={handleFileChange}
                                     disabled={loading}
