@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Link, Music, Video } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video } from 'lucide-react';
 import api from '../../config/axios';
 
 const MiPrograma = () => {
@@ -159,19 +159,25 @@ const MiPrograma = () => {
                         {programa.sesiones?.map((sesion, index) => (
                             <div
                                 key={sesion.id}
-                                className={`p-4 rounded-lg border ${sesion.completada
-                                    ? 'border-green-200 bg-green-50'
+                                className={`flex items-center justify-between p-4 rounded-lg transition-colors ${sesion.completada
+                                    ? 'bg-green-50 hover:bg-green-100'
                                     : index === 0 || programa.sesiones[index - 1]?.completada
-                                        ? 'border-blue-200 bg-blue-50'
-                                        : 'border-gray-200 bg-gray-50'
+                                        ? 'bg-blue-50 hover:bg-blue-100'
+                                        : 'bg-gray-50 hover:bg-gray-100'
                                     }`}
                             >
-                                <div className="flex items-start justify-between">
-                                    <div className="flex-1">
+                                <div className="flex items-center space-x-4">
+                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${sesion.completada
+                                        ? 'bg-green-100 text-green-600'
+                                        : index === 0 || programa.sesiones[index - 1]?.completada
+                                            ? 'bg-blue-100 text-blue-600'
+                                            : 'bg-gray-100 text-gray-600'
+                                        }`}>
+                                        {sesion.semana}
+                                    </div>
+                                    <div>
                                         <div className="flex items-center gap-2">
-                                            <h3 className="text-lg font-medium text-gray-900">
-                                                Semana {sesion.semana}: {sesion.titulo}
-                                            </h3>
+                                            <h3 className="text-lg font-medium text-gray-900">{sesion.titulo}</h3>
                                             {sesion.completada ? (
                                                 <CheckCircle2 className="h-5 w-5 text-green-600" />
                                             ) : index === 0 || programa.sesiones[index - 1]?.completada ? (
@@ -180,43 +186,49 @@ const MiPrograma = () => {
                                                 <AlertCircle className="h-5 w-5 text-gray-400" />
                                             )}
                                         </div>
-                                        <p className="mt-1 text-sm text-gray-600">{sesion.descripcion}</p>
-                                        <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
-                                            <span className="flex items-center">
-                                                <Clock className="h-4 w-4 mr-1" />
-                                                {sesion.duracion_estimada} min
-                                            </span>
-                                            <span className="flex items-center">
-                                                <FileText className="h-4 w-4 mr-1" />
+                                        <p className="text-gray-600 mt-1">{sesion.descripcion}</p>
+                                        <div className="flex items-center mt-2 text-sm text-gray-500">
+                                            <Clock className="h-4 w-4 mr-1" />
+                                            <span>{sesion.duracion_estimada} minutos</span>
+                                            <span className="mx-2">•</span>
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${sesion.tipo_practica === 'focus_attention' ? 'bg-blue-100 text-blue-800' :
+                                                sesion.tipo_practica === 'open_monitoring' ? 'bg-green-100 text-green-800' :
+                                                    sesion.tipo_practica === 'loving_kindness' ? 'bg-purple-100 text-purple-800' :
+                                                        sesion.tipo_practica === 'body_scan' ? 'bg-yellow-100 text-yellow-800' :
+                                                            sesion.tipo_practica === 'mindful_movement' ? 'bg-red-100 text-red-800' :
+                                                                sesion.tipo_practica === 'self_compassion' ? 'bg-pink-100 text-pink-800' :
+                                                                    'bg-gray-100 text-gray-800'
+                                                }`}>
                                                 {sesion.tipo_practica_display}
                                             </span>
+                                            <span className="mx-2">•</span>
                                             <span className="flex items-center">
-                                                {sesion.tipo_contenido === 'temporizador' && <Clock className="h-4 w-4 mr-1" />}
-                                                {sesion.tipo_contenido === 'enlace' && <Link className="h-4 w-4 mr-1" />}
-                                                {sesion.tipo_contenido === 'audio' && <Music className="h-4 w-4 mr-1" />}
-                                                {sesion.tipo_contenido === 'video' && <Video className="h-4 w-4 mr-1" />}
+                                                {sesion.tipo_contenido === 'temporizador' && <Timer className="h-4 w-4 mr-1 text-blue-500" />}
+                                                {sesion.tipo_contenido === 'enlace' && <Link className="h-4 w-4 mr-1 text-green-500" />}
+                                                {sesion.tipo_contenido === 'audio' && <Music className="h-4 w-4 mr-1 text-purple-500" />}
+                                                {sesion.tipo_contenido === 'video' && <Video className="h-4 w-4 mr-1 text-red-500" />}
                                                 {sesion.tipo_contenido_display}
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="ml-4">
-                                        {sesion.completada ? (
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                                Completada
-                                            </span>
-                                        ) : index === 0 || programa.sesiones[index - 1]?.completada ? (
-                                            <button
-                                                onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
-                                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                            >
-                                                Comenzar
-                                            </button>
-                                        ) : (
-                                            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                                                Bloqueada
-                                            </span>
-                                        )}
-                                    </div>
+                                </div>
+                                <div className="ml-4">
+                                    {sesion.completada ? (
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                            Completada
+                                        </span>
+                                    ) : index === 0 || programa.sesiones[index - 1]?.completada ? (
+                                        <button
+                                            onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
+                                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        >
+                                            Comenzar
+                                        </button>
+                                    ) : (
+                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                                            Bloqueada
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         ))}

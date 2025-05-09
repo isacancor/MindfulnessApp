@@ -1,6 +1,6 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from .models import Sesion, DiarioRespuesta, EtiquetaPractica, TipoContenido
 from .serializers import (
     SesionSerializer, 
@@ -15,6 +15,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+import os
+from django.conf import settings
 
 def validate_url(url):
     if not url:
@@ -28,8 +30,14 @@ def validate_url(url):
     except ValidationError:
         return False
 
+def validate_video_file(file):
+    if not file:
+        return True
+    return file.name.lower().endswith('.mp4')
+
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 def sesion_list_create(request):
     if request.method == 'GET':
         queryset = Sesion.objects.all()
@@ -76,14 +84,14 @@ def sesion_list_create(request):
         return Response(serializer.data)
     
     elif request.method == 'POST':
-        # Verificar que el usuario es un investigador
+        # Validar que el usuario es un investigador
         if not request.user.is_investigador():
             return Response(
                 {"error": "Solo los investigadores pueden crear sesiones"},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Verificar que el programa existe y pertenece al investigador
+        # Validar que el programa pertenece al investigador
         programa_id = request.data.get('programa')
         try:
             programa = Programa.objects.get(id=programa_id)
@@ -92,26 +100,20 @@ def sesion_list_create(request):
                     {"error": "No tienes permiso para crear sesiones en este programa"},
                     status=status.HTTP_403_FORBIDDEN
                 )
-            if programa.estado_publicacion == EstadoPublicacion.PUBLICADO:
-                return Response(
-                    {"error": "No se pueden crear sesiones en un programa publicado"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
         except Programa.DoesNotExist:
             return Response(
-                {"error": "El programa especificado no existe"},
+                {"error": "Programa no encontrado"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Validar que el programa no está publicado
+        if programa.estado_publicacion == EstadoPublicacion.PUBLICADO:
+            return Response(
+                {"error": "No se pueden crear sesiones en un programa publicado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Verificar que no existe una sesión para esa semana
-        semana = request.data.get('semana')
-        if Sesion.objects.filter(programa=programa, semana=semana).exists():
-            return Response(
-                {"error": "Ya existe una sesión para esta semana"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Validar campos según el tipo de contenido
+        # Validar tipo de contenido
         tipo_contenido = request.data.get('tipo_contenido')
         if tipo_contenido == 'enlace':
             url = request.data.get('contenido_url', '')
@@ -120,6 +122,10 @@ def sesion_list_create(request):
         elif tipo_contenido == 'temporizador':
             if not request.data.get('contenido_temporizador'):
                 request.data['contenido_temporizador'] = 0
+        elif tipo_contenido == 'video':
+            video_file = request.FILES.get('contenido_video')
+            if video_file and not validate_video_file(video_file):
+                return Response({'error': 'Solo se permiten archivos de video en formato MP4'}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = SesionSerializer(data=request.data)
         if serializer.is_valid():
@@ -129,9 +135,10 @@ def sesion_list_create(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 def sesion_detail(request, pk):
     try:
-        sesion = Sesion.objects.get(pk=pk)
+        sesion = get_object_or_404(Sesion, pk=pk)
     except Sesion.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -159,6 +166,47 @@ def sesion_detail(request, pk):
                 {"error": "No se pueden modificar sesiones de un programa publicado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        # Validar tipo de contenido
+        tipo_contenido = request.data.get('tipo_contenido')
+        if tipo_contenido == 'enlace':
+            url = request.data.get('contenido_url', '')
+            if url and not validate_url(url):
+                return Response({'error': 'URL inválida. Debe incluir http:// o https://'}, status=status.HTTP_400_BAD_REQUEST)
+        elif tipo_contenido == 'temporizador':
+            if not request.data.get('contenido_temporizador'):
+                request.data['contenido_temporizador'] = 0
+        elif tipo_contenido == 'video':
+            video_file = request.FILES.get('contenido_video')
+            if video_file and not validate_video_file(video_file):
+                return Response({'error': 'Solo se permiten archivos de video en formato MP4'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Limpiar contenido anterior si se cambió el tipo de contenido
+        if request.data.get('limpiar_contenido') == 'true':
+            tipo_anterior = request.data.get('tipo_contenido_anterior')
+            
+            # Eliminar archivos físicos si existen
+            if tipo_anterior == 'audio' and sesion.contenido_audio:
+                try:
+                    os.remove(os.path.join(settings.MEDIA_ROOT, str(sesion.contenido_audio)))
+                except:
+                    pass
+                sesion.contenido_audio = None
+            
+            elif tipo_anterior == 'video' and sesion.contenido_video:
+                try:
+                    os.remove(os.path.join(settings.MEDIA_ROOT, str(sesion.contenido_video)))
+                except:
+                    pass
+                sesion.contenido_video = None
+            
+            # Limpiar campos en la base de datos
+            if tipo_anterior == 'temporizador':
+                sesion.contenido_temporizador = None
+            elif tipo_anterior == 'enlace':
+                sesion.contenido_url = None
+            
+            sesion.save()
         
         serializer = SesionSerializer(sesion, data=request.data)
         if serializer.is_valid():
@@ -186,6 +234,19 @@ def sesion_detail(request, pk):
                 {"error": "No se pueden eliminar sesiones de un programa publicado"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # Eliminar archivos físicos si existen
+        if sesion.contenido_audio:
+            try:
+                os.remove(os.path.join(settings.MEDIA_ROOT, str(sesion.contenido_audio)))
+            except:
+                pass
+        
+        if sesion.contenido_video:
+            try:
+                os.remove(os.path.join(settings.MEDIA_ROOT, str(sesion.contenido_video)))
+            except:
+                pass
         
         sesion.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

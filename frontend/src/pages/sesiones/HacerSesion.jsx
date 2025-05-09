@@ -11,6 +11,7 @@ const HacerSesion = () => {
     const [error, setError] = useState(null);
     const [tiempoRestante, setTiempoRestante] = useState(null);
     const [completada, setCompletada] = useState(false);
+    const [temporizadorActivo, setTemporizadorActivo] = useState(false);
 
     useEffect(() => {
         const fetchSesion = async () => {
@@ -33,7 +34,7 @@ const HacerSesion = () => {
 
     useEffect(() => {
         let timer;
-        if (sesion?.tipo_contenido === 'temporizador' && tiempoRestante > 0 && !completada) {
+        if (sesion?.tipo_contenido === 'temporizador' && !completada && temporizadorActivo) {
             timer = setInterval(() => {
                 setTiempoRestante(prev => {
                     if (prev <= 1) {
@@ -46,11 +47,11 @@ const HacerSesion = () => {
             }, 1000);
         }
         return () => clearInterval(timer);
-    }, [sesion?.tipo_contenido, tiempoRestante, completada]);
+    }, [sesion?.tipo_contenido, temporizadorActivo, completada]);
 
     const handleCompletar = async () => {
         try {
-            await api.post('/diario-respuesta/', {
+            await api.post('/diario/', {
                 sesion: sesionId,
                 completada: true
             });
@@ -120,6 +121,16 @@ const HacerSesion = () => {
                                 <div className="text-6xl font-bold text-blue-600 mb-4">
                                     {formatTime(tiempoRestante)}
                                 </div>
+
+                                {!temporizadorActivo && !completada && (
+                                    <button
+                                        onClick={() => setTemporizadorActivo(true)}
+                                        className="mt-4 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-md shadow-sm"
+                                    >
+                                        Comenzar
+                                    </button>
+                                )}
+
                                 {completada && (
                                     <div className="text-green-600 font-medium">
                                         ¡Tiempo completado!
