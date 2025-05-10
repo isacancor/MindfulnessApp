@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Clock, CheckCircle2, ExternalLink } from 'lucide-react';
 import api from '../../config/axios';
+import DiarioForm from '../../components/DiarioForm';
 
 const HacerSesion = () => {
     const navigate = useNavigate();
@@ -12,6 +13,8 @@ const HacerSesion = () => {
     const [tiempoRestante, setTiempoRestante] = useState(null);
     const [completada, setCompletada] = useState(false);
     const [temporizadorActivo, setTemporizadorActivo] = useState(false);
+    const [mostrarDiario, setMostrarDiario] = useState(false);
+    const [diarioCompletado, setDiarioCompletado] = useState(false);
 
     useEffect(() => {
         const fetchSesion = async () => {
@@ -19,11 +22,22 @@ const HacerSesion = () => {
                 const response = await api.get(`/sesiones/${sesionId}/`);
                 setSesion(response.data);
                 if (response.data.tipo_contenido === 'temporizador') {
-                    setTiempoRestante(response.data.contenido_temporizador * 60); // Convertir a segundos
+                    setTiempoRestante(response.data.contenido_temporizador * 60);
+                }
+
+                // Verificar si ya existe un diario para esta sesión
+                const diarioResponse = await api.get(`/sesiones/${sesionId}/diario_info/`);
+                if (diarioResponse.data) {
+                    setDiarioCompletado(true);
+                    setCompletada(true);
                 }
             } catch (err) {
-                console.error('Error al cargar la sesión:', err);
-                setError('Error al cargar la sesión. Por favor, intenta nuevamente.');
+                if (err.response?.status === 404) {
+                    // No hay diario, continuar normalmente
+                } else {
+                    console.error('Error al cargar la sesión:', err);
+                    setError('Error al cargar la sesión. Por favor, intenta nuevamente.');
+                }
             } finally {
                 setLoading(false);
             }
@@ -49,16 +63,11 @@ const HacerSesion = () => {
         return () => clearInterval(timer);
     }, [sesion?.tipo_contenido, temporizadorActivo, completada]);
 
-    const handleCompletar = async () => {
-        try {
-            await api.post('/diario/', {
-                sesion: sesionId,
-                completada: true
-            });
-            navigate('/mi-programa');
-        } catch (err) {
-            console.error('Error al marcar la sesión como completada:', err);
-            setError('Error al guardar el progreso. Por favor, intenta nuevamente.');
+    const handleCompletar = () => {
+        if (diarioCompletado) {
+            navigate('/miprograma');
+        } else {
+            setMostrarDiario(true);
         }
     };
 
@@ -99,94 +108,84 @@ const HacerSesion = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="absolute top-8 left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
-                    aria-label="Volver atrás"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                </button>
-
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                        Semana {sesion.semana}: {sesion.titulo}
-                    </h1>
-                    <p className="text-gray-600 mb-6">{sesion.descripcion}</p>
-
-                    <div className="space-y-6">
-                        {sesion.tipo_contenido === 'temporizador' && (
-                            <div className="text-center">
-                                <div className="text-6xl font-bold text-blue-600 mb-4">
-                                    {formatTime(tiempoRestante)}
+        <div className="min-h-screen bg-gray-50">
+            <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="inline-flex items-center text-gray-600 hover:text-gray-900"
+                            >
+                                <ArrowLeft className="h-5 w-5 mr-2" />
+                                Volver
+                            </button>
+                            {sesion.tipo_contenido === 'temporizador' && (
+                                <div className="flex items-center text-gray-600">
+                                    <Clock className="h-5 w-5 mr-2" />
+                                    <span className="font-medium">{formatTime(tiempoRestante)}</span>
                                 </div>
+                            )}
+                        </div>
 
-                                {!temporizadorActivo && !completada && (
-                                    <button
-                                        onClick={() => setTemporizadorActivo(true)}
-                                        className="mt-4 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-md shadow-sm"
-                                    >
-                                        Comenzar
-                                    </button>
-                                )}
+                        <h1 className="text-2xl font-bold text-gray-900 mb-4">{sesion.titulo}</h1>
+                        <p className="text-gray-600 mb-6">{sesion.descripcion}</p>
 
-                                {completada && (
-                                    <div className="text-green-600 font-medium">
-                                        ¡Tiempo completado!
+                        <div className="space-y-6">
+                            {sesion.tipo_contenido === 'temporizador' && (
+                                <div className="text-center">
+                                    <div className="text-4xl font-bold text-blue-600 mb-4">
+                                        {formatTime(tiempoRestante)}
                                     </div>
-                                )}
-                            </div>
-                        )}
+                                    <button
+                                        onClick={() => setTemporizadorActivo(!temporizadorActivo)}
+                                        disabled={completada}
+                                        className={`px-4 py-2 rounded-md text-white font-medium ${temporizadorActivo
+                                            ? 'bg-red-600 hover:bg-red-700'
+                                            : completada
+                                                ? 'bg-gray-400 cursor-not-allowed'
+                                                : 'bg-blue-600 hover:bg-blue-700'
+                                            }`}
+                                    >
+                                        {temporizadorActivo ? 'Pausar' : completada ? 'Completado' : 'Iniciar'}
+                                    </button>
+                                </div>
+                            )}
 
-                        {sesion.tipo_contenido === 'enlace' && (
-                            <div className="text-center">
-                                <a
-                                    href={sesion.contenido_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                >
-                                    <ExternalLink className="h-5 w-5 mr-2" />
-                                    Abrir enlace
-                                </a>
-                            </div>
-                        )}
+                            {sesion.tipo_contenido === 'enlace' && (
+                                <div className="text-center">
+                                    <a
+                                        href={sesion.contenido_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                                    >
+                                        Abrir enlace
+                                        <ExternalLink className="ml-2 h-5 w-5" />
+                                    </a>
+                                </div>
+                            )}
 
-                        {sesion.tipo_contenido === 'audio' && (
-                            <div className="w-full">
-                                <audio
-                                    controls
-                                    className="w-full"
-                                    src={getMediaUrl(sesion.contenido_audio)}
-                                >
-                                    Tu navegador no soporta el elemento de audio.
-                                </audio>
-                            </div>
-                        )}
-
-                        {sesion.tipo_contenido === 'video' && (
-                            <div className="aspect-video">
-                                {sesion.contenido_video?.toLowerCase().endsWith('.mp4') ? (
+                            {sesion.tipo_contenido === 'video' && (
+                                <div className="aspect-w-16 aspect-h-9">
                                     <video
+                                        src={getMediaUrl(sesion.contenido_video)}
                                         controls
                                         className="w-full h-full rounded-lg"
-                                        src={getMediaUrl(sesion.contenido_video)}
-                                    >
-                                        Tu navegador no soporta el elemento de video.
-                                    </video>
-                                ) : (
-                                    <div className="w-full h-full rounded-lg bg-red-50 border border-red-200 flex items-center justify-center p-6">
-                                        <div className="text-center">
-                                            <p className="text-red-700 font-medium mb-2">Formato de video no compatible</p>
-                                            <p className="text-red-600 text-sm">
-                                                El video debe estar en formato MP4 para poder reproducirlo en el navegador.
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
+                                    />
+                                </div>
+                            )}
+
+                            {sesion.tipo_contenido === 'audio' && (
+                                <div className="text-center">
+                                    <audio
+                                        src={getMediaUrl(sesion.contenido_audio)}
+                                        controls
+                                        className="w-full"
+                                    />
+                                </div>
+                            )}
+                        </div>
 
                         <div className="flex justify-center mt-8">
                             <button
@@ -194,16 +193,29 @@ const HacerSesion = () => {
                                 disabled={sesion.tipo_contenido === 'temporizador' && !completada}
                                 className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white ${sesion.tipo_contenido === 'temporizador' && !completada
                                     ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+                                    : diarioCompletado
+                                        ? 'bg-green-600 hover:bg-green-700'
+                                        : 'bg-blue-600 hover:bg-blue-700'
                                     }`}
                             >
                                 <CheckCircle2 className="h-5 w-5 mr-2" />
-                                Marcar como completada
+                                {diarioCompletado ? 'Volver al programa' : 'Marcar como completada'}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {mostrarDiario && (
+                <DiarioForm
+                    sesion={sesion}
+                    onClose={() => setMostrarDiario(false)}
+                    onSuccess={() => {
+                        setDiarioCompletado(true);
+                        setMostrarDiario(false);
+                    }}
+                />
+            )}
         </div>
     );
 };

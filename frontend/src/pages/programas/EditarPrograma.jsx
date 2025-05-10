@@ -57,7 +57,6 @@ const EditarPrograma = () => {
         const fetchPrograma = async () => {
             try {
                 const response = await api.get(`/programas/${id}/`);
-                console.log(response.data);
                 if (response.data.estado_publicacion === 'publicado') {
                     navigate('/programas');
                     return;

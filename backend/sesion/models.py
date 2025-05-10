@@ -1,5 +1,5 @@
 from django.db import models
-from programa.models import Programa, ProgramaParticipante
+from programa.models import Programa, ProgramaParticipante, Escala
 from usuario.models import Participante
 from django.utils import timezone
 
@@ -22,8 +22,8 @@ class Sesion(models.Model):
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='sesiones')
     titulo = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
-    semana = models.PositiveIntegerField(help_text="Número de semana en el programa")
-    duracion_estimada = models.PositiveIntegerField(help_text="Duración estimada en minutos", blank=True, null=True)
+    semana = models.PositiveIntegerField(help_text='Número de semana en el programa')
+    duracion_estimada = models.PositiveIntegerField(blank=True, help_text='Duración estimada en minutos', null=True)
     tipo_practica = models.CharField(
         max_length=50,
         choices=EtiquetaPractica.choices,
@@ -33,6 +33,11 @@ class Sesion(models.Model):
         max_length=50,
         choices=TipoContenido.choices,
         default=TipoContenido.TEMPORIZADOR
+    )
+    tipo_escala = models.CharField(
+        max_length=50,
+        choices=Escala.choices,
+        default=Escala.EMOCIONAL
     )
     contenido_temporizador = models.PositiveIntegerField(blank=True, null=True, help_text="Duración del temporizador en minutos")
     contenido_url = models.URLField(blank=True, null=True, help_text="URL para contenido externo o cargado")
@@ -46,30 +51,66 @@ class Sesion(models.Model):
     def __str__(self):
         return f"{self.programa.nombre} - Semana {self.semana}: {self.titulo}"
     
+    def get_tipo_practica_display(self):
+        return dict(EtiquetaPractica.choices).get(self.tipo_practica, self.tipo_practica)
+    
+    def get_tipo_contenido_display(self):
+        return dict(TipoContenido.choices).get(self.tipo_contenido, self.tipo_contenido)
+    
     def esta_disponible_para(self, participante):
-        try:
-            inscripcion = ProgramaParticipante.objects.get(
-                programa=self.programa, 
-                participante=participante,
-                activo=True
-            )
-            fecha_inicio_semana = inscripcion.fecha_inicio + timezone.timedelta(weeks=self.semana-1)
-            fecha_fin_semana = fecha_inicio_semana + timezone.timedelta(weeks=1)
-            ahora = timezone.now()
-            return fecha_inicio_semana <= ahora <= fecha_fin_semana
-        except ProgramaParticipante.DoesNotExist:
+        """Verifica si la sesión está disponible para un participante."""
+        # Verificar si el participante está inscrito en el programa
+        inscripcion = ProgramaParticipante.objects.filter(
+            participante=participante,
+            programa=self.programa,
+            activo=True
+        ).first()
+        
+        if not inscripcion:
             return False
+            
+        # Calcular la fecha de inicio de la semana
+        fecha_inicio_semana = inscripcion.fecha_inicio + timezone.timedelta(weeks=self.semana-1)
+        fecha_fin_semana = fecha_inicio_semana + timezone.timedelta(weeks=1)
+        
+        # Verificar si estamos en la semana correcta
+        ahora = timezone.now()
+        if not (fecha_inicio_semana <= ahora <= fecha_fin_semana):
+            return False
+            
+        # Verificar si ya existe un diario para esta sesión
+        if DiarioSesion.objects.filter(participante=participante, sesion=self).exists():
+            return False
+            
+        # Verificar si la sesión anterior está completada
+        if self.semana > 1:
+            sesion_anterior = Sesion.objects.filter(
+                programa=self.programa,
+                semana=self.semana - 1
+            ).first()
+            
+            if sesion_anterior:
+                diario_anterior = DiarioSesion.objects.filter(
+                    participante=participante,
+                    sesion=sesion_anterior
+                ).exists()
+                
+                if not diario_anterior:
+                    return False
+        
+        return True
 
-class DiarioRespuesta(models.Model):
+
+class DiarioSesion(models.Model):
     participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='diarios')
     sesion = models.ForeignKey(Sesion, on_delete=models.CASCADE, related_name='diarios')
-    valoracion = models.IntegerField(help_text="Valor numérico de la respuesta (1-5, 0-10, etc.)")
+    valoracion = models.FloatField()  # Usamos float por si hay escalas decimales en el futuro
     comentario = models.TextField(blank=True, null=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
-        ordering = ['-fecha_creacion']
-        unique_together = ['participante', 'sesion']
-    
+        unique_together = ('participante', 'sesion')
+        ordering = ['sesion__semana', 'fecha_creacion']
+
     def __str__(self):
-        return f"Diario de {self.participante.usuario.email} - {self.sesion.titulo}"
+        return f"Diario de {self.participante.usuario.nombre_completo} en Semana {self.sesion.semana}"

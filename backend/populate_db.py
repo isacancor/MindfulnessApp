@@ -195,7 +195,7 @@ def run():
                 tipo_contenido='temporizador',
                 contenido_temporizador=15
             )
-            print(f"Sesión {i} creada: {sesion.titulo}")
+            # print(f"Sesión {i} creada: {sesion.titulo}")
         except Exception as e:
             print(f"Error al crear sesión {i}: {e}")
 
@@ -257,7 +257,7 @@ def run():
                 tipo_contenido='temporizador',
                 contenido_temporizador=20
             )
-            print(f"Sesión {i} creada para programa2: {sesion.titulo}")
+            # print(f"Sesión {i} creada para programa2: {sesion.titulo}")
         except Exception as e:
             print(f"Error al crear sesión {i} para programa2: {e}")
 

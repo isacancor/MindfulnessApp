@@ -1,11 +1,11 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, parser_classes
-from .models import Sesion, DiarioRespuesta, EtiquetaPractica, TipoContenido
+from .models import Sesion, DiarioSesion, EtiquetaPractica, TipoContenido
 from .serializers import (
     SesionSerializer, 
     SesionDetalleSerializer, 
-    DiarioRespuestaSerializer,
+    DiarioSesionSerializer,
     EtiquetaPracticaSerializer,
     TipoContenidoSerializer
 )
@@ -269,51 +269,76 @@ def tipos_contenido(request):
 
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
-def diario_respuesta_list_create(request):
+def diario_sesion_list_create(request):
     if request.method == 'GET':
-        queryset = DiarioRespuesta.objects.all()
+        # Verificar que el usuario es un participante
+        if not hasattr(request.user, 'perfil_participante'):
+            return Response(
+                {"error": "Solo los participantes pueden ver sus diarios"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
         
-        # Si el usuario es un participante, mostrar solo sus propias respuestas
-        if hasattr(request.user, 'participante'):
-            queryset = queryset.filter(participante=request.user.participante)
+        # Filtrar por participante
+        queryset = DiarioSesion.objects.filter(participante=request.user.perfil_participante)
         
-        # Si el usuario es un investigador, mostrar las respuestas de sus programas
-        elif hasattr(request.user, 'investigador'):
-            programas = Programa.objects.filter(creado_por=request.user)
-            sesiones = Sesion.objects.filter(programa__in=programas)
-            queryset = queryset.filter(sesion__in=sesiones)
-            
-        # Filtrar por sesión si se proporciona el ID
+        # Filtrar por sesión si se proporciona
         sesion_id = request.query_params.get('sesion')
         if sesion_id:
             queryset = queryset.filter(sesion_id=sesion_id)
-            
-        serializer = DiarioRespuestaSerializer(queryset, many=True)
+        
+        serializer = DiarioSesionSerializer(queryset, many=True)
         return Response(serializer.data)
     
     elif request.method == 'POST':
         # Verificar que el usuario es un participante
-        if not hasattr(request.user, 'participante'):
+        if not hasattr(request.user, 'perfil_participante'):
             return Response(
                 {"error": "Solo los participantes pueden enviar diarios"}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Establecer el participante automáticamente
-        data = request.data.copy()
-        data['participante'] = request.user.participante.id
+        # Verificar que la sesión existe
+        sesion_id = request.data.get('sesion_id')
+        if not sesion_id:
+            return Response(
+                {"error": "Se requiere el ID de la sesión"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        try:
+            sesion = Sesion.objects.get(id=sesion_id)
+        except Sesion.DoesNotExist:
+            return Response(
+                {"error": "La sesión no existe"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Verificar si ya existe un diario para esta sesión
+        if DiarioSesion.objects.filter(participante=request.user.perfil_participante, sesion=sesion).exists():
+            return Response(
+                {"error": "Ya has completado el diario para esta sesión"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
-        # Verificar que la sesión está disponible para el participante
-        sesion_id = data.get('sesion')
-        if sesion_id:
-            sesion = get_object_or_404(Sesion, id=sesion_id)
-            if not sesion.esta_disponible_para(request.user.participante):
-                return Response(
-                    {"error": "Esta sesión no está disponible actualmente"}, 
-                    status=status.HTTP_403_FORBIDDEN
-                )
+        # Verificar que el participante está inscrito en el programa
+        inscripcion = ProgramaParticipante.objects.filter(
+            participante=request.user.perfil_participante,
+            programa=sesion.programa,
+            activo=True
+        ).first()
         
-        serializer = DiarioRespuestaSerializer(data=data)
+        if not inscripcion:
+            return Response(
+                {"error": "No estás inscrito en este programa"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Crear el serializador con el contexto necesario
+        serializer = DiarioSesionSerializer(
+            data=request.data,
+            context={'request': request}
+        )
+        
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -321,37 +346,63 @@ def diario_respuesta_list_create(request):
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])
-def diario_respuesta_detail(request, pk):
+def diario_sesion_detail(request, pk):
     try:
-        respuesta = DiarioRespuesta.objects.get(pk=pk)
-    except DiarioRespuesta.DoesNotExist:
+        diario = DiarioSesion.objects.get(pk=pk)
+    except DiarioSesion.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = DiarioRespuestaSerializer(respuesta)
+        serializer = DiarioSesionSerializer(diario)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        # Verificar que el usuario es el participante que creó la respuesta
-        if not hasattr(request.user, 'participante') or respuesta.participante != request.user.participante:
+        # Verificar que el usuario es el participante que creó el diario
+        if not hasattr(request.user, 'perfil_participante') or diario.participante != request.user.perfil_participante:
             return Response(
-                {"error": "No tienes permiso para modificar esta respuesta"},
+                {"error": "No tienes permiso para modificar este diario"},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        serializer = DiarioRespuestaSerializer(respuesta, data=request.data)
+        serializer = DiarioSesionSerializer(diario, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        # Verificar que el usuario es el participante que creó la respuesta
-        if not hasattr(request.user, 'participante') or respuesta.participante != request.user.participante:
+        # Verificar que el usuario es el participante que creó el diario
+        if not hasattr(request.user, 'perfil_participante') or diario.participante != request.user.perfil_participante:
             return Response(
-                {"error": "No tienes permiso para eliminar esta respuesta"},
+                {"error": "No tienes permiso para eliminar este diario"},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        respuesta.delete()
+        diario.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def diario_info(request, sesion_id):
+    try:
+        sesion = get_object_or_404(Sesion, pk=sesion_id)
+    except Sesion.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # Verificar que el usuario es un participante
+    if not hasattr(request.user, 'perfil_participante'):
+        return Response(
+            {"error": "Solo los participantes pueden ver sus diarios"}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    # Buscar el diario para esta sesión
+    try:
+        diario = DiarioSesion.objects.get(
+            participante=request.user.perfil_participante,
+            sesion=sesion
+        )
+        serializer = DiarioSesionSerializer(diario)
+        return Response(serializer.data)
+    except DiarioSesion.DoesNotExist:
+        return Response(None, status=status.HTTP_200_OK)

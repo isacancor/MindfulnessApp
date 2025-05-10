@@ -8,7 +8,8 @@ urlpatterns = [
     path('tipos-practica/', api.tipos_practica, name='tipos-practica'),
     path('tipos-contenido/', api.tipos_contenido, name='tipos-contenido'),
     
-    # Diarios de respuesta
-    path('diarios/', api.diario_respuesta_list_create, name='diario-respuesta-list-create'),
-    path('diarios/<int:pk>/', api.diario_respuesta_detail, name='diario-respuesta-detail'),
+    # Diarios de sesión
+    path('diario/', api.diario_sesion_list_create, name='diario-sesion-list-create'),
+    path('diario/<int:pk>/', api.diario_sesion_detail, name='diario-sesion-detail'),
+    path('<int:sesion_id>/diario_info/', api.diario_info, name='diario-info'),
 ]

@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video, Scale } from 'lucide-react';
 import api from '../../config/axios';
 
 const MiPrograma = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
     const [programa, setPrograma] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -20,12 +18,39 @@ const MiPrograma = () => {
         const fetchMiPrograma = async () => {
             try {
                 const response = await api.get('/programas/mi-programa/');
-                setPrograma(response.data);
+                const programaData = response.data;
+
+                // Verificar el estado de cada sesión
+                const sesionesConEstado = await Promise.all(
+                    programaData.sesiones?.map(async (sesion) => {
+                        try {
+                            const diarioResponse = await api.get(`/sesiones/${sesion.id}/diario_info/`);
+                            return {
+                                ...sesion,
+                                completada: !!diarioResponse.data
+                            };
+                        } catch (error) {
+                            console.error(`Error al verificar diario de sesión ${sesion.id}:`, error);
+                            return {
+                                ...sesion,
+                                completada: false
+                            };
+                        }
+                    }) || []
+                );
+
+                const programaActualizado = {
+                    ...programaData,
+                    sesiones: sesionesConEstado
+                };
+
+                setPrograma(programaActualizado);
 
                 // Calcular progreso basado en las sesiones completadas
-                const sesionesCompletadas = response.data.sesiones?.filter(s => s.completada).length || 0;
-                const totalSesiones = response.data.sesiones?.length || 0;
-                const minutosCompletados = response.data.sesiones?.reduce((acc, s) => acc + (s.completada ? s.duracion : 0), 0) || 0;
+                const sesionesCompletadas = sesionesConEstado.filter(s => s.completada).length;
+                const totalSesiones = sesionesConEstado.length;
+                const minutosCompletados = sesionesConEstado.reduce((acc, s) => acc + (s.completada ? s.duracion_estimada : 0), 0);
+
                 setProgreso({
                     sesionesCompletadas,
                     totalSesiones,
@@ -85,7 +110,7 @@ const MiPrograma = () => {
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
                 <button
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/home')}
                     className="absolute top-8 left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
                     aria-label="Volver atrás"
                 >
@@ -114,8 +139,8 @@ const MiPrograma = () => {
                             <span>{programa.duracion_semanas} semanas</span>
                         </div>
                         <div className="flex items-center text-gray-600">
-                            <Users className="mr-2 text-gray-400" size={16} />
-                            <span>{programa.participantes?.length || 0} participantes</span>
+                            <Scale className="mr-2 text-gray-400" size={16} />
+                            <span>{programa.escala}</span>
                         </div>
                         <div className="flex items-center text-gray-600">
                             <FileText className="mr-2 text-gray-400" size={16} />
