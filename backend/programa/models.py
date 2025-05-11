@@ -87,8 +87,30 @@ class Programa(models.Model):
         # Verificar que tenga todas las sesiones necesarias
         sesiones_requeridas = set(range(1, self.duracion_semanas + 1))
         sesiones_existentes = set(self.sesiones.values_list('semana', flat=True))
-        
         return all(campos_requeridos) and sesiones_requeridas == sesiones_existentes
+
+    def puede_agregar_participantes(self):
+        return self.estado_publicacion == EstadoPublicacion.PUBLICADO
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # Si es un nuevo programa
+            # Forzar que los programas nuevos siempre se creen como BORRADOR
+            self.estado_publicacion = EstadoPublicacion.BORRADOR
+            self.fecha_publicacion = None
+            super().save(*args, **kwargs)
+        else:  # Si el programa ya existe
+            programa_original = Programa.objects.get(pk=self.pk)
+            if programa_original.estado_publicacion == EstadoPublicacion.BORRADOR and self.estado_publicacion == EstadoPublicacion.PUBLICADO:
+                # Si estamos intentando publicar, verificar que se puede publicar
+                if not self.puede_ser_publicado():
+                    raise ValueError("No se puede publicar el programa. Asegúrese de que tiene todas las sesiones necesarias y los campos requeridos.")
+                self.fecha_publicacion = timezone.now()
+                super().save(*args, **kwargs)
+            elif programa_original.estado_publicacion == EstadoPublicacion.BORRADOR and self.participantes.exists():
+                # Si el programa está en borrador y tiene participantes, no permitir guardar
+                raise ValueError("No se pueden agregar participantes a un programa en borrador")
+            else:
+                super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['-fecha_creacion']

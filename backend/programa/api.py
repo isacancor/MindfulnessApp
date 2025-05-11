@@ -147,7 +147,7 @@ def programa_enrolar(request, pk):
             status=status.HTTP_403_FORBIDDEN
         )
 
-    if programa.estado_publicacion != EstadoPublicacion.PUBLICADO:
+    if not programa.puede_agregar_participantes():
         return Response(
             {'error': 'No se puede enrolar en un programa que no está publicado'},
             status=status.HTTP_400_BAD_REQUEST
@@ -167,14 +167,20 @@ def programa_enrolar(request, pk):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Crear la inscripción
-    inscripcion = ProgramaParticipante.objects.create(
-        programa=programa,
-        participante=participante
-    )
-    inscripcion.calcular_fecha_fin()
+    try:
+        # Crear la inscripción
+        inscripcion = ProgramaParticipante.objects.create(
+            programa=programa,
+            participante=participante
+        )
+        inscripcion.calcular_fecha_fin()
 
-    # Agregar al participante al programa
-    programa.participantes.add(participante)
-    
-    return Response({'status': 'Enrolamiento exitoso'})
+        # Agregar al participante al programa
+        programa.participantes.add(participante)
+        
+        return Response({'status': 'Enrolamiento exitoso'})
+    except ValueError as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )

@@ -37,14 +37,6 @@ const Sidebar = () => {
                     </Link>
 
                     <Link
-                        to="/sesiones"
-                        className={getNavButtonClass('/sesiones')}
-                    >
-                        <Calendar size={20} />
-                        <span>Sesiones</span>
-                    </Link>
-
-                    <Link
                         to="/cuestionarios"
                         className={getNavButtonClass('/cuestionarios')}
                     >
