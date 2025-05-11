@@ -196,129 +196,140 @@ const DetallePrograma = () => {
                         </div>
 
                         {/* Detalles del Programa */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-6">
+                            {/* Información General */}
                             <div className="bg-gray-50 p-6 rounded-lg">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Información General</h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-start">
-                                        <Users className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-500">Población Objetivo</p>
-                                            <p className="text-gray-900">{programa.poblacion_objetivo}</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-4">
+                                        <div className="flex items-start">
+                                            <Users className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Población Objetivo</p>
+                                                <p className="text-gray-900">{programa.poblacion_objetivo}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <Calendar className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Tipo de Contexto</p>
+                                                <p className="text-gray-900">{programa.tipo_contexto}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-start">
-                                        <Calendar className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-500">Tipo de Contexto</p>
-                                            <p className="text-gray-900">{programa.tipo_contexto}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start">
-                                        <BookOpen className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-500">Enfoque Metodológico</p>
-                                            <p className="text-gray-900">{programa.enfoque_metodologico}</p>
+                                    <div className="space-y-4">
+                                        <div className="flex items-start">
+                                            <BookOpen className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Enfoque Metodológico</p>
+                                                <p className="text-gray-900">{programa.enfoque_metodologico}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-gray-50 p-6 rounded-lg">
+                            {/* Evaluación */}
+                            <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Evaluación</h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-start">
-                                            <Link className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                            <div>
-                                                <p className="text-sm text-gray-500">Cuestionario Pre</p>
-                                                {programa.cuestionario_pre ? (
-                                                    <div className="flex items-center space-x-2">
-                                                        <a
-                                                            href={programa.cuestionario_pre}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-indigo-600 hover:text-indigo-800"
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Cuestionario Pre */}
+                                    <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <h4 className="font-medium text-gray-800 flex items-center">
+                                                <FileQuestion className="h-5 w-5 text-indigo-600 mr-2" />
+                                                Cuestionario Pre
+                                            </h4>
+                                            {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_pre && (
+                                                <button
+                                                    onClick={handleNuevoCuestionarioPre}
+                                                    className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                >
+                                                    <Plus className="h-3 w-3 mr-1" />
+                                                    Crear
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {programa.cuestionario_pre ? (
+                                            <div className="flex justify-between items-center">
+                                                <a
+                                                    href={`/programas/${id}/cuestionarios/${programa.cuestionario_pre.id}`}
+                                                    className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                                                >
+                                                    Ver vista previa del cuestionario
+                                                </a>
+                                                {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                                    <div className="flex space-x-2">
+                                                        <button
+                                                            onClick={() => handleEditarCuestionario(programa.cuestionario_pre.id)}
+                                                            className="text-gray-500 hover:text-indigo-600 focus:outline-none"
+                                                            title="Editar"
                                                         >
-                                                            Ver cuestionario
-                                                        </a>
-                                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
-                                                            <>
-                                                                <button
-                                                                    onClick={() => handleEditarCuestionario(programa.cuestionario_pre.id)}
-                                                                    className="text-gray-600 hover:text-indigo-600"
-                                                                >
-                                                                    <Edit className="h-4 w-4" />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleEliminarCuestionario(programa.cuestionario_pre.id)}
-                                                                    className="text-gray-600 hover:text-red-600"
-                                                                >
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </button>
-                                                            </>
-                                                        )}
+                                                            <Edit className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleEliminarCuestionario(programa.cuestionario_pre.id)}
+                                                            className="text-gray-500 hover:text-red-600 focus:outline-none"
+                                                            title="Eliminar"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
                                                     </div>
-                                                ) : (
-                                                    <p className="text-gray-500">No disponible</p>
                                                 )}
                                             </div>
-                                        </div>
-                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_pre && (
-                                            <button
-                                                onClick={handleNuevoCuestionarioPre}
-                                                className="flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
-                                            >
-                                                <Plus className="h-4 w-4 mr-1" />
-                                                Crear Pre
-                                            </button>
+                                        ) : (
+                                            <p className="text-gray-500 text-sm">No se ha creado cuestionario pre</p>
                                         )}
                                     </div>
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-start">
-                                            <Link className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                            <div>
-                                                <p className="text-sm text-gray-500">Cuestionario Post</p>
-                                                {programa.cuestionario_post ? (
-                                                    <div className="flex items-center space-x-2">
-                                                        <a
-                                                            href={programa.cuestionario_post}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-indigo-600 hover:text-indigo-800"
+
+                                    {/* Cuestionario Post */}
+                                    <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <h4 className="font-medium text-gray-800 flex items-center">
+                                                <FileQuestion className="h-5 w-5 text-indigo-600 mr-2" />
+                                                Cuestionario Post
+                                            </h4>
+                                            {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_post && (
+                                                <button
+                                                    onClick={handleNuevoCuestionarioPost}
+                                                    className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                >
+                                                    <Plus className="h-3 w-3 mr-1" />
+                                                    Crear
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {programa.cuestionario_post ? (
+                                            <div className="flex justify-between items-center">
+                                                <a
+                                                    href={`/programas/${id}/cuestionarios/${programa.cuestionario_post.id}`}
+                                                    className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                                                >
+                                                    Ver vista previa del cuestionario
+                                                </a>
+                                                {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                                    <div className="flex space-x-2">
+                                                        <button
+                                                            onClick={() => handleEditarCuestionario(programa.cuestionario_post.id)}
+                                                            className="text-gray-500 hover:text-indigo-600 focus:outline-none"
+                                                            title="Editar"
                                                         >
-                                                            Ver cuestionario
-                                                        </a>
-                                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
-                                                            <>
-                                                                <button
-                                                                    onClick={() => handleEditarCuestionario(programa.cuestionario_post.id)}
-                                                                    className="text-gray-600 hover:text-indigo-600"
-                                                                >
-                                                                    <Edit className="h-4 w-4" />
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleEliminarCuestionario(programa.cuestionario_post.id)}
-                                                                    className="text-gray-600 hover:text-red-600"
-                                                                >
-                                                                    <Trash2 className="h-4 w-4" />
-                                                                </button>
-                                                            </>
-                                                        )}
+                                                            <Edit className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleEliminarCuestionario(programa.cuestionario_post.id)}
+                                                            className="text-gray-500 hover:text-red-600 focus:outline-none"
+                                                            title="Eliminar"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
                                                     </div>
-                                                ) : (
-                                                    <p className="text-gray-500">No disponible</p>
                                                 )}
                                             </div>
-                                        </div>
-                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_post && (
-                                            <button
-                                                onClick={handleNuevoCuestionarioPost}
-                                                className="flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
-                                            >
-                                                <Plus className="h-4 w-4 mr-1" />
-                                                Crear Post
-                                            </button>
+                                        ) : (
+                                            <p className="text-gray-500 text-sm">No se ha creado cuestionario post</p>
                                         )}
                                     </div>
                                 </div>

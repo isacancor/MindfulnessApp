@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Save, Type, List, CheckSquare, ChevronDown, Star, BarChart2, Heart, ThumbsUp } from 'lucide-react';
-import api from '../config/axios';
+import api from '../../config/axios';
 
-const EditarCuestionario = () => {
-    const { id, cuestionarioId } = useParams();
+const CrearCuestionario = ({ tipo }) => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const [titulo, setTitulo] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [preguntas, setPreguntas] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [initialLoading, setInitialLoading] = useState(true);
 
     const tiposPregunta = [
         { id: 'texto', nombre: 'Texto Libre', icono: <Type className="h-5 w-5" /> },
@@ -44,25 +43,6 @@ const EditarCuestionario = () => {
             "Siempre"
         ]
     };
-
-    useEffect(() => {
-        const fetchCuestionario = async () => {
-            try {
-                const response = await api.get(`/cuestionarios/${cuestionarioId}/`);
-                const cuestionario = response.data;
-                setTitulo(cuestionario.titulo);
-                setDescripcion(cuestionario.descripcion);
-                setPreguntas(cuestionario.preguntas);
-            } catch (err) {
-                setError('Error al cargar el cuestionario');
-                console.error('Error:', err);
-            } finally {
-                setInitialLoading(false);
-            }
-        };
-
-        fetchCuestionario();
-    }, [cuestionarioId]);
 
     const validarCuestionario = () => {
         if (!titulo.trim()) {
@@ -266,10 +246,11 @@ const EditarCuestionario = () => {
             const cuestionario = {
                 titulo,
                 descripcion,
-                preguntas
+                preguntas,
+                tipo
             };
 
-            await api.put(`/cuestionarios/${cuestionarioId}/`, cuestionario);
+            await api.post(`/programa/${id}/cuestionarios/`, cuestionario);
             navigate(`/programas/${id}`);
         } catch (err) {
             console.error('Error al guardar el cuestionario:', err);
@@ -282,14 +263,6 @@ const EditarCuestionario = () => {
     const getIconoPregunta = (tipo) => {
         return tiposPregunta.find(t => t.id === tipo)?.icono;
     };
-
-    if (initialLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -306,7 +279,7 @@ const EditarCuestionario = () => {
                         </button>
                         <div className="flex items-center space-x-4">
                             <span className="text-lg font-semibold text-gray-700">
-                                Editando Cuestionario
+                                Creando Cuestionario {tipo === 'pre' ? 'Pre' : 'Post'}
                             </span>
                             <button
                                 onClick={handleGuardar}
@@ -318,7 +291,7 @@ const EditarCuestionario = () => {
                                 ) : (
                                     <Save className="h-5 w-5 mr-2" />
                                 )}
-                                {loading ? 'Guardando...' : 'Guardar Cambios'}
+                                {loading ? 'Guardando...' : 'Guardar Cuestionario'}
                             </button>
                         </div>
                     </div>
@@ -489,10 +462,10 @@ const EditarCuestionario = () => {
                                             </label>
                                             <div className="flex items-center space-x-2">
                                                 {Array.from({ length: pregunta.estrellas.cantidad }, (_, i) => (
-                                                    <div key={i} className="text-2xl text-indigo-600">
-                                                        {pregunta.estrellas.icono === 'star' && <Star className="h-6 w-6" />}
-                                                        {pregunta.estrellas.icono === 'heart' && <Heart className="h-6 w-6" />}
-                                                        {pregunta.estrellas.icono === 'thumbsup' && <ThumbsUp className="h-6 w-6" />}
+                                                    <div key={i} className="text-2xl">
+                                                        {pregunta.estrellas.icono === 'star' && <Star className="h-6 w-6 text-yellow-500" />}
+                                                        {pregunta.estrellas.icono === 'heart' && <Heart className="h-6 w-6 text-red-500" />}
+                                                        {pregunta.estrellas.icono === 'thumbsup' && <ThumbsUp className="h-6 w-6 text-blue-500" />}
                                                     </div>
                                                 ))}
                                             </div>
@@ -672,4 +645,4 @@ const EditarCuestionario = () => {
     );
 };
 
-export default EditarCuestionario; 
+export default CrearCuestionario; 
