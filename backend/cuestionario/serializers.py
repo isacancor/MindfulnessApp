@@ -4,8 +4,7 @@ from .models import Cuestionario, RespuestaCuestionario
 class CuestionarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cuestionario
-        fields = ['id', 'programa', 'tipo', 'titulo', 'descripcion', 'preguntas', 
-                 'fecha_creacion', 'fecha_actualizacion']
+        fields = ['id', 'programa', 'tipo', 'titulo', 'descripcion', 'preguntas', 'fecha_creacion', 'fecha_actualizacion']
         read_only_fields = ['fecha_creacion', 'fecha_actualizacion']
 
     def validate_preguntas(self, value):

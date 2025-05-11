@@ -17,8 +17,6 @@ const CrearPrograma = () => {
         enfoque_metodologico: '',
         duracion_semanas: '',
         poblacion_objetivo: '',
-        cuestionario_pre: '',
-        cuestionario_post: '',
         creado_por: user.id,
         estado_publicacion: 'borrador'
     });
@@ -58,8 +56,6 @@ const CrearPrograma = () => {
 
         const dataToSend = {
             ...formData,
-            cuestionario_pre: ensureHttps(formData.cuestionario_pre),
-            cuestionario_post: ensureHttps(formData.cuestionario_post),
         };
 
         try {
@@ -215,40 +211,6 @@ const CrearPrograma = () => {
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
                                     placeholder="Ej. 8"
                                     value={formData.duracion_semanas}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label htmlFor="cuestionario_pre" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Enlace al Cuestionario Pre
-                                </label>
-                                <input
-                                    id="cuestionario_pre"
-                                    name="cuestionario_pre"
-                                    //type="url"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    placeholder="https://forms.google.com/..."
-                                    value={formData.cuestionario_pre}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="cuestionario_post" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Enlace al Cuestionario Post
-                                </label>
-                                <input
-                                    id="cuestionario_post"
-                                    name="cuestionario_post"
-                                    //type="url"
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    placeholder="https://forms.google.com/..."
-                                    value={formData.cuestionario_post}
                                     onChange={handleChange}
                                     disabled={loading}
                                 />

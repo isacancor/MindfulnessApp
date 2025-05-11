@@ -7,7 +7,7 @@ import api from '../../config/axios';
 const DetallePrograma = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user, hasRole, isInvestigador } = useAuth();
+    const { isInvestigador } = useAuth();
     const [programa, setPrograma] = useState(null);
     const [sesiones, setSesiones] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -56,11 +56,11 @@ const DetallePrograma = () => {
     };
 
     const handleNuevoCuestionarioPre = () => {
-        navigate(`/programas/${id}/cuestionarios/nuevo`);
+        navigate(`/programas/${id}/cuestionario-pre/nuevo`);
     };
 
     const handleNuevoCuestionarioPost = () => {
-        navigate(`/programas/${id}/cuestionarios/nuevo`);
+        navigate(`/programas/${id}/cuestionario-post/nuevo`);
     };
 
     const handleEliminarSesion = async (sesionId) => {
@@ -78,20 +78,27 @@ const DetallePrograma = () => {
         }
     };
 
+    const handleEliminarCuestionario = async (cuestionarioId) => {
+        if (window.confirm('¿Estás seguro de que deseas eliminar este cuestionario?')) {
+            try {
+                await api.delete(`/cuestionarios/${cuestionarioId}/`);
+                // Actualizar el estado del programa con los datos más recientes
+                const response = await api.get(`/programas/${id}/`);
+                setPrograma(response.data);
+            } catch (err) {
+                console.error('Error al eliminar el cuestionario:', err);
+            }
+        }
+    };
+
+    const handleEditarCuestionario = (cuestionarioId) => {
+        navigate(`/programas/${id}/cuestionarios/${cuestionarioId}/editar`);
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                    <p className="text-red-700">{error}</p>
-                </div>
             </div>
         );
     }
@@ -143,6 +150,33 @@ const DetallePrograma = () => {
                     </div>
 
                     {/* Información del Programa */}
+                    {error && (
+                        <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-md">
+                            <div className="flex items-center">
+                                <div className="flex-shrink-0">
+                                    <svg className="h-5 w-5 text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div className="ml-3">
+                                    <p className="text-sm text-red-700">{error}</p>
+                                </div>
+                                <div className="ml-auto pl-3">
+                                    <div className="-mx-1.5 -my-1.5">
+                                        <button
+                                            onClick={() => setError(null)}
+                                            className="inline-flex rounded-md p-1.5 text-red-500 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                        >
+                                            <span className="sr-only">Cerrar</span>
+                                            <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <div className="space-y-8">
                         {/* Título y Estado */}
                         <div>
@@ -199,20 +233,38 @@ const DetallePrograma = () => {
                                             <div>
                                                 <p className="text-sm text-gray-500">Cuestionario Pre</p>
                                                 {programa.cuestionario_pre ? (
-                                                    <a
-                                                        href={programa.cuestionario_pre}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-indigo-600 hover:text-indigo-800"
-                                                    >
-                                                        Ver cuestionario
-                                                    </a>
+                                                    <div className="flex items-center space-x-2">
+                                                        <a
+                                                            href={programa.cuestionario_pre}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-indigo-600 hover:text-indigo-800"
+                                                        >
+                                                            Ver cuestionario
+                                                        </a>
+                                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleEditarCuestionario(programa.cuestionario_pre.id)}
+                                                                    className="text-gray-600 hover:text-indigo-600"
+                                                                >
+                                                                    <Edit className="h-4 w-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleEliminarCuestionario(programa.cuestionario_pre.id)}
+                                                                    className="text-gray-600 hover:text-red-600"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 ) : (
                                                     <p className="text-gray-500">No disponible</p>
                                                 )}
                                             </div>
                                         </div>
-                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_pre && (
                                             <button
                                                 onClick={handleNuevoCuestionarioPre}
                                                 className="flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
@@ -228,20 +280,38 @@ const DetallePrograma = () => {
                                             <div>
                                                 <p className="text-sm text-gray-500">Cuestionario Post</p>
                                                 {programa.cuestionario_post ? (
-                                                    <a
-                                                        href={programa.cuestionario_post}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-indigo-600 hover:text-indigo-800"
-                                                    >
-                                                        Ver cuestionario
-                                                    </a>
+                                                    <div className="flex items-center space-x-2">
+                                                        <a
+                                                            href={programa.cuestionario_post}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-indigo-600 hover:text-indigo-800"
+                                                        >
+                                                            Ver cuestionario
+                                                        </a>
+                                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                                            <>
+                                                                <button
+                                                                    onClick={() => handleEditarCuestionario(programa.cuestionario_post.id)}
+                                                                    className="text-gray-600 hover:text-indigo-600"
+                                                                >
+                                                                    <Edit className="h-4 w-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleEliminarCuestionario(programa.cuestionario_post.id)}
+                                                                    className="text-gray-600 hover:text-red-600"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 ) : (
                                                     <p className="text-gray-500">No disponible</p>
                                                 )}
                                             </div>
                                         </div>
-                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_post && (
                                             <button
                                                 onClick={handleNuevoCuestionarioPost}
                                                 className="flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"

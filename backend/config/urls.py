@@ -25,7 +25,7 @@ urlpatterns = [
     path('api/usuario/', include('usuario.urls')),
     path('api/programas/', include('programa.urls')),
     path('api/sesiones/', include('sesion.urls')),
-    path('api/cuestionario/', include('cuestionario.urls')),
+    path('api/', include('cuestionario.urls')),
 ]
 
 if settings.DEBUG:

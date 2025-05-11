@@ -4,6 +4,8 @@ from rest_framework.decorators import api_view, permission_classes
 from .models import Programa, EstadoPublicacion, ProgramaParticipante, EstadoPrograma
 from .serializers import ProgramaSerializer
 from sesion.models import Sesion, EtiquetaPractica, TipoContenido
+from django.shortcuts import get_object_or_404
+from cuestionario.models import Cuestionario
 
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -30,12 +32,13 @@ def programa_list_create(request):
                 {'error': 'El usuario no tiene un perfil de investigador configurado'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+                
         serializer = ProgramaSerializer(data=request.data)
         if serializer.is_valid():
             programa = serializer.save(creado_por=investigador)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+   
 
 @api_view(['GET', 'PUT', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])
@@ -50,6 +53,24 @@ def programa_detail(request, pk):
         return Response(serializer.data)
 
     elif request.method == 'PUT':
+        # Verificar que el usuario es el investigador
+        if programa.creado_por != request.user:
+            return Response(
+                {'error': 'Solo el investigador puede modificar el programa'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Si se intenta publicar, verificar que tenga ambos cuestionarios
+        if request.data.get('estado') == 'publicado':
+            tiene_pre = Cuestionario.objects.filter(programa=programa, tipo='pre').exists()
+            tiene_post = Cuestionario.objects.filter(programa=programa, tipo='post').exists()
+            
+            if not (tiene_pre and tiene_post):
+                return Response(
+                    {'error': 'No se puede publicar el programa sin tener ambos cuestionarios (pre y post)'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
         if programa.estado_publicacion == EstadoPublicacion.PUBLICADO:
             return Response(
                 {'error': 'No se puede modificar un programa publicado'},
@@ -68,6 +89,14 @@ def programa_detail(request, pk):
                 {'error': 'No se puede eliminar un programa publicado'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        
+        # Verificar que el usuario es el investigador
+        if programa.creado_por != request.user:
+            return Response(
+                {'error': 'Solo el investigador puede eliminar el programa'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
         try:
             programa.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -93,25 +122,28 @@ def programa_participantes(request, pk):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def programa_publicar(request, pk):
-    try:
-        programa = Programa.objects.get(pk=pk)
-    except Programa.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if not request.user.is_investigador() or programa.creado_por != request.user:
+    programa = get_object_or_404(Programa, pk=pk)
+    
+    # Verificar que el usuario es el investigador del programa
+    if programa.creado_por != request.user:
         return Response(
-            {'error': 'No tienes permiso para publicar este programa'},
+            {"error": "No tienes permiso para publicar este programa"},
             status=status.HTTP_403_FORBIDDEN
         )
-
-    if not programa.puede_ser_publicado():
+    
+    try:
+        programa.publicar()
+        return Response({"message": "Programa publicado exitosamente"})
+    except ValueError as e:
         return Response(
-            {'error': 'No se puede publicar el programa porque faltan campos requeridos'},
+            {"error": str(e)},
             status=status.HTTP_400_BAD_REQUEST
         )
-
-    programa.publicar()
-    return Response({'status': 'Programa publicado exitosamente'})
+    except Exception as e:
+        return Response(
+            {"error": "Ha ocurrido un error al publicar el programa"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 @api_view(['GET'])
 @permission_classes([permissions.IsAuthenticated])

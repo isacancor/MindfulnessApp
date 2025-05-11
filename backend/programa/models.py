@@ -2,6 +2,7 @@ from django.db import models
 from usuario.models import Usuario, Participante
 from django.utils import timezone
 from datetime import datetime, timedelta
+from django.core.exceptions import ValidationError
 
 class TipoContexto(models.TextChoices):
     ACADEMICO = 'académico', 'Académico'
@@ -24,6 +25,7 @@ class EnfoqueMetodologico(models.TextChoices):
 class EstadoPublicacion(models.TextChoices):
     BORRADOR = 'borrador', 'Borrador'
     PUBLICADO = 'publicado', 'Publicado'
+    FINALIZADO = 'finalizado', 'Finalizado'
 
 class EstadoPrograma(models.TextChoices):
     EN_PROGRESO = 'en progreso', 'En progreso'
@@ -47,10 +49,24 @@ class Programa(models.Model):
     
     # Configuración de Duración
     duracion_semanas = models.PositiveIntegerField()
-    
+
     # Evaluaciones
-    cuestionario_pre = models.URLField(max_length=500, blank=True, null=True)
-    cuestionario_post = models.URLField(max_length=500, blank=True, null=True)
+    cuestionario_pre = models.ForeignKey(
+        'cuestionario.Cuestionario', 
+        on_delete=models.SET_NULL, 
+        related_name='programas_pre', 
+        null=True, 
+        blank=True,
+        db_column='cuestionario_pre'
+    )
+    cuestionario_post = models.ForeignKey(
+        'cuestionario.Cuestionario', 
+        on_delete=models.SET_NULL, 
+        related_name='programas_post', 
+        null=True, 
+        blank=True,
+        db_column='cuestionario_post'
+    )
     
     # Estado de publicación
     estado_publicacion = models.CharField(
@@ -67,6 +83,7 @@ class Programa(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     fecha_publicacion = models.DateTimeField(null=True, blank=True)
+    fecha_finalizacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre
@@ -78,6 +95,11 @@ class Programa(models.Model):
             self.save()
 
     def puede_ser_publicado(self):
+        return self.puede_ser_publicado1() and self.puede_ser_publicado2() and self.puede_ser_publicado3()
+
+    # Comprobar si tiene todos los campos requeridos
+    def puede_ser_publicado1(self):
+        # Verificar campos requeridos
         campos_requeridos = [
             self.nombre,
             self.descripcion,
@@ -88,10 +110,33 @@ class Programa(models.Model):
             self.creado_por
         ]
         
-        # Verificar que tenga todas las sesiones necesarias
+        if not all(campos_requeridos):
+            return False
+            
+        return True
+
+    # Comprobar si tiene todas las sesiones
+    def puede_ser_publicado2(self):            
+        # Verificar sesiones
         sesiones_requeridas = set(range(1, self.duracion_semanas + 1))
         sesiones_existentes = set(self.sesiones.values_list('semana', flat=True))
-        return all(campos_requeridos) and sesiones_requeridas == sesiones_existentes
+        
+        if sesiones_requeridas != sesiones_existentes:
+            return False
+                
+        return True
+
+    # Comprobar si tiene los cuestionarios
+    def puede_ser_publicado3(self):
+        # Solo validar cuestionarios si se intenta publicar
+        if self.estado_publicacion == EstadoPublicacion.PUBLICADO:
+            tiene_pre = self.cuestionario_pre is not None
+            tiene_post = self.cuestionario_post is not None
+            
+            if not (tiene_pre and tiene_post):
+                return False
+                
+        return True
 
     def puede_agregar_participantes(self):
         return self.estado_publicacion == EstadoPublicacion.PUBLICADO
@@ -101,18 +146,30 @@ class Programa(models.Model):
             # Forzar que los programas nuevos siempre se creen como BORRADOR
             self.estado_publicacion = EstadoPublicacion.BORRADOR
             self.fecha_publicacion = None
+            self.fecha_finalizacion = None
             super().save(*args, **kwargs)
         else:  # Si el programa ya existe
             programa_original = Programa.objects.get(pk=self.pk)
             if programa_original.estado_publicacion == EstadoPublicacion.BORRADOR and self.estado_publicacion == EstadoPublicacion.PUBLICADO:
                 # Si estamos intentando publicar, verificar que se puede publicar
-                if not self.puede_ser_publicado():
-                    raise ValueError("No se puede publicar el programa. Asegúrese de que tiene todas las sesiones necesarias y los campos requeridos.")
+                if not self.puede_ser_publicado1():
+                    raise ValueError("No se puede publicar el programa. Asegúrese de que tiene todos los campos requeridos.")
+                
+                if not self.puede_ser_publicado2():
+                    raise ValueError("No se puede publicar el programa. Asegúrese de que tiene todas las sesiones necesarias.")
+                
+                if not self.puede_ser_publicado3():
+                    raise ValueError("No se puede publicar el programa. Asegúrese de que tiene los cuestionarios necesarios.")
+
                 self.fecha_publicacion = timezone.now()
+                self.fecha_finalizacion = None
                 super().save(*args, **kwargs)
             elif programa_original.estado_publicacion == EstadoPublicacion.BORRADOR and self.participantes.exists():
                 # Si el programa está en borrador y tiene participantes, no permitir guardar
                 raise ValueError("No se pueden agregar participantes a un programa en borrador")
+            elif programa_original.estado_publicacion == EstadoPublicacion.PUBLICADO and self.estado_publicacion == EstadoPublicacion.FINALIZADO:
+                self.fecha_finalizacion = timezone.now()
+                super().save(*args, **kwargs)
             else:
                 super().save(*args, **kwargs)
 

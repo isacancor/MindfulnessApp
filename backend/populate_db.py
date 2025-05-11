@@ -8,6 +8,7 @@ django.setup()
 from usuario.models import Usuario, Investigador, Participante
 from programa.models import Programa, EstadoPublicacion, ProgramaParticipante
 from sesion.models import Sesion
+from cuestionario.models import Cuestionario, RespuestaCuestionario
 
 from datetime import date, timedelta
 
@@ -167,7 +168,7 @@ def run():
             }
         )
 
-    # Crear mi usuario
+    # Crear mi usuario de prueba 1
     yo, _ = Usuario.objects.get_or_create(
         email="isabel@gmail.com",
         defaults={
@@ -192,30 +193,74 @@ def run():
         }
     )
 
-    # Crear mi usuario
-    yo, _ = Usuario.objects.get_or_create(
-        email="yo@gmail.com",
-        defaults={
-            "username": "yo",
-            "nombre": "yo",
-            "apellidos": "yoyo",
-            "role": "PARTICIPANTE",
-            "telefono": "123456789",
-            "genero": "femenino",
-            "fechaNacimiento": "2000-10-30",
-            "ubicacion": "Sevilla, España",
-            "ocupacion": "Estudiante de Ingeniería de Software",
+    # Crear mis usuarios de prueba (yo1, yo2, yo3)
+    participantes_base = [
+        {
+            "username": "yo1",
+            "email": "yo1@demo.com",
+            "nombre": "Participante",
+            "apellidos": "Uno",
+            "genero": "masculino",
+            "fechaNacimiento": "1990-01-01",
+            "ubicacion": "Madrid, España",
+            "ocupacion": "Ingeniero",
             "nivelEducativo": "universidad",
-        }
-    )
-    yo.set_password("12")
-    yo.save()
-    yopart, _ = Participante.objects.get_or_create(usuario=yo,
-        defaults={
+            "experienciaMindfulness": "ninguna",
+            "condicionesSalud": "Ninguna",
+        },
+        {
+            "username": "yo2",
+            "email": "yo2@demo.com",
+            "nombre": "Participante",
+            "apellidos": "Dos",
+            "genero": "femenino",
+            "fechaNacimiento": "1992-05-15",
+            "ubicacion": "Barcelona, España",
+            "ocupacion": "Médica",
+            "nivelEducativo": "doctorado",
+            "experienciaMindfulness": "menos_de_6_meses",
+            "condicionesSalud": "Estrés laboral",
+        },
+        {
+            "username": "yo3",
+            "email": "pyo33@demo.com",
+            "nombre": "Participante",
+            "apellidos": "Tres",
+            "genero": "masculino",
+            "fechaNacimiento": "1988-12-20",
+            "ubicacion": "Valencia, España",
+            "ocupacion": "Profesor",
+            "nivelEducativo": "master",
             "experienciaMindfulness": "mas_de_2_anos",
-            "condicionesSalud": "Nada",
+            "condicionesSalud": "Ansiedad",
         }
-    )
+    ]
+
+    for p_data in participantes_base:
+        user, _ = Usuario.objects.get_or_create(
+            email=p_data["email"],
+            defaults={
+                "username": p_data["username"],
+                "nombre": p_data["nombre"],
+                "apellidos": p_data["apellidos"],
+                "role": "PARTICIPANTE",
+                "telefono": "123456789",
+                "genero": p_data["genero"],
+                "fechaNacimiento": p_data["fechaNacimiento"],
+                "ubicacion": p_data["ubicacion"],
+                "ocupacion": p_data["ocupacion"],
+                "nivelEducativo": p_data["nivelEducativo"],
+            }
+        )
+        user.set_password("12")  # password igual al username
+        user.save()
+        Participante.objects.get_or_create(
+            usuario=user,
+            defaults={
+                "experienciaMindfulness": p_data["experienciaMindfulness"],
+                "condicionesSalud": p_data["condicionesSalud"],
+            }
+        )
 
     # Crear programas para Bea
     programa1 = Programa.objects.create(
@@ -264,9 +309,6 @@ def run():
             programa=programa1,
             **sesion_data
         )
-
-    # Publicar programa1 después de crear las sesiones
-    programa1.publicar()
 
     # Crear programa para Jon Kabat-Zinn
     programa_jon = Programa.objects.create(
@@ -397,10 +439,6 @@ def run():
             programa=programa_jon,
             **sesion_data
         )
-
-    # Publicar programa_jon después de crear las sesiones
-    programa_jon.publicar()
-
     programa3 = Programa.objects.create(
         nombre="MBSR Clásico",
         descripcion="Programa original de Reducción del Estrés Basado en Mindfulness (MBSR) de 8 semanas.",
@@ -494,9 +532,6 @@ def run():
             **sesion_data
         )
 
-    # Publicar programa3 después de crear las sesiones
-    programa3.publicar()
-
     programa4 = Programa.objects.create(
         nombre="Mindfulness para la Salud",
         descripcion="Programa de 2 semanas para mejorar la salud física y mental",
@@ -537,8 +572,6 @@ def run():
 
     # Publicar programa4 después de crear las sesiones
     # programa4.publicar()
-
-
 
     # Crear programa 5 borrador - Jon
     programa5 = Programa.objects.create(
@@ -588,6 +621,72 @@ def run():
             **sesion_data
         )
 
+    #===========================================================================
+    # Crear cuestionarios con preguntas y respuestas
+    preguntas_base = [
+        {
+            "id": 1,
+            "texto": "¿Con qué frecuencia te sientes estresado/a?",
+            "tipo": "escala",
+            "opciones": ["Nunca", "Raramente", "A veces", "Frecuentemente", "Siempre"]
+        },
+        {
+            "id": 2,
+            "texto": "¿Con qué frecuencia practicas mindfulness o meditación?",
+            "tipo": "escala",
+            "opciones": ["Nunca", "Raramente", "A veces", "Frecuentemente", "Siempre"]
+        },
+        {
+            "id": 3,
+            "texto": "¿Cómo calificarías tu nivel de atención plena en el momento presente?",
+            "tipo": "escala",
+            "opciones": ["Muy bajo", "Bajo", "Medio", "Alto", "Muy alto"]
+        },
+        {
+            "id": 4,
+            "texto": "¿Con qué frecuencia te sientes abrumado/a por tus pensamientos?",
+            "tipo": "escala",
+            "opciones": ["Nunca", "Raramente", "A veces", "Frecuentemente", "Siempre"]
+        },
+        {
+            "id": 5,
+            "texto": "¿Cómo calificarías tu capacidad para manejar situaciones estresantes?",
+            "tipo": "escala",
+            "opciones": ["Muy baja", "Baja", "Media", "Alta", "Muy alta"]
+        }
+    ]
+
+    # Crear cuestionarios pre y post para cada programa
+    programas = [programa1, programa_jon, programa3, programa4]
+    for programa in programas:
+        # Cuestionario Pre
+        cuestionario_pre = Cuestionario.objects.create(
+            programa=programa,
+            tipo='pre',
+            titulo=f'Evaluación Inicial - {programa.nombre}',
+            descripcion='Cuestionario para evaluar el estado inicial antes de comenzar el programa',
+            preguntas=preguntas_base
+        )
+
+        # Cuestionario Post
+        cuestionario_post = Cuestionario.objects.create(
+            programa=programa,
+            tipo='post',
+            titulo=f'Evaluación Final - {programa.nombre}',
+            descripcion='Cuestionario para evaluar el progreso después de completar el programa',
+            preguntas=preguntas_base
+        )
+
+        # Asignar los cuestionarios al programa
+        programa.cuestionario_pre = cuestionario_pre
+        programa.cuestionario_post = cuestionario_post
+        programa.save()
+
+    # Publicar programas después de crear los cuestionarios
+    programa1.publicar()
+    programa_jon.publicar()
+    programa3.publicar()
+
     # ================================================================
     # Enrolar participantes en programas
     participantes = Participante.objects.all()
@@ -605,9 +704,28 @@ def run():
         participante=participantes[2]
     )
 
-    #===========================================================================
-    # Crear cuestionarios con preguntas y respuestas
-    
+    # Crear respuestas de ejemplo para los cuestionarios
+    for programa in programas:
+        for participante in programa.participantes.all():
+            # Respuesta Pre
+            respuestas_pre = {
+                str(p["id"]): "A veces" for p in preguntas_base
+            }
+            RespuestaCuestionario.objects.create(
+                cuestionario=programa.cuestionario_pre,
+                usuario=participante.usuario,
+                respuestas=respuestas_pre
+            )
+
+            # Respuesta Post
+            respuestas_post = {
+                str(p["id"]): "Frecuentemente" for p in preguntas_base
+            }
+            RespuestaCuestionario.objects.create(
+                cuestionario=programa.cuestionario_post,
+                usuario=participante.usuario,
+                respuestas=respuestas_post
+            )
 
     print("✅ Base de datos poblada con datos de prueba.")
 

@@ -3,6 +3,8 @@ from .models import Programa, TipoContexto, EnfoqueMetodologico, EstadoPublicaci
 from usuario.serializers import UsuarioSerializer, ParticipanteSerializer
 from sesion.serializers import SesionSerializer
 from django.utils import timezone
+from cuestionario.serializers import CuestionarioSerializer
+from rest_framework.exceptions import ValidationError
 
 class ProgramaParticipanteSerializer(serializers.ModelSerializer):
     fecha_fin = serializers.DateTimeField(read_only=True)
@@ -17,6 +19,9 @@ class ProgramaSerializer(serializers.ModelSerializer):
     participantes = ParticipanteSerializer(many=True, read_only=True)
     sesiones = SesionSerializer(many=True, read_only=True)
     inscripcion_info = serializers.SerializerMethodField()
+    cuestionario_pre = CuestionarioSerializer(read_only=True)
+    cuestionario_post = CuestionarioSerializer(read_only=True)
+    tiene_cuestionarios_completos = serializers.SerializerMethodField()
     
     tipo_contexto = serializers.ChoiceField(choices=TipoContexto.choices)
     enfoque_metodologico = serializers.ChoiceField(choices=EnfoqueMetodologico.choices)
@@ -32,7 +37,8 @@ class ProgramaSerializer(serializers.ModelSerializer):
             'cuestionario_pre', 'cuestionario_post',
             'estado_publicacion', 'creado_por', 'participantes',
             'fecha_creacion', 'fecha_actualizacion', 'fecha_publicacion', 'puede_ser_publicado',
-            'sesiones', 'inscripcion_info'
+            'sesiones', 'inscripcion_info',
+            'tiene_cuestionarios_completos'
         ]
         read_only_fields = ['fecha_creacion', 'fecha_actualizacion', 'fecha_publicacion']
 
@@ -58,8 +64,13 @@ class ProgramaSerializer(serializers.ModelSerializer):
                 }
         return None
 
+    def get_tiene_cuestionarios_completos(self, obj):
+        return obj.cuestionario_pre is not None and obj.cuestionario_post is not None
+
     def validate_estado_publicacion(self, value):
         if value == EstadoPublicacion.PUBLICADO:
             if not self.instance.puede_ser_publicado():
-                raise serializers.ValidationError("No se puede publicar el programa porque faltan campos requeridos")
+                raise serializers.ValidationError(
+                    "No se puede publicar el programa porque faltan campos requeridos, sesiones o cuestionarios"
+                )
         return value

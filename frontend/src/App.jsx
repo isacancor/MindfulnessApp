@@ -22,6 +22,7 @@ import CrearSesion from './pages/sesiones/CrearSesion';
 import EditarSesion from './pages/sesiones/EditarSesion';
 import HacerSesion from './pages/sesiones/HacerSesion';
 import CrearCuestionario from './pages/CrearCuestionario';
+import EditarCuestionario from './pages/EditarCuestionario';
 
 function App() {
   return (
@@ -57,7 +58,9 @@ function App() {
           <Route path="/programas/:id/sesiones/:sesionId/editar" element={<EditarSesion />} />
 
           {/* Cuestionarios */}
-          <Route path="/programas/:id/cuestionarios/nuevo" element={<CrearCuestionario />} />
+          <Route path="/programas/:id/cuestionario-pre/nuevo" element={<CrearCuestionario tipo="pre" />} />
+          <Route path="/programas/:id/cuestionario-post/nuevo" element={<CrearCuestionario tipo="post" />} />
+          <Route path="/programas/:id/cuestionarios/:cuestionarioId/editar" element={<EditarCuestionario />} />
           <Route path="/programas/:id/cuestionarios/:cuestionarioId" element={<div>Detalle de Cuestionario</div>} />
         </Route>
 
