@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Programa, TipoContexto, EnfoqueMetodologico, Escala, EstadoPublicacion, ProgramaParticipante
+from .models import Programa, TipoContexto, EnfoqueMetodologico, EstadoPublicacion, ProgramaParticipante
 from usuario.serializers import UsuarioSerializer, ParticipanteSerializer
 from sesion.serializers import SesionSerializer
 from django.utils import timezone
@@ -20,7 +20,6 @@ class ProgramaSerializer(serializers.ModelSerializer):
     
     tipo_contexto = serializers.ChoiceField(choices=TipoContexto.choices)
     enfoque_metodologico = serializers.ChoiceField(choices=EnfoqueMetodologico.choices)
-    escala = serializers.ChoiceField(choices=Escala.choices)
     estado_publicacion = serializers.ChoiceField(choices=EstadoPublicacion.choices)
     puede_ser_publicado = serializers.SerializerMethodField()
     
@@ -31,7 +30,7 @@ class ProgramaSerializer(serializers.ModelSerializer):
             'tipo_contexto', 'enfoque_metodologico',
             'poblacion_objetivo', 'duracion_semanas',
             'cuestionario_pre', 'cuestionario_post',
-            'escala', 'estado_publicacion', 'creado_por', 'participantes',
+            'estado_publicacion', 'creado_por', 'participantes',
             'fecha_creacion', 'fecha_actualizacion', 'fecha_publicacion', 'puede_ser_publicado',
             'sesiones', 'inscripcion_info'
         ]

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Programa
+from .models import Programa, ProgramaParticipante
 
 @admin.register(Programa)
 class ProgramaAdmin(admin.ModelAdmin):
@@ -8,3 +8,9 @@ class ProgramaAdmin(admin.ModelAdmin):
     search_fields = ('nombre', 'descripcion', 'poblacion_objetivo')
     readonly_fields = ('fecha_creacion', 'fecha_actualizacion')
     filter_horizontal = ('participantes',)
+
+@admin.register(ProgramaParticipante)
+class ProgramaParticipanteAdmin(admin.ModelAdmin):
+    list_display = ('programa', 'participante', 'fecha_inicio', 'fecha_fin', 'activo')
+    list_filter = ('activo', 'fecha_inicio')
+    search_fields = ('programa__nombre', 'participante__usuario__email')

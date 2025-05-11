@@ -7,6 +7,7 @@ urlpatterns = [
     path('<int:pk>/', api.sesion_detail, name='sesion-detail'),
     path('tipos-practica/', api.tipos_practica, name='tipos-practica'),
     path('tipos-contenido/', api.tipos_contenido, name='tipos-contenido'),
+    path('tipos-escala/', api.tipos_escala, name='tipos-escala'),
     
     # Diarios de sesión
     path('diario/', api.diario_sesion_list_create, name='diario-sesion-list-create'),

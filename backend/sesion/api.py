@@ -1,13 +1,14 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, parser_classes
-from .models import Sesion, DiarioSesion, EtiquetaPractica, TipoContenido
+from .models import Sesion, DiarioSesion, EtiquetaPractica, TipoContenido, Escala
 from .serializers import (
     SesionSerializer, 
     SesionDetalleSerializer, 
     DiarioSesionSerializer,
     EtiquetaPracticaSerializer,
-    TipoContenidoSerializer
+    TipoContenidoSerializer,
+    EscalaSerializer
 )
 from programa.models import Programa, ProgramaParticipante, EstadoPublicacion
 from django.utils import timezone
@@ -266,6 +267,12 @@ def tipos_contenido(request):
     tipos = [{'value': key, 'label': label} for key, label in TipoContenido.choices]
     serializer = TipoContenidoSerializer(tipos, many=True)
     return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def tipos_escala(request):
+    tipos = [{'value': choice[0], 'label': choice[1]} for choice in Escala.choices]
+    return Response(tipos)
 
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])

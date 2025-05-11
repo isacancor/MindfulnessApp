@@ -128,7 +128,7 @@ def mi_programa(request):
             activo=True
         )
         programa = inscripcion.programa
-        serializer = ProgramaSerializer(programa)
+        serializer = ProgramaSerializer(programa, context={'request': request})
         return Response(serializer.data)
     except ProgramaParticipante.DoesNotExist:
         return Response(None)

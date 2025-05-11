@@ -21,6 +21,7 @@ const EditarSesion = () => {
         duracion_estimada: '',
         tipo_practica: 'focus_attention',
         tipo_contenido: 'temporizador',
+        tipo_escala: 'emocional',
         contenido_temporizador: 0,
         contenido_url: '',
         contenido_audio: null,
@@ -42,6 +43,14 @@ const EditarSesion = () => {
         { value: 'enlace', label: 'Enlace' },
         { value: 'audio', label: 'Audio' },
         { value: 'video', label: 'Video' }
+    ];
+
+    const tiposEscala = [
+        { value: 'emocional', label: 'Estado Emocional (1-5)' },
+        { value: 'utilidad', label: 'Utilidad de la Sesión (1-5)' },
+        { value: 'estres', label: 'PSS - Estrés (0-4)' },
+        { value: 'compromiso', label: 'UWES-3 - Compromiso (1-5)' },
+        { value: 'bienestar', label: 'VAS - Bienestar General (0-10)' }
     ];
 
     useEffect(() => {
@@ -213,7 +222,7 @@ const EditarSesion = () => {
                                     min="1"
                                     required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    placeholder="Ej. 45"
+                                    placeholder="Ej. 10"
                                     value={formData.duracion_estimada}
                                     onChange={handleChange}
                                     disabled={loading}
@@ -253,6 +262,25 @@ const EditarSesion = () => {
                                     disabled={loading}
                                 >
                                     {tiposContenido.map((tipo) => (
+                                        <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label htmlFor="tipo_escala" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Tipo de Escala de Evaluación *
+                                </label>
+                                <select
+                                    id="tipo_escala"
+                                    name="tipo_escala"
+                                    required
+                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                    value={formData.tipo_escala}
+                                    onChange={handleChange}
+                                    disabled={loading}
+                                >
+                                    {tiposEscala.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
                                 </select>

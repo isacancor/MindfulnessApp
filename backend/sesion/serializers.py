@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Sesion, DiarioSesion, EtiquetaPractica, TipoContenido
+from .models import Sesion, DiarioSesion, EtiquetaPractica, TipoContenido, Escala
 from usuario.serializers import ParticipanteSerializer
 
 class EtiquetaPracticaSerializer(serializers.Serializer):
@@ -10,11 +10,16 @@ class TipoContenidoSerializer(serializers.Serializer):
     value = serializers.CharField(source='value')
     label = serializers.CharField(source='label')
 
+class EscalaSerializer(serializers.Serializer):
+    value = serializers.CharField(source='value')
+    label = serializers.CharField(source='label')
+
 class SesionSerializer(serializers.ModelSerializer):
     programa_nombre = serializers.CharField(source='programa.nombre', read_only=True)
     tipo_practica_display = serializers.CharField(source='get_tipo_practica_display', read_only=True)
     tipo_contenido_display = serializers.CharField(source='get_tipo_contenido_display', read_only=True)
     tipo_escala_display = serializers.CharField(source='get_tipo_escala_display', read_only=True)
+    tipo_escala = serializers.ChoiceField(choices=Escala.choices)
 
     class Meta:
         model = Sesion
@@ -47,6 +52,7 @@ class SesionDetalleSerializer(serializers.ModelSerializer):
         representation['tipo_practica_display'] = instance.get_tipo_practica_display()
         representation['tipo_contenido_display'] = instance.get_tipo_contenido_display()
         representation['tipo_escala_display'] = instance.get_tipo_escala_display()
+        representation['tipo_escala'] = instance.tipo_escala
         return representation
 
 class DiarioSesionSerializer(serializers.ModelSerializer):

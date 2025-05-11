@@ -186,13 +186,6 @@ const DetallePrograma = () => {
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Evaluación</h3>
                                 <div className="space-y-4">
                                     <div className="flex items-start">
-                                        <FileText className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-500">Escala de Evaluación</p>
-                                            <p className="text-gray-900">{programa.escala}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start">
                                         <Link className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
                                         <div>
                                             <p className="text-sm text-gray-500">Cuestionario Pre</p>

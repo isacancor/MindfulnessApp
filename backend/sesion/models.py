@@ -1,7 +1,14 @@
 from django.db import models
-from programa.models import Programa, ProgramaParticipante, Escala
+from programa.models import Programa, ProgramaParticipante
 from usuario.models import Participante
 from django.utils import timezone
+
+class Escala(models.TextChoices):
+    EMOCIONAL = 'emocional', 'Estado emocional [1–5]'
+    UTILIDAD = 'utilidad', 'Utilidad de la sesión [1–5]'
+    ESTRES = 'estres', 'PSS (estrés) [0–4]'
+    COMPROMISO = 'compromiso', 'UWES-3 (compromiso) [1–5]'
+    BIENESTAR = 'bienestar', 'VAS (bienestar general) [0–10]'
 
 class EtiquetaPractica(models.TextChoices):
     FOCUS_ATTENTION = 'focus_attention', 'Atención Focalizada'

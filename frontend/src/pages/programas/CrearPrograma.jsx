@@ -17,7 +17,6 @@ const CrearPrograma = () => {
         enfoque_metodologico: '',
         duracion_semanas: '',
         poblacion_objetivo: '',
-        escala: '',
         cuestionario_pre: '',
         cuestionario_post: '',
         creado_por: user.id,
@@ -31,14 +30,6 @@ const CrearPrograma = () => {
         { value: 'deportivo', label: 'Deportivo' },
         { value: 'personal/desarrollo individual', label: 'Personal/Desarrollo Individual' },
         { value: 'otro', label: 'Otro' }
-    ];
-
-    const escalas = [
-        { value: 'emocional', label: 'Estado emocional [1–5]' },
-        { value: 'utilidad', label: 'Utilidad de la sesión [1–5]' },
-        { value: 'estres', label: 'PSS (estrés) [0–4]' },
-        { value: 'compromiso', label: 'UWES-3 (compromiso) [1–5]' },
-        { value: 'bienestar', label: 'VAS (bienestar general) [0–10]' }
     ];
 
     const enfoquesMetodologicos = [
@@ -227,26 +218,6 @@ const CrearPrograma = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 />
-                            </div>
-
-                            <div>
-                                <label htmlFor="escala" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Escala de autoevaluación post-sesión *
-                                </label>
-                                <select
-                                    id="escala"
-                                    name="escala"
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    value={formData.escala}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                >
-                                    <option value="">Selecciona una escala</option>
-                                    {escalas.map((tipo) => (
-                                        <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
-                                    ))}
-                                </select>
                             </div>
                         </div>
 

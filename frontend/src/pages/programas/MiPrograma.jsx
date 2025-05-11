@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video, Scale } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video, Scale, Lock } from 'lucide-react';
 import api from '../../config/axios';
+import SesionCard from '../../components/SesionCard';
 
 const MiPrograma = () => {
     const navigate = useNavigate();
@@ -13,6 +14,11 @@ const MiPrograma = () => {
         totalSesiones: 0,
         minutosCompletados: 0
     });
+
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString('es-ES', options);
+    };
 
     useEffect(() => {
         const fetchMiPrograma = async () => {
@@ -133,14 +139,28 @@ const MiPrograma = () => {
 
                     <p className="mt-4 text-gray-600">{programa.descripcion}</p>
 
+                    {/* Información de inscripción */}
+                    {programa.inscripcion_info && (
+                        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                            <div className="flex items-start">
+                                <Lock className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
+                                <div>
+                                    <h3 className="text-sm font-medium text-blue-900">Período de dedicación exclusiva</h3>
+                                    <p className="mt-1 text-sm text-blue-700">
+                                        Estás inscrito en este programa desde el {formatDate(programa.inscripcion_info.fecha_inicio)} hasta el {formatDate(programa.inscripcion_info.fecha_fin)}.
+                                    </p>
+                                    <p className="mt-1 text-sm text-blue-700">
+                                        Durante este período, te recomendamos dedicarte exclusivamente a este programa para obtener los mejores resultados.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="flex items-center text-gray-600">
                             <Calendar className="mr-2 text-gray-400" size={16} />
                             <span>{programa.duracion_semanas} semanas</span>
-                        </div>
-                        <div className="flex items-center text-gray-600">
-                            <Scale className="mr-2 text-gray-400" size={16} />
-                            <span>{programa.escala}</span>
                         </div>
                         <div className="flex items-center text-gray-600">
                             <FileText className="mr-2 text-gray-400" size={16} />
@@ -182,80 +202,12 @@ const MiPrograma = () => {
                     <h2 className="text-xl font-semibold text-gray-900 mb-4">Sesiones del programa</h2>
                     <div className="space-y-4">
                         {programa.sesiones?.map((sesion, index) => (
-                            <div
+                            <SesionCard
                                 key={sesion.id}
-                                className={`flex items-center justify-between p-4 rounded-lg transition-colors ${sesion.completada
-                                    ? 'bg-green-50 hover:bg-green-100'
-                                    : index === 0 || programa.sesiones[index - 1]?.completada
-                                        ? 'bg-blue-50 hover:bg-blue-100'
-                                        : 'bg-gray-50 hover:bg-gray-100'
-                                    }`}
-                            >
-                                <div className="flex items-center space-x-4">
-                                    <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${sesion.completada
-                                        ? 'bg-green-100 text-green-600'
-                                        : index === 0 || programa.sesiones[index - 1]?.completada
-                                            ? 'bg-blue-100 text-blue-600'
-                                            : 'bg-gray-100 text-gray-600'
-                                        }`}>
-                                        {sesion.semana}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <h3 className="text-lg font-medium text-gray-900">{sesion.titulo}</h3>
-                                            {sesion.completada ? (
-                                                <CheckCircle2 className="h-5 w-5 text-green-600" />
-                                            ) : index === 0 || programa.sesiones[index - 1]?.completada ? (
-                                                <AlertCircle className="h-5 w-5 text-blue-600" />
-                                            ) : (
-                                                <AlertCircle className="h-5 w-5 text-gray-400" />
-                                            )}
-                                        </div>
-                                        <p className="text-gray-600 mt-1">{sesion.descripcion}</p>
-                                        <div className="flex items-center mt-2 text-sm text-gray-500">
-                                            <Clock className="h-4 w-4 mr-1" />
-                                            <span>{sesion.duracion_estimada} minutos</span>
-                                            <span className="mx-2">•</span>
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${sesion.tipo_practica === 'focus_attention' ? 'bg-blue-100 text-blue-800' :
-                                                sesion.tipo_practica === 'open_monitoring' ? 'bg-green-100 text-green-800' :
-                                                    sesion.tipo_practica === 'loving_kindness' ? 'bg-purple-100 text-purple-800' :
-                                                        sesion.tipo_practica === 'body_scan' ? 'bg-yellow-100 text-yellow-800' :
-                                                            sesion.tipo_practica === 'mindful_movement' ? 'bg-red-100 text-red-800' :
-                                                                sesion.tipo_practica === 'self_compassion' ? 'bg-pink-100 text-pink-800' :
-                                                                    'bg-gray-100 text-gray-800'
-                                                }`}>
-                                                {sesion.tipo_practica_display}
-                                            </span>
-                                            <span className="mx-2">•</span>
-                                            <span className="flex items-center">
-                                                {sesion.tipo_contenido === 'temporizador' && <Timer className="h-4 w-4 mr-1 text-blue-500" />}
-                                                {sesion.tipo_contenido === 'enlace' && <Link className="h-4 w-4 mr-1 text-green-500" />}
-                                                {sesion.tipo_contenido === 'audio' && <Music className="h-4 w-4 mr-1 text-purple-500" />}
-                                                {sesion.tipo_contenido === 'video' && <Video className="h-4 w-4 mr-1 text-red-500" />}
-                                                {sesion.tipo_contenido_display}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="ml-4">
-                                    {sesion.completada ? (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                                            Completada
-                                        </span>
-                                    ) : index === 0 || programa.sesiones[index - 1]?.completada ? (
-                                        <button
-                                            onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
-                                            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                        >
-                                            Comenzar
-                                        </button>
-                                    ) : (
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                                            Bloqueada
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
+                                sesion={sesion}
+                                index={index}
+                                sesiones={programa.sesiones}
+                            />
                         ))}
                     </div>
                 </div>

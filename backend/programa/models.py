@@ -21,13 +21,6 @@ class EnfoqueMetodologico(models.TextChoices):
     PROPIO = 'propio', 'Enfoque propio'
     OTRO = 'otro', 'Otro'
 
-class Escala(models.TextChoices):
-    EMOCIONAL = 'emocional', 'Estado emocional [1–5]'
-    UTILIDAD = 'utilidad', 'Utilidad de la sesión [1–5]'
-    ESTRES = 'estres', 'PSS (estrés) [0–4]'
-    COMPROMISO = 'compromiso', 'UWES-3 (compromiso) [1–5]'
-    BIENESTAR = 'bienestar', 'VAS (bienestar general) [0–10]'
-
 class EstadoPublicacion(models.TextChoices):
     BORRADOR = 'borrador', 'Borrador'
     PUBLICADO = 'publicado', 'Publicado'
@@ -54,11 +47,6 @@ class Programa(models.Model):
     # Evaluaciones
     cuestionario_pre = models.URLField(max_length=500, blank=True, null=True)
     cuestionario_post = models.URLField(max_length=500, blank=True, null=True)
-    escala = models.CharField(
-        max_length=50,
-        choices=Escala.choices,
-        default=Escala.EMOCIONAL
-    )
     
     # Estado de publicación
     estado_publicacion = models.CharField(
@@ -93,7 +81,6 @@ class Programa(models.Model):
             self.enfoque_metodologico,
             self.poblacion_objetivo,
             self.duracion_semanas,
-            self.escala,
             self.creado_por
         ]
         
