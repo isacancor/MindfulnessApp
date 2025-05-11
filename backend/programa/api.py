@@ -1,7 +1,7 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from .models import Programa, EstadoPublicacion, ProgramaParticipante
+from .models import Programa, EstadoPublicacion, ProgramaParticipante, EstadoPrograma
 from .serializers import ProgramaSerializer
 from sesion.models import Sesion, EtiquetaPractica, TipoContenido
 
@@ -125,7 +125,7 @@ def mi_programa(request):
     try:
         inscripcion = ProgramaParticipante.objects.get(
             participante=request.user.perfil_participante,
-            activo=True
+            estado_programa=EstadoPrograma.EN_PROGRESO
         )
         programa = inscripcion.programa
         serializer = ProgramaSerializer(programa, context={'request': request})
@@ -160,10 +160,10 @@ def programa_enrolar(request, pk):
             status=status.HTTP_400_BAD_REQUEST
         )
 
-    # Verificar si el participante ya está enrolado en algún programa activo
-    if ProgramaParticipante.objects.filter(participante=participante, activo=True).exists():
+    # Verificar si el participante ya está enrolado en algún programa en progreso
+    if ProgramaParticipante.objects.filter(participante=participante, estado_programa=EstadoPrograma.EN_PROGRESO).exists():
         return Response(
-            {'error': 'Ya estás enrolado en un programa activo'},
+            {'error': 'Ya estás enrolado en un programa en progreso'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -171,7 +171,8 @@ def programa_enrolar(request, pk):
         # Crear la inscripción
         inscripcion = ProgramaParticipante.objects.create(
             programa=programa,
-            participante=participante
+            participante=participante,
+            estado_programa=EstadoPrograma.EN_PROGRESO
         )
         inscripcion.calcular_fecha_fin()
 
@@ -180,6 +181,44 @@ def programa_enrolar(request, pk):
         
         return Response({'status': 'Enrolamiento exitoso'})
     except ValueError as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_completar(request, pk):
+    try:
+        programa = Programa.objects.get(pk=pk)
+    except Programa.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if not request.user.is_participante():
+        return Response(
+            {'error': 'Solo los participantes pueden completar programas'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        inscripcion = ProgramaParticipante.objects.get(
+            programa=programa,
+            participante=request.user.perfil_participante,
+            estado_programa=EstadoPrograma.EN_PROGRESO
+        )
+    except ProgramaParticipante.DoesNotExist:
+        return Response(
+            {'error': 'No estás enrolado en este programa o ya está completado'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        inscripcion.completar_programa()
+        return Response({
+            'status': 'Programa completado exitosamente',
+            'estado_programa': inscripcion.estado_programa
+        })
+    except Exception as e:
         return Response(
             {'error': str(e)},
             status=status.HTTP_400_BAD_REQUEST

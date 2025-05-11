@@ -10,7 +10,7 @@ from .serializers import (
     TipoContenidoSerializer,
     EscalaSerializer
 )
-from programa.models import Programa, ProgramaParticipante, EstadoPublicacion
+from programa.models import Programa, ProgramaParticipante, EstadoPublicacion, EstadoPrograma
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -54,7 +54,7 @@ def sesion_list_create(request):
                 if hasattr(request.user, 'participante'):
                     inscripciones = ProgramaParticipante.objects.filter(
                         participante=request.user.participante,
-                        activo=True,
+                        estado_programa=EstadoPrograma.EN_PROGRESO,
                         programa=programa
                     )
                     
@@ -331,7 +331,7 @@ def diario_sesion_list_create(request):
         inscripcion = ProgramaParticipante.objects.filter(
             participante=request.user.perfil_participante,
             programa=sesion.programa,
-            activo=True
+            estado_programa=EstadoPrograma.EN_PROGRESO,
         ).first()
         
         if not inscripcion:

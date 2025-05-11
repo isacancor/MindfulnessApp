@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, BookOpen, Calendar, Users, Clock, FileText, Link, Edit, Trash2, Plus, Timer, Music, Video } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Users, Clock, FileText, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion } from 'lucide-react';
 import api from '../../config/axios';
 
 const DetallePrograma = () => {
@@ -53,6 +53,14 @@ const DetallePrograma = () => {
 
     const handleNuevaSesion = () => {
         navigate(`/programas/${id}/sesiones/nueva`);
+    };
+
+    const handleNuevoCuestionarioPre = () => {
+        navigate(`/programas/${id}/cuestionarios/nuevo`);
+    };
+
+    const handleNuevoCuestionarioPost = () => {
+        navigate(`/programas/${id}/cuestionarios/nuevo`);
     };
 
     const handleEliminarSesion = async (sesionId) => {
@@ -185,41 +193,63 @@ const DetallePrograma = () => {
                             <div className="bg-gray-50 p-6 rounded-lg">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Evaluación</h3>
                                 <div className="space-y-4">
-                                    <div className="flex items-start">
-                                        <Link className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-500">Cuestionario Pre</p>
-                                            {programa.cuestionario_pre ? (
-                                                <a
-                                                    href={programa.cuestionario_pre}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-indigo-600 hover:text-indigo-800"
-                                                >
-                                                    Ver cuestionario
-                                                </a>
-                                            ) : (
-                                                <p className="text-gray-500">No disponible</p>
-                                            )}
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-start">
+                                            <Link className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Cuestionario Pre</p>
+                                                {programa.cuestionario_pre ? (
+                                                    <a
+                                                        href={programa.cuestionario_pre}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-indigo-600 hover:text-indigo-800"
+                                                    >
+                                                        Ver cuestionario
+                                                    </a>
+                                                ) : (
+                                                    <p className="text-gray-500">No disponible</p>
+                                                )}
+                                            </div>
                                         </div>
+                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                            <button
+                                                onClick={handleNuevoCuestionarioPre}
+                                                className="flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                                            >
+                                                <Plus className="h-4 w-4 mr-1" />
+                                                Crear Pre
+                                            </button>
+                                        )}
                                     </div>
-                                    <div className="flex items-start">
-                                        <Link className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                        <div>
-                                            <p className="text-sm text-gray-500">Cuestionario Post</p>
-                                            {programa.cuestionario_post ? (
-                                                <a
-                                                    href={programa.cuestionario_post}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-indigo-600 hover:text-indigo-800"
-                                                >
-                                                    Ver cuestionario
-                                                </a>
-                                            ) : (
-                                                <p className="text-gray-500">No disponible</p>
-                                            )}
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-start">
+                                            <Link className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Cuestionario Post</p>
+                                                {programa.cuestionario_post ? (
+                                                    <a
+                                                        href={programa.cuestionario_post}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-indigo-600 hover:text-indigo-800"
+                                                    >
+                                                        Ver cuestionario
+                                                    </a>
+                                                ) : (
+                                                    <p className="text-gray-500">No disponible</p>
+                                                )}
+                                            </div>
                                         </div>
+                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                            <button
+                                                onClick={handleNuevoCuestionarioPost}
+                                                className="flex items-center px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                                            >
+                                                <Plus className="h-4 w-4 mr-1" />
+                                                Crear Post
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>

@@ -1,5 +1,5 @@
 from django.db import models
-from programa.models import Programa, ProgramaParticipante
+from programa.models import Programa, ProgramaParticipante, EstadoPrograma
 from usuario.models import Participante
 from django.utils import timezone
 
@@ -70,7 +70,7 @@ class Sesion(models.Model):
         inscripcion = ProgramaParticipante.objects.filter(
             participante=participante,
             programa=self.programa,
-            activo=True
+            estado_programa=EstadoPrograma.EN_PROGRESO
         ).first()
         
         if not inscripcion:

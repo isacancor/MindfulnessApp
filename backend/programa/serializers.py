@@ -1,16 +1,16 @@
 from rest_framework import serializers
-from .models import Programa, TipoContexto, EnfoqueMetodologico, EstadoPublicacion, ProgramaParticipante
+from .models import Programa, TipoContexto, EnfoqueMetodologico, EstadoPublicacion, ProgramaParticipante, EstadoPrograma
 from usuario.serializers import UsuarioSerializer, ParticipanteSerializer
 from sesion.serializers import SesionSerializer
 from django.utils import timezone
 
 class ProgramaParticipanteSerializer(serializers.ModelSerializer):
     fecha_fin = serializers.DateTimeField(read_only=True)
-    esta_activo = serializers.BooleanField(read_only=True)
+    estado_programa = serializers.ChoiceField(choices=EstadoPrograma.choices, read_only=True)
 
     class Meta:
         model = ProgramaParticipante
-        fields = ['fecha_inicio', 'fecha_fin', 'activo', 'esta_activo']
+        fields = ['fecha_inicio', 'fecha_fin', 'estado_programa']
 
 class ProgramaSerializer(serializers.ModelSerializer):
     creado_por = UsuarioSerializer(read_only=True)
@@ -45,16 +45,16 @@ class ProgramaSerializer(serializers.ModelSerializer):
             inscripcion = ProgramaParticipante.objects.filter(
                 participante=request.user.perfil_participante,
                 programa=obj,
-                activo=True
+                estado_programa=EstadoPrograma.EN_PROGRESO
             ).first()
             
             if inscripcion:
                 fecha_inicio = inscripcion.fecha_inicio
-                fecha_fin = fecha_inicio + timezone.timedelta(weeks=obj.duracion_semanas)
+                fecha_fin = inscripcion.fecha_fin or (fecha_inicio + timezone.timedelta(weeks=obj.duracion_semanas))
                 return {
                     'fecha_inicio': fecha_inicio,
                     'fecha_fin': fecha_fin,
-                    'activa': inscripcion.activo
+                    'estado_programa': inscripcion.estado_programa
                 }
         return None
 

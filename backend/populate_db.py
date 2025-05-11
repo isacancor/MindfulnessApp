@@ -8,7 +8,6 @@ django.setup()
 from usuario.models import Usuario, Investigador, Participante
 from programa.models import Programa, EstadoPublicacion, ProgramaParticipante
 from sesion.models import Sesion
-from cuestionario.models import Cuestionario, Pregunta, Respuesta
 
 from datetime import date, timedelta
 
@@ -607,29 +606,8 @@ def run():
     )
 
     #===========================================================================
-    # Crear cuestionario con preguntas y respuestas
-    try:
-        primera_sesion = Sesion.objects.first()
-        if primera_sesion:
-            cuestionario = Cuestionario.objects.create(
-                titulo="Cuestionario de evaluación inicial",
-                sesion=primera_sesion
-            )
-
-            for n in range(1, 3):
-                pregunta = Pregunta.objects.create(
-                    cuestionario=cuestionario,
-                    texto=f"¿Cómo te sientes hoy? ({n})"
-                )
-                for r in ["Bien", "Mal"]:
-                    Respuesta.objects.create(
-                        pregunta=pregunta,
-                        texto=r
-                    )
-        else:
-            print("No se encontraron sesiones para crear el cuestionario")
-    except Exception as e:
-        print(f"Error al crear cuestionario, preguntas o respuestas: {e}")
+    # Crear cuestionarios con preguntas y respuestas
+    
 
     print("✅ Base de datos poblada con datos de prueba.")
 

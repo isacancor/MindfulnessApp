@@ -11,6 +11,6 @@ class ProgramaAdmin(admin.ModelAdmin):
 
 @admin.register(ProgramaParticipante)
 class ProgramaParticipanteAdmin(admin.ModelAdmin):
-    list_display = ('programa', 'participante', 'fecha_inicio', 'fecha_fin', 'activo')
-    list_filter = ('activo', 'fecha_inicio')
+    list_display = ('programa', 'participante', 'fecha_inicio', 'fecha_fin', 'estado_programa')
+    list_filter = ('estado_programa', 'fecha_inicio')
     search_fields = ('programa__nombre', 'participante__usuario__email')

@@ -21,6 +21,7 @@ import MiPrograma from './pages/programas/MiPrograma';
 import CrearSesion from './pages/sesiones/CrearSesion';
 import EditarSesion from './pages/sesiones/EditarSesion';
 import HacerSesion from './pages/sesiones/HacerSesion';
+import CrearCuestionario from './pages/CrearCuestionario';
 
 function App() {
   return (
@@ -56,7 +57,7 @@ function App() {
           <Route path="/programas/:id/sesiones/:sesionId/editar" element={<EditarSesion />} />
 
           {/* Cuestionarios */}
-          <Route path="/programas/:id/cuestionarios/crear" element={<div>Crear Cuestionario</div>} />
+          <Route path="/programas/:id/cuestionarios/nuevo" element={<CrearCuestionario />} />
           <Route path="/programas/:id/cuestionarios/:cuestionarioId" element={<div>Detalle de Cuestionario</div>} />
         </Route>
 
@@ -66,7 +67,8 @@ function App() {
           <Route path="/explorar" element={<ExplorarProgramas />} />
           <Route path="/miprograma" element={<MiPrograma />} />
           <Route path="/miprograma/sesion/:sesionId" element={<HacerSesion />} />
-          <Route path="/miprograma/:cuestionarioId" element={<div>Realizar Cuestionario</div>} />
+          <Route path="/miprograma/cuestionario-pre" element={<div>Realizar Cuestionario Pre</div>} />
+          <Route path="/miprograma/cuestionario-post" element={<div>Realizar Cuestionario Post</div>} />
         </Route>
 
         {/* Rutas protegidas para admin */}
