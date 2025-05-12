@@ -4,6 +4,7 @@ import { PlusCircle, Eye, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../config/axios';
 import InvestigadorLayout from '../components/InvestigadorLayout';
+import ErrorAlert from '../components/ErrorAlert';
 
 const InvestigadorDashboard = () => {
     const { user } = useAuth();
@@ -57,11 +58,10 @@ const InvestigadorDashboard = () => {
                     </Link>
                 </div>
 
-                {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                        <p className="text-red-700">{error}</p>
-                    </div>
-                )}
+                <ErrorAlert
+                    message={error}
+                    onClose={() => setError(null)}
+                />
 
                 {/* Estadísticas */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

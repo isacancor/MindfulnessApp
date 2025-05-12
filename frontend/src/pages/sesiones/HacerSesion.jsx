@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Clock, CheckCircle2, ExternalLink } from 'lucide-react';
 import api from '../../config/axios';
 import DiarioForm from '../../components/DiarioForm';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const HacerSesion = () => {
     const navigate = useNavigate();
@@ -79,16 +80,6 @@ const HacerSesion = () => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm">
-                    <p className="text-red-700 font-medium">{error}</p>
-                </div>
-            </div>
-        );
-    }
-
     if (!sesion) {
         return null;
     }
@@ -127,6 +118,11 @@ const HacerSesion = () => {
                                 </div>
                             )}
                         </div>
+
+                        <ErrorAlert
+                            message={error}
+                            onClose={() => setError(null)}
+                        />
 
                         <h1 className="text-2xl font-bold text-gray-900 mb-4">{sesion.titulo}</h1>
                         <p className="text-gray-600 mb-6">{sesion.descripcion}</p>

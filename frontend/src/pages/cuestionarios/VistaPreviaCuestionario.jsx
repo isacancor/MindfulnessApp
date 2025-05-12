@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Heart, ThumbsUp } from 'lucide-react';
 import api from '../../config/axios';
 import { useAuth } from '../../context/AuthContext';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const VistaPreviaCuestionario = () => {
     const { id, cuestionarioId } = useParams();
@@ -273,11 +274,10 @@ const VistaPreviaCuestionario = () => {
                         </button>
                     </div>
 
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
-                            <p className="text-red-700">{error}</p>
-                        </div>
-                    )}
+                    <ErrorAlert
+                        message={error}
+                        onClose={() => setError(null)}
+                    />
 
                     <form onSubmit={handleSubmit}>
                         {/* Información del cuestionario */}

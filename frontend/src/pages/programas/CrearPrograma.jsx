@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import api from '../../config/axios';
-import { ensureHttps } from '../../utils/url';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const CrearPrograma = () => {
     const navigate = useNavigate();
@@ -99,11 +99,10 @@ const CrearPrograma = () => {
                         </p>
                     </div>
 
-                    {(error || authError) && (
-                        <div className="mt-6 bg-red-50 border-l-4 border-red-500 p-4 rounded" role="alert">
-                            <p className="text-red-700">{error || authError}</p>
-                        </div>
-                    )}
+                    <ErrorAlert
+                        message={error || authError}
+                        onClose={() => setError(null)}
+                    />
 
                     <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
                         <div>

@@ -1,9 +1,10 @@
 import { User, Mail, Calendar, Heart, Activity, Phone, MapPin, BookOpen, Clock, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import ErrorAlert from '../ErrorAlert';
 
 const PerfilParticipante = () => {
-    const { user } = useAuth();
+    const { user, error, resetError } = useAuth();
     const navigate = useNavigate();
 
     // Función para formatear la fecha de registro
@@ -100,6 +101,11 @@ const PerfilParticipante = () => {
 
             {/* Contenido principal */}
             <div className="px-6 py-6">
+                <ErrorAlert
+                    message={error}
+                    onClose={() => resetError()}
+                />
+
                 {/* Sección de información básica */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div className="bg-gray-50 p-6 rounded-xl shadow-sm">

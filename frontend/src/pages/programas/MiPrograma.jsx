@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video, Scale, Lock } from 'lucide-react';
 import api from '../../config/axios';
 import SesionCard from '../../components/SesionCard';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const MiPrograma = () => {
     const navigate = useNavigate();
@@ -82,16 +83,6 @@ const MiPrograma = () => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-                <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm">
-                    <p className="text-red-700 font-medium">{error}</p>
-                </div>
-            </div>
-        );
-    }
-
     if (!programa) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
@@ -122,6 +113,11 @@ const MiPrograma = () => {
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </button>
+
+                <ErrorAlert
+                    message={error}
+                    onClose={() => setError(null)}
+                />
 
                 {/* Encabezado del Programa */}
                 <div className="bg-white rounded-xl shadow-sm p-6 mb-8">

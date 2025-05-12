@@ -266,7 +266,7 @@ def run():
     programa1 = Programa.objects.create(
         nombre="Mindfulness para la Vida Cotidiana",
         descripcion="Programa de 3 semanas para integrar mindfulness en el día a día",
-        tipo_contexto="educativo",
+        tipo_contexto="académico",
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Adultos en general",
         duracion_semanas=3,
@@ -577,7 +577,7 @@ def run():
     programa5 = Programa.objects.create(
         nombre="prueba",
         descripcion="Programa de 3 semanas para integrar mindfulness en el día a día",
-        tipo_contexto="educativo",
+        tipo_contexto="académico",
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Adultos en general",
         duracion_semanas=3,

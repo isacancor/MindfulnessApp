@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { BookOpen, Calendar, Users, Clock, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
+import { BookOpen, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
 import api from '../../config/axios';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const ExplorarProgramas = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
     const [programas, setProgramas] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -99,13 +98,10 @@ const ExplorarProgramas = () => {
                     </p>
                 </div>
 
-                {error && (
-                    <div className="max-w-3xl mx-auto mb-8">
-                        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg shadow-sm">
-                            <p className="text-red-700 font-medium">{error}</p>
-                        </div>
-                    </div>
-                )}
+                <ErrorAlert
+                    message={error}
+                    onClose={() => setError(null)}
+                />
 
                 {yaEnrolado && (
                     <div className="max-w-3xl mx-auto mb-8">

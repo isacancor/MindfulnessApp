@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Clock } from 'lucide-react';
 import api from '../../config/axios';
 import { prepareSessionFormData } from '../../utils/formData';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const EditarSesion = () => {
     const navigate = useNavigate();
@@ -150,11 +151,10 @@ const EditarSesion = () => {
                         </p>
                     </div>
 
-                    {(error || authError) && (
-                        <div className="mt-6 bg-red-50 border-l-4 border-red-500 p-4 rounded" role="alert">
-                            <p className="text-red-700">{error || authError}</p>
-                        </div>
-                    )}
+                    <ErrorAlert
+                        message={error || authError}
+                        onClose={() => setError(null)}
+                    />
 
                     <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
                         <div>

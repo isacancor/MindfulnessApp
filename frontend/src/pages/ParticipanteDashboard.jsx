@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import ErrorAlert from '@/components/ErrorAlert';
 import {
     Play,
     ClipboardList,
@@ -90,16 +91,6 @@ const ParticipanteDashboard = () => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="text-center">
-                    <p className="text-red-600">{error}</p>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             {/* Saludo y bienvenida */}
@@ -111,6 +102,11 @@ const ParticipanteDashboard = () => {
                     Bienvenido/a a tu espacio de mindfulness
                 </p>
             </div>
+
+            <ErrorAlert
+                message={error}
+                onClose={() => setError(null)}
+            />
 
             {/* Próxima sesión - Card grande y llamativa */}
             {proximaSesion && (

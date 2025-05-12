@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Save, Type, List, CheckSquare, ChevronDown, Star, BarChart2, Heart, ThumbsUp } from 'lucide-react';
 import api from '../../config/axios';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const CrearCuestionario = ({ tipo }) => {
     const { id } = useParams();
@@ -296,11 +297,10 @@ const CrearCuestionario = ({ tipo }) => {
                         </div>
                     </div>
 
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
-                            <p className="text-red-700">{error}</p>
-                        </div>
-                    )}
+                    <ErrorAlert
+                        message={error}
+                        onClose={() => setError(null)}
+                    />
 
                     {/* Información básica */}
                     <div className="space-y-6 mb-8">

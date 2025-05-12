@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Users } from 'lucide-react';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const RegisterParticipante = () => {
-    const { register, loading, error, isAuthenticated, user } = useAuth();
+    const { register, loading, error, resetError, isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         nombre: '',
@@ -119,11 +120,10 @@ const RegisterParticipante = () => {
                         </p>
                     </div>
 
-                    {error && (
-                        <div className="mt-6 bg-red-50 border-l-4 border-red-500 p-4 rounded" role="alert">
-                            <p className="text-red-700">{error}</p>
-                        </div>
-                    )}
+                    <ErrorAlert
+                        message={error}
+                        onClose={() => resetError()}
+                    />
 
                     <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

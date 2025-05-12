@@ -4,6 +4,7 @@ import { PlusCircle } from 'lucide-react';
 import api from '../../config/axios';
 import ProgramaCard from '../../components/ProgramaCard';
 import InvestigadorLayout from '../../components/InvestigadorLayout';
+import ErrorAlert from '../../components/ErrorAlert';
 
 const ListaProgramas = () => {
     const navigate = useNavigate();
@@ -60,11 +61,10 @@ const ListaProgramas = () => {
                     </button>
                 </div>
 
-                {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                        <p className="text-red-700">{error}</p>
-                    </div>
-                )}
+                <ErrorAlert
+                    message={error}
+                    onClose={() => setError(null)}
+                />
 
                 {programas.length === 0 ? (
                     <div className="bg-white rounded-xl shadow-sm p-8 text-center">
