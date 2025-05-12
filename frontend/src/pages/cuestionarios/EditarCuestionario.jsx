@@ -48,7 +48,7 @@ const EditarCuestionario = () => {
     useEffect(() => {
         const fetchCuestionario = async () => {
             try {
-                const response = await api.get(`/cuestionarios/${cuestionarioId}/`);
+                const response = await api.get(`/cuestionario/${cuestionarioId}/`);
                 const cuestionario = response.data;
                 setTitulo(cuestionario.titulo);
                 setDescripcion(cuestionario.descripcion);
@@ -269,7 +269,7 @@ const EditarCuestionario = () => {
                 preguntas
             };
 
-            await api.put(`/cuestionarios/${cuestionarioId}/`, cuestionario);
+            await api.put(`/cuestionario/${cuestionarioId}/`, cuestionario);
             navigate(`/programas/${id}`);
         } catch (err) {
             console.error('Error al guardar el cuestionario:', err);

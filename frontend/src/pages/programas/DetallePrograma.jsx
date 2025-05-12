@@ -82,7 +82,7 @@ const DetallePrograma = () => {
     const handleEliminarCuestionario = async (cuestionarioId) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar este cuestionario?')) {
             try {
-                await api.delete(`/cuestionarios/${cuestionarioId}/`);
+                await api.delete(`/cuestionario/${cuestionarioId}/`);
                 // Actualizar el estado del programa con los datos más recientes
                 const response = await api.get(`/programas/${id}/`);
                 setPrograma(response.data);
@@ -224,7 +224,7 @@ const DetallePrograma = () => {
                                                     onClick={handleNuevoCuestionarioPre}
                                                     className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                                 >
-                                                    <Plus className="h-3 w-3 mr-1" />
+                                                    <Plus className="h-5 w-5 mr-1" />
                                                     Crear
                                                 </button>
                                             )}
@@ -245,14 +245,14 @@ const DetallePrograma = () => {
                                                             className="text-gray-500 hover:text-indigo-600 focus:outline-none"
                                                             title="Editar"
                                                         >
-                                                            <Edit className="h-4 w-4" />
+                                                            <Edit className="h-5 w-5" />
                                                         </button>
                                                         <button
                                                             onClick={() => handleEliminarCuestionario(programa.cuestionario_pre.id)}
                                                             className="text-gray-500 hover:text-red-600 focus:outline-none"
                                                             title="Eliminar"
                                                         >
-                                                            <Trash2 className="h-4 w-4" />
+                                                            <Trash2 className="h-5 w-5" />
                                                         </button>
                                                     </div>
                                                 )}
@@ -274,7 +274,7 @@ const DetallePrograma = () => {
                                                     onClick={handleNuevoCuestionarioPost}
                                                     className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                                 >
-                                                    <Plus className="h-3 w-3 mr-1" />
+                                                    <Plus className="h-5 w-5 mr-1" />
                                                     Crear
                                                 </button>
                                             )}
@@ -295,14 +295,14 @@ const DetallePrograma = () => {
                                                             className="text-gray-500 hover:text-indigo-600 focus:outline-none"
                                                             title="Editar"
                                                         >
-                                                            <Edit className="h-4 w-4" />
+                                                            <Edit className="h-5 w-5" />
                                                         </button>
                                                         <button
                                                             onClick={() => handleEliminarCuestionario(programa.cuestionario_post.id)}
                                                             className="text-gray-500 hover:text-red-600 focus:outline-none"
                                                             title="Eliminar"
                                                         >
-                                                            <Trash2 className="h-4 w-4" />
+                                                            <Trash2 className="h-5 w-5" />
                                                         </button>
                                                     </div>
                                                 )}

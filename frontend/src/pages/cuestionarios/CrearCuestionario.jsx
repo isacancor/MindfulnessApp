@@ -251,7 +251,7 @@ const CrearCuestionario = ({ tipo }) => {
                 tipo
             };
 
-            await api.post(`/programa/${id}/cuestionarios/`, cuestionario);
+            await api.post(`/programas/${id}/cuestionarios/`, cuestionario);
             navigate(`/programas/${id}`);
         } catch (err) {
             console.error('Error al guardar el cuestionario:', err);

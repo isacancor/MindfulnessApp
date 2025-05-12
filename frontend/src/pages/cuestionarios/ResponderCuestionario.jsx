@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Heart, ThumbsUp } from 'lucide-react';
 import api from '../../config/axios';
 import { useAuth } from '../../context/AuthContext';
 import ErrorAlert from '../../components/ErrorAlert';
 
-const VistaPreviaCuestionario = () => {
-    const { id, cuestionarioId } = useParams();
+const ResponderCuestionario = ({ tipo }) => {
     const navigate = useNavigate();
     const [cuestionario, setCuestionario] = useState(null);
     const [respuestas, setRespuestas] = useState({});
@@ -18,7 +17,9 @@ const VistaPreviaCuestionario = () => {
     useEffect(() => {
         const fetchCuestionario = async () => {
             try {
-                const response = await api.get(`/cuestionario/${cuestionarioId}/`);
+                setLoading(true);
+                setError(null);
+                const response = await api.get(`/cuestionario/${tipo}/`);
                 setCuestionario(response.data);
                 const respuestasIniciales = {};
                 response.data.preguntas.forEach(pregunta => {
@@ -30,15 +31,21 @@ const VistaPreviaCuestionario = () => {
                 });
                 setRespuestas(respuestasIniciales);
             } catch (err) {
-                setError('Error al cargar el cuestionario');
-                console.error('Error:', err);
+                console.error('Error al obtener cuestionario pre:', err);
+                if (err.response?.status === 400 && err.response?.data?.error === 'Ya has respondido este cuestionario pre') {
+                    setError('Ya has completado este cuestionario. ¡Gracias por tu participación!');
+                } else if (err.response?.data?.error) {
+                    setError(err.response.data.error);
+                } else {
+                    setError('Error al cargar el cuestionario. Por favor, intenta más tarde.');
+                }
             } finally {
                 setLoading(false);
             }
         };
 
         fetchCuestionario();
-    }, [cuestionarioId]);
+    }, [tipo]);
 
     const handleRespuestaChange = (preguntaId, valor, tipo) => {
         if (tipo === 'checkbox') {
@@ -58,17 +65,22 @@ const VistaPreviaCuestionario = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setEnviando(true);
-        setError('');
 
         try {
-            await api.post(`/cuestionario/${cuestionarioId}/respuestas/`, {
+            setEnviando(true);
+            setError(null);
+
+            await api.post(`/cuestionario/responder/${tipo}/`, {
                 respuestas
             });
-            navigate(`/programas/${id}`);
+            navigate('/miprograma');
         } catch (err) {
-            console.error('Error al enviar las respuestas:', err);
-            setError(err.response?.data?.error || 'Error al enviar las respuestas');
+            console.error('Error al enviar respuestas:', err);
+            if (err.response?.data?.error) {
+                setError(err.response.data.error);
+            } else {
+                setError('Error al enviar tus respuestas. Por favor, intenta más tarde.');
+            }
         } finally {
             setEnviando(false);
         }
@@ -266,7 +278,7 @@ const VistaPreviaCuestionario = () => {
                     {/* Encabezado */}
                     <div className="flex items-center justify-between mb-8">
                         <button
-                            onClick={() => navigate(`/programas/${id}`)}
+                            onClick={() => navigate('/miprograma')}
                             className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
                         >
                             <ArrowLeft className="h-5 w-5 mr-2" />
@@ -328,4 +340,4 @@ const VistaPreviaCuestionario = () => {
     );
 };
 
-export default VistaPreviaCuestionario; 
+export default ResponderCuestionario; 

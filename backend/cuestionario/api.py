@@ -7,6 +7,24 @@ from .models import Cuestionario, RespuestaCuestionario
 from .serializers import CuestionarioSerializer, RespuestaCuestionarioSerializer
 from programa.models import Programa
 from usuario.models import Usuario
+from programa.models import ProgramaParticipante, EstadoPrograma
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def obtener_cuestionarios_programa(request, programa_id):
+    """
+    Obtiene los cuestionarios (pre y post) de un programa específico
+    """
+    try:
+        programa = get_object_or_404(Programa, id=programa_id)
+        cuestionarios = Cuestionario.objects.filter(programa=programa)
+        serializer = CuestionarioSerializer(cuestionarios, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -118,72 +136,282 @@ def cuestionario_detail(request, cuestionario_id):
         cuestionario.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def respuesta_list(request, cuestionario_id):
-    cuestionario = get_object_or_404(Cuestionario, id=cuestionario_id)
-    
-    if request.method == 'GET':
-        # Solo los investigadores pueden ver todas las respuestas
-        if request.user.is_investigador():
-            respuestas = RespuestaCuestionario.objects.filter(cuestionario=cuestionario)
-        else:
-            # Los usuarios normales solo ven sus propias respuestas
-            respuestas = RespuestaCuestionario.objects.filter(
-                cuestionario=cuestionario,
-                usuario=request.user
-            )
-        
-        serializer = RespuestaCuestionarioSerializer(respuestas, many=True)
-        return Response(serializer.data)
-    
-    elif request.method == 'POST':
-        # Verificar que el usuario es participante del programa
+def obtener_cuestionario_pre(request):
+    """
+    Obtiene el cuestionario pre del programa en que está enrolado el usuario
+    """
+    try:
+        # Verificar que el usuario es participante
         if not request.user.is_participante():
             return Response(
-                {'error': 'Solo los participantes pueden responder cuestionarios'},
+                {'error': 'Solo los participantes pueden acceder a los cuestionarios'},
                 status=status.HTTP_403_FORBIDDEN
             )
-            
-        # Verificar que el usuario está inscrito en el programa
-        if not cuestionario.programa.participantes.filter(usuario=request.user).exists():
+
+        # Obtener el participante 
+        participante = request.user.perfil_participante
+        
+        # Verificar si está inscrito en algún programa
+        if not participante.programas_inscritos.exists():
             return Response(
-                {'error': 'Debes estar inscrito en el programa para responder el cuestionario'},
-                status=status.HTTP_403_FORBIDDEN
+                {'error': 'No estás inscrito en ningún programa'},
+                status=status.HTTP_404_NOT_FOUND
             )
         
-        # Verificar que el usuario no ha respondido antes
+        # Obtener el programa más reciente donde está inscrito
+        # (Asumimos que el participante está activo en un programa a la vez)
+        programa = participante.programas_inscritos.filter(
+            inscripciones__estado_programa='en progreso'
+        ).order_by('-inscripciones__fecha_inicio').first()
+        
+        if not programa:
+            return Response(
+                {'error': 'No tienes programas activos actualmente'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Obtener el cuestionario pre del programa
+        if not programa.cuestionario_pre:
+            return Response(
+                {'error': 'El programa no tiene cuestionario pre configurado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        cuestionario = programa.cuestionario_pre
+        
+        # Verificar si el usuario ya respondió este cuestionario
         if RespuestaCuestionario.objects.filter(
             cuestionario=cuestionario,
             usuario=request.user
         ).exists():
             return Response(
-                {'error': 'Ya has respondido este cuestionario'},
+                {'error': 'Ya has respondido este cuestionario pre'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
-        # Crear la respuesta con el cuestionario y usuario asociados
-        data = request.data.copy()
-        data['cuestionario'] = cuestionario.id
-        data['usuario'] = request.user.id
-        
-        serializer = RespuestaCuestionarioSerializer(data=data)
-        if serializer.is_valid():
-            respuesta = serializer.save()
-            return Response(RespuestaCuestionarioSerializer(respuesta).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = CuestionarioSerializer(cuestionario)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def respuesta_detail(request, respuesta_id):
-    respuesta = get_object_or_404(RespuestaCuestionario, id=respuesta_id)
-    
-    # Verificar permisos
-    if not request.user.is_investigador() and respuesta.usuario != request.user:
+def obtener_cuestionario_post(request):
+    """
+    Obtiene el cuestionario post del programa en que está enrolado el usuario
+    """
+    try:
+        # Verificar que el usuario es participante
+        if not request.user.is_participante():
+            return Response(
+                {'error': 'Solo los participantes pueden acceder a los cuestionarios'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Obtener el participante 
+        participante = request.user.perfil_participante
+        
+        # Verificar si está inscrito en algún programa
+        if not participante.programas_inscritos.exists():
+            return Response(
+                {'error': 'No estás inscrito en ningún programa'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Obtener el programa más reciente donde está inscrito
+        # (Asumimos que el participante está activo en un programa a la vez)
+        programa = participante.programas_inscritos.filter(
+            inscripciones__estado_programa='en progreso'
+        ).order_by('-inscripciones__fecha_inicio').first()
+        
+        if not programa:
+            return Response(
+                {'error': 'No tienes programas activos actualmente'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Obtener el cuestionario post del programa
+        if not programa.cuestionario_post:
+            return Response(
+                {'error': 'El programa no tiene cuestionario post configurado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        cuestionario = programa.cuestionario_post
+        
+        # Verificar si el usuario ya respondió este cuestionario
+        if RespuestaCuestionario.objects.filter(
+            cuestionario=cuestionario,
+            usuario=request.user
+        ).exists():
+            return Response(
+                {'error': 'Ya has respondido este cuestionario post'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer = CuestionarioSerializer(cuestionario)
+        return Response(serializer.data)
+    except Exception as e:
         return Response(
-            {'error': 'No tienes permiso para ver esta respuesta'},
-            status=status.HTTP_403_FORBIDDEN
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
         )
-    
-    serializer = RespuestaCuestionarioSerializer(respuesta)
-    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def responder_cuestionario_pre(request):
+    """
+    Permite a un participante responder el cuestionario pre
+    """
+    try:
+        # Verificar que el usuario es participante
+        if not request.user.is_participante():
+            return Response(
+                {'error': 'Solo los participantes pueden responder cuestionarios'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Obtener el participante 
+        participante = request.user.perfil_participante
+        
+        # Verificar si está inscrito en algún programa
+        if not participante.programas_inscritos.exists():
+            return Response(
+                {'error': 'No estás inscrito en ningún programa'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Obtener el programa más reciente donde está inscrito
+        programa = participante.programas_inscritos.filter(
+            inscripciones__estado_programa='en progreso'
+        ).order_by('-inscripciones__fecha_inicio').first()
+        
+        if not programa:
+            return Response(
+                {'error': 'No tienes programas activos actualmente'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Obtener el cuestionario pre del programa
+        if not programa.cuestionario_pre:
+            return Response(
+                {'error': 'El programa no tiene cuestionario pre configurado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        cuestionario = programa.cuestionario_pre
+
+        # Verificar si el usuario ya respondió este cuestionario
+        if RespuestaCuestionario.objects.filter(
+            cuestionario=cuestionario,
+            usuario=request.user
+        ).exists():
+            return Response(
+                {'error': 'Ya has respondido este cuestionario pre'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Crear la respuesta
+        data = {
+            'cuestionario': cuestionario.id,
+            'usuario': request.user.id,
+            'respuestas': request.data.get('respuestas', {})
+        }
+
+        serializer = RespuestaCuestionarioSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def responder_cuestionario_post(request):
+    """
+    Permite a un participante responder el cuestionario post
+    """
+    try:
+        # Verificar que el usuario es participante
+        if not request.user.is_participante():
+            return Response(
+                {'error': 'Solo los participantes pueden responder cuestionarios'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Obtener el participante 
+        participante = request.user.perfil_participante
+        
+        # Verificar si está inscrito en algún programa
+        if not participante.programas_inscritos.exists():
+            return Response(
+                {'error': 'No estás inscrito en ningún programa'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Obtener el programa más reciente donde está inscrito
+        programa = participante.programas_inscritos.filter(
+            inscripciones__estado_programa='en progreso'
+        ).order_by('-inscripciones__fecha_inicio').first()
+        
+        if not programa:
+            return Response(
+                {'error': 'No tienes programas activos actualmente'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        # Obtener el cuestionario post del programa
+        if not programa.cuestionario_post:
+            return Response(
+                {'error': 'El programa no tiene cuestionario post configurado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+        cuestionario = programa.cuestionario_post
+
+        # Verificar si el usuario ya respondió este cuestionario
+        if RespuestaCuestionario.objects.filter(
+            cuestionario=cuestionario,
+            usuario=request.user
+        ).exists():
+            return Response(
+                {'error': 'Ya has respondido este cuestionario post'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Crear la respuesta
+        data = {
+            'cuestionario': cuestionario.id,
+            'usuario': request.user.id,
+            'respuestas': request.data.get('respuestas', {})
+        }
+
+        serializer = RespuestaCuestionarioSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            
+            # Marcar el programa como completado
+            inscripcion = ProgramaParticipante.objects.get(
+                programa=programa,
+                participante=participante,
+                estado_programa=EstadoPrograma.EN_PROGRESO
+            )
+            inscripcion.estado_programa = EstadoPrograma.COMPLETADO
+            inscripcion.save()
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )

@@ -160,8 +160,31 @@ def mi_programa(request):
             estado_programa=EstadoPrograma.EN_PROGRESO
         )
         programa = inscripcion.programa
+        
+        # Verificar si ha respondido el cuestionario pre
+        cuestionario_pre_respondido = False
+        if programa.cuestionario_pre:
+            from cuestionario.models import RespuestaCuestionario
+            cuestionario_pre_respondido = RespuestaCuestionario.objects.filter(
+                cuestionario=programa.cuestionario_pre,
+                usuario=request.user
+            ).exists()
+        
+        # Verificar si ha respondido el cuestionario post
+        cuestionario_post_respondido = False
+        if programa.cuestionario_post:
+            from cuestionario.models import RespuestaCuestionario
+            cuestionario_post_respondido = RespuestaCuestionario.objects.filter(
+                cuestionario=programa.cuestionario_post,
+                usuario=request.user
+            ).exists()
+        
         serializer = ProgramaSerializer(programa, context={'request': request})
-        return Response(serializer.data)
+        response_data = serializer.data
+        response_data['cuestionario_pre_respondido'] = cuestionario_pre_respondido
+        response_data['cuestionario_post_respondido'] = cuestionario_post_respondido
+        
+        return Response(response_data)
     except ProgramaParticipante.DoesNotExist:
         return Response(None)
 

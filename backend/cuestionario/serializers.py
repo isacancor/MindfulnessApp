@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Cuestionario, RespuestaCuestionario
+from usuario.models import Usuario
 
 class CuestionarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,12 +51,28 @@ class CuestionarioSerializer(serializers.ModelSerializer):
         return value
 
 class RespuestaCuestionarioSerializer(serializers.ModelSerializer):
+    usuario_nombre = serializers.SerializerMethodField()
+    cuestionario_titulo = serializers.SerializerMethodField()
+
     class Meta:
         model = RespuestaCuestionario
-        fields = ['id', 'cuestionario', 'usuario', 'respuestas', 'fecha_respuesta']
+        fields = ['id', 'cuestionario', 'usuario', 'usuario_nombre', 'cuestionario_titulo', 
+                 'respuestas', 'fecha_respuesta']
         read_only_fields = ['fecha_respuesta']
 
-    def validate_respuestas(self, value):
-        if not isinstance(value, dict):
-            raise serializers.ValidationError("Las respuestas deben ser un objeto")
-        return value
+    def get_usuario_nombre(self, obj):
+        return obj.usuario.nombre_completo
+
+    def get_cuestionario_titulo(self, obj):
+        return obj.cuestionario.titulo
+
+    def validate(self, data):
+        # Verificar que el usuario no haya respondido este cuestionario antes
+        if RespuestaCuestionario.objects.filter(
+            cuestionario=data['cuestionario'],
+            usuario=data['usuario']
+        ).exists():
+            raise serializers.ValidationError(
+                "Este usuario ya ha respondido este cuestionario"
+            )
+        return data

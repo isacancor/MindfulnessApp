@@ -88,7 +88,7 @@ const EditarPrograma = () => {
 
         try {
             await api.put(`/programas/${id}/`, dataToSend);
-            navigate('/programas');
+            navigate(-1);
         } catch (error) {
             console.error('Error al actualizar el programa:', error);
             if (error.response?.data?.error) {
@@ -114,7 +114,7 @@ const EditarPrograma = () => {
             <div className="w-full max-w-2xl">
                 <div className="bg-white p-8 rounded-2xl shadow-xl relative">
                     <button
-                        onClick={() => navigate('/programas')}
+                        onClick={() => navigate(-1)}
                         className="absolute top-6 left-6 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-indigo-600 border border-gray-300/30 hover:border-indigo-300 bg-white/90 hover:bg-indigo-100 focus:outline-none shadow-sm"
                         aria-label="Volver atrás"
                     >
@@ -255,7 +255,7 @@ const EditarPrograma = () => {
                         <div className="pt-4 flex justify-end space-x-4">
                             <button
                                 type="button"
-                                onClick={() => navigate('/programas')}
+                                onClick={() => navigate(-1)}
                                 className="px-6 py-3 rounded-lg font-medium text-gray-700 border border-gray-300 hover:bg-gray-50 transition duration-200 shadow-sm"
                                 disabled={loading}
                             >

@@ -1,9 +1,9 @@
 import { CheckCircle2, AlertCircle, Timer, Music, Video, Clock, Link } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const SesionCard = ({ sesion, index, sesiones }) => {
+const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido }) => {
     const navigate = useNavigate();
-    const isAvailable = index === 0 || sesiones[index - 1]?.completada;
+    const isAvailable = cuestionarioPreRespondido && (index === 0 || sesiones[index - 1]?.completada);
     const isCompleted = sesion.completada;
 
     return (
@@ -75,7 +75,8 @@ const SesionCard = ({ sesion, index, sesiones }) => {
                     </button>
                 ) : (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                        Bloqueada
+                        {!cuestionarioPreRespondido ? 'Completa el cuestionario pre' :
+                            (index > 0 && !sesiones[index - 1]?.completada) ? 'Completa la sesión anterior' : 'Bloqueada'}
                     </span>
                 )}
             </div>

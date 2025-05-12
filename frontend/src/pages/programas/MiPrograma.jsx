@@ -15,6 +15,8 @@ const MiPrograma = () => {
         totalSesiones: 0,
         minutosCompletados: 0
     });
+    const [cuestionarioPreRespondido, setCuestionarioPreRespondido] = useState(false);
+    const [cuestionarioPostRespondido, setCuestionarioPostRespondido] = useState(false);
 
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -63,6 +65,10 @@ const MiPrograma = () => {
                     totalSesiones,
                     minutosCompletados
                 });
+
+                // Obtener el estado de los cuestionarios del backend
+                setCuestionarioPreRespondido(programaData.cuestionario_pre_respondido || false);
+                setCuestionarioPostRespondido(programaData.cuestionario_post_respondido || false);
             } catch (err) {
                 console.error('Error al cargar el programa:', err);
                 setError('Error al cargar tu programa. Por favor, intenta nuevamente.');
@@ -129,8 +135,13 @@ const MiPrograma = () => {
                             </p>
                         </div>
                         <div className="flex flex-col items-end space-y-2">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${programa.estado_programa === 'completado' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                                {programa.estado_programa === 'completado' ? 'Completado' : 'En progreso'}
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${programa.inscripciones?.[0]?.estado_programa === 'completado' || cuestionarioPostRespondido
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                {programa.inscripciones?.[0]?.estado_programa === 'completado' || cuestionarioPostRespondido
+                                    ? 'Completado'
+                                    : 'En progreso'}
                             </span>
                         </div>
                     </div>
@@ -182,20 +193,35 @@ const MiPrograma = () => {
                         Completa estos cuestionarios para avanzar en el programa:
                     </p>
                     <div className="flex space-x-4">
-                        <button
-                            onClick={() => navigate('/miprograma/cuestionario-pre')}
-                            disabled={progreso.sesionesCompletadas > 0}
-                            className={`w-1/2 px-6 py-3 rounded-md text-lg font-medium ${progreso.sesionesCompletadas > 0 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white border-2 border-blue-400 shadow-md ring-2 ring-blue-200 hover:bg-blue-700'}`}
-                        >
-                            Cuestionario Pre
-                        </button>
-                        <button
-                            onClick={() => navigate('/miprograma/cuestionario-post')}
-                            disabled={progreso.sesionesCompletadas < progreso.totalSesiones}
-                            className={`w-1/2 px-6 py-3 rounded-md text-lg font-medium ${progreso.sesionesCompletadas < progreso.totalSesiones ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white border-2 border-blue-400 shadow-md ring-2 ring-blue-200 hover:bg-blue-700'}`}
-                        >
-                            Cuestionario Post
-                        </button>
+                        <div className="w-1/2">
+                            {cuestionarioPreRespondido ? (
+                                <div className="flex items-center px-6 py-3 rounded-md text-lg font-medium bg-green-100 text-green-800">
+                                    <CheckCircle2 className="mr-2 h-5 w-5" /> Cuestionario Pre Completado
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => navigate('/miprograma/cuestionario-pre')}
+                                    className="w-full px-6 py-3 rounded-md text-lg font-medium bg-blue-600 text-white border-2 border-blue-400 shadow-md ring-2 ring-blue-200 hover:bg-blue-700"
+                                >
+                                    Cuestionario Pre
+                                </button>
+                            )}
+                        </div>
+                        <div className="w-1/2">
+                            {cuestionarioPostRespondido ? (
+                                <div className="flex items-center px-6 py-3 rounded-md text-lg font-medium bg-green-100 text-green-800">
+                                    <CheckCircle2 className="mr-2 h-5 w-5" /> Cuestionario Post Completado
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => navigate('/miprograma/cuestionario-post')}
+                                    disabled={progreso.sesionesCompletadas < progreso.totalSesiones}
+                                    className={`w-full px-6 py-3 rounded-md text-lg font-medium ${progreso.sesionesCompletadas < progreso.totalSesiones ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white border-2 border-blue-400 shadow-md ring-2 ring-blue-200 hover:bg-blue-700'}`}
+                                >
+                                    Cuestionario Post
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -233,6 +259,7 @@ const MiPrograma = () => {
                                 sesion={sesion}
                                 index={index}
                                 sesiones={programa.sesiones}
+                                cuestionarioPreRespondido={cuestionarioPreRespondido}
                             />
                         ))}
                     </div>
