@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
+import { BookOpen, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle, Star } from 'lucide-react';
 import api from '../../config/axios';
 import ErrorAlert from '../../components/ErrorAlert';
 
@@ -169,6 +169,14 @@ const ExplorarProgramas = () => {
                                         >
                                             <CheckCircle className="mr-2 h-4 w-4" />
                                             Programa actual
+                                        </button>
+                                    ) : programa.inscripcion_info?.es_completado ? (
+                                        <button
+                                            onClick={() => navigate(`/completados/${programa.id}`)}
+                                            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors duration-200"
+                                        >
+                                            <Star className="mr-2 h-4 w-4" />
+                                            Ver programa completado
                                         </button>
                                     ) : (
                                         <button

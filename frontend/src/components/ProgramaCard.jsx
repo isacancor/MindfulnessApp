@@ -99,6 +99,7 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                         <span className="capitalize">{programa.tipo_contexto}</span>
                     </div>
                     <div className="flex items-center text-gray-600">
+                        <BookOpen className="mr-2" size={16} />
                         <span className="capitalize">{programa.enfoque_metodologico}</span>
                     </div>
                 </div>

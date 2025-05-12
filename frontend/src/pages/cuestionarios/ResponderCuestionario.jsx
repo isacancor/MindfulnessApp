@@ -12,7 +12,23 @@ const ResponderCuestionario = ({ tipo }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [enviando, setEnviando] = useState(false);
-    const { isParticipante } = useAuth();
+    const { isParticipante, user } = useAuth();
+
+    const validarRespuestas = () => {
+        if (!cuestionario) return false;
+
+        return cuestionario.preguntas.every(pregunta => {
+            const respuesta = respuestas[pregunta.id];
+
+            if (pregunta.tipo === 'checkbox') {
+                return respuesta && respuesta.length > 0;
+            } else if (pregunta.tipo === 'likert-5-puntos') {
+                return respuesta && Object.keys(respuesta).length === pregunta.likert5Puntos.filas.length;
+            } else {
+                return respuesta !== undefined && respuesta !== '';
+            }
+        });
+    };
 
     useEffect(() => {
         const fetchCuestionario = async () => {
@@ -66,6 +82,11 @@ const ResponderCuestionario = ({ tipo }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!validarRespuestas()) {
+            setError('Por favor, responde todas las preguntas antes de enviar el cuestionario.');
+            return;
+        }
+
         try {
             setEnviando(true);
             setError(null);
@@ -73,7 +94,21 @@ const ResponderCuestionario = ({ tipo }) => {
             await api.post(`/cuestionario/responder/${tipo}/`, {
                 respuestas
             });
-            navigate('/miprograma');
+
+            // Si es el cuestionario post, marcar el programa como completado
+            if (tipo === 'post') {
+                try {
+                    const programaResponse = await api.get('/programas/mi-programa/');
+                    if (programaResponse.data) {
+                        await api.post(`/programas/${programaResponse.data.id}/completar/`);
+                    }
+                    navigate(`/completados/${cuestionario.programa}`);
+                } catch (err) {
+                    console.error('Error al marcar programa como completado:', err);
+                }
+            } else {
+                navigate('/miprograma');
+            }
         } catch (err) {
             console.error('Error al enviar respuestas:', err);
             if (err.response?.data?.error) {

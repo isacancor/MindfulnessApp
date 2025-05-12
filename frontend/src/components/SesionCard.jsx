@@ -1,4 +1,4 @@
-import { CheckCircle2, AlertCircle, Timer, Music, Video, Clock, Link } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Timer, Music, Video, Clock, Link, Repeat } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido }) => {
@@ -63,9 +63,13 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido }) => {
             </div>
             <div className="ml-4">
                 {isCompleted ? (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                        Completada
-                    </span>
+                    <button
+                        onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                        <Repeat className="h-4 w-4 mr-2" />
+                        Repetir
+                    </button>
                 ) : isAvailable ? (
                     <button
                         onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}

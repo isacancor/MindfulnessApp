@@ -1,5 +1,5 @@
 from django.urls import path
-from .api import programa_list_create, programa_detail, programa_participantes, programa_publicar, programa_enrolar, mi_programa, programa_completar
+from .api import programa_list_create, programa_detail, programa_participantes, programa_publicar, programa_enrolar, mi_programa, programa_completar, mis_programas_completados
 from cuestionario.api import cuestionario_list
 
 urlpatterns = [
@@ -10,5 +10,6 @@ urlpatterns = [
     path('<int:pk>/enrolar/', programa_enrolar, name='programa-enrolar'),
     path('<int:pk>/completar/', programa_completar, name='programa-completar'),
     path('mi-programa/', mi_programa, name='mi-programa'),
+    path('mis-completados/', mis_programas_completados, name='mis_programas-completados'),
     path('<int:programa_id>/cuestionarios/', cuestionario_list, name='cuestionario-list'),
 ]

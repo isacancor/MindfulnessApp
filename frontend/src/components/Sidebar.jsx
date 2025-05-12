@@ -36,13 +36,6 @@ const Sidebar = () => {
                         <span>Mis Programas</span>
                     </Link>
 
-                    <Link
-                        to="/cuestionarios"
-                        className={getNavButtonClass('/cuestionarios')}
-                    >
-                        <ClipboardList size={20} />
-                        <span>Cuestionarios</span>
-                    </Link>
                 </div>
             </nav>
 

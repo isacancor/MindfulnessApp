@@ -15,7 +15,7 @@ def programa_list_create(request):
             programas = Programa.objects.filter(creado_por=request.user)
         else:
             programas = Programa.objects.filter(estado_publicacion=EstadoPublicacion.PUBLICADO)
-        serializer = ProgramaSerializer(programas, many=True)
+        serializer = ProgramaSerializer(programas, many=True, context={'request': request})
         return Response(serializer.data)
     
     elif request.method == 'POST':
@@ -277,4 +277,34 @@ def programa_completar(request, pk):
         return Response(
             {'error': str(e)},
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def mis_programas_completados(request):
+    """
+    Obtiene la lista de programas completados por el usuario actual.
+    """
+    if not request.user.is_participante():
+        return Response(
+            {'error': 'Solo los participantes pueden acceder a esta vista'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        # Obtener todos los programas en los que el usuario está inscrito y están completados
+        programas_completados = ProgramaParticipante.objects.filter(
+            participante=request.user.perfil_participante,
+            estado_programa=EstadoPrograma.COMPLETADO
+        ).select_related('programa')
+
+        # Serializar los programas
+        programas = [inscripcion.programa for inscripcion in programas_completados]
+        serializer = ProgramaSerializer(programas, many=True, context={'request': request})
+
+        return Response(serializer.data)
+    except Exception as e:
+        return Response(
+            {'error': f'Error al obtener programas completados: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

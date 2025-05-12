@@ -48,10 +48,10 @@ class ProgramaSerializer(serializers.ModelSerializer):
     def get_inscripcion_info(self, obj):
         request = self.context.get('request')
         if request and hasattr(request.user, 'perfil_participante'):
+            # Buscar cualquier inscripción del usuario en este programa
             inscripcion = ProgramaParticipante.objects.filter(
                 participante=request.user.perfil_participante,
-                programa=obj,
-                estado_programa=EstadoPrograma.EN_PROGRESO
+                programa=obj
             ).first()
             
             if inscripcion:
@@ -60,7 +60,8 @@ class ProgramaSerializer(serializers.ModelSerializer):
                 return {
                     'fecha_inicio': fecha_inicio,
                     'fecha_fin': fecha_fin,
-                    'estado_programa': inscripcion.estado_programa
+                    'estado_programa': inscripcion.estado_programa,
+                    'es_completado': inscripcion.estado_programa == EstadoPrograma.COMPLETADO
                 }
         return None
 

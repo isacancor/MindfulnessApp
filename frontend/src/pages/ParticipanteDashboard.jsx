@@ -10,7 +10,8 @@ import {
     BookOpen,
     User,
     ChevronRight,
-    CheckCircle2
+    CheckCircle2,
+    Star
 } from 'lucide-react';
 import api from '@/config/axios';
 
@@ -206,14 +207,14 @@ const ParticipanteDashboard = () => {
                 </Link>
 
                 <Link
-                    to="/cuestionarios"
+                    to="/completados"
                     className="flex items-center justify-between p-4 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 transition-colors"
                 >
                     <div className="flex items-center">
-                        <ClipboardList className="h-6 w-6 text-blue-600 mr-3" />
+                        <Star className="h-6 w-6 text-blue-600 mr-3" />
                         <div>
-                            <h3 className="font-medium text-gray-900">Cuestionarios</h3>
-                            <p className="text-sm text-gray-500">Completar cuestionarios pendientes</p>
+                            <h3 className="font-medium text-gray-900">Programas Completados</h3>
+                            <p className="text-sm text-gray-500">Ver mis programas finalizados</p>
                         </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-gray-400" />

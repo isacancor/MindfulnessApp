@@ -202,7 +202,7 @@ const HacerSesion = () => {
                 </div>
             </div>
 
-            {mostrarDiario && (
+            {mostrarDiario && !diarioCompletado && (
                 <DiarioForm
                     sesion={sesion}
                     onClose={() => setMostrarDiario(false)}
