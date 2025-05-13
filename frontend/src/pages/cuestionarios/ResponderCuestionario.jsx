@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, Heart, ThumbsUp } from 'lucide-react';
+import { ArrowLeft, Star, Heart, ThumbsUp, AlertCircle } from 'lucide-react';
 import api from '../../config/axios';
 import { useAuth } from '../../context/AuthContext';
 import ErrorAlert from '../../components/ErrorAlert';
@@ -12,7 +12,8 @@ const ResponderCuestionario = ({ tipo }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [enviando, setEnviando] = useState(false);
-    const { isParticipante, user } = useAuth();
+    const { isParticipante } = useAuth();
+    const formEndRef = useRef(null);
 
     const validarRespuestas = () => {
         if (!cuestionario) return false;
@@ -84,6 +85,7 @@ const ResponderCuestionario = ({ tipo }) => {
 
         if (!validarRespuestas()) {
             setError('Por favor, responde todas las preguntas antes de enviar el cuestionario.');
+            formEndRef.current?.scrollIntoView({ behavior: 'smooth' });
             return;
         }
 
@@ -116,6 +118,7 @@ const ResponderCuestionario = ({ tipo }) => {
             } else {
                 setError('Error al enviar tus respuestas. Por favor, intenta más tarde.');
             }
+            formEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         } finally {
             setEnviando(false);
         }
@@ -321,10 +324,12 @@ const ResponderCuestionario = ({ tipo }) => {
                         </button>
                     </div>
 
-                    <ErrorAlert
-                        message={error}
-                        onClose={() => setError(null)}
-                    />
+                    {error && loading && (
+                        <ErrorAlert
+                            message={error}
+                            onClose={() => setError(null)}
+                        />
+                    )}
 
                     <form onSubmit={handleSubmit}>
                         {/* Información del cuestionario */}
@@ -347,6 +352,21 @@ const ResponderCuestionario = ({ tipo }) => {
                                     </div>
                                 </div>
                             ))}
+                        </div>
+
+                        {/* Error más visible */}
+                        <div ref={formEndRef} className="mt-6">
+                            {error && !loading && (
+                                <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 rounded-md">
+                                    <div className="flex items-start">
+                                        <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2" />
+                                        <div>
+                                            <h3 className="text-red-800 font-medium">Error</h3>
+                                            <p className="text-red-700">{error}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Botón de envío */}

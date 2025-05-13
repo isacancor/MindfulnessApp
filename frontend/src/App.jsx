@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import InvestigadorDashboard from './pages/InvestigadorDashboard';
 import ParticipanteDashboard from './pages/ParticipanteDashboard';
 import PrivateRoute from './components/PrivateRoute';
+import { SesionProtectedRoute, CuestionarioPostProtectedRoute } from './components/ProtectedRoutes';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import RegisterInvestigador from '@/pages/auth/RegisterInvestigador';
@@ -75,9 +76,23 @@ function App() {
           <Route path="/home" element={<ParticipanteDashboard />} />
           <Route path="/explorar" element={<ExplorarProgramas />} />
           <Route path="/miprograma" element={<MiPrograma />} />
-          <Route path="/miprograma/sesion/:sesionId" element={<HacerSesion />} />
+
+          {/* Proteger ruta de sesiones */}
+          <Route path="/miprograma/sesion/:sesionId" element={
+            <SesionProtectedRoute>
+              <HacerSesion />
+            </SesionProtectedRoute>
+          } />
+
           <Route path="/miprograma/cuestionario-pre" element={<ResponderCuestionario tipo="pre" />} />
-          <Route path="/miprograma/cuestionario-post" element={<ResponderCuestionario tipo="post" />} />
+
+          {/* Proteger ruta de cuestionario post */}
+          <Route path="/miprograma/cuestionario-post" element={
+            <CuestionarioPostProtectedRoute>
+              <ResponderCuestionario tipo="post" />
+            </CuestionarioPostProtectedRoute>
+          } />
+
           <Route path="/completados" element={<ProgramasCompletados />} />
           <Route path="/completados/:id" element={<ProgramaCompletado />} />
         </Route>

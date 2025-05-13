@@ -1,10 +1,39 @@
-import { CheckCircle2, AlertCircle, Timer, Music, Video, Clock, Link, Repeat } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Timer, Music, Video, Clock, Link, Repeat, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido }) => {
     const navigate = useNavigate();
     const isAvailable = cuestionarioPreRespondido && (index === 0 || sesiones[index - 1]?.completada);
     const isCompleted = sesion.completada;
+
+    // Calcular fechas de inicio y fin de la semana correspondiente a la sesión
+    const calcularFechas = () => {
+        // Si hay fecha de inscripción disponible (se puede añadir como prop)
+        if (sesion.fechaInicio && sesion.fechaFin) {
+            return {
+                inicio: new Date(sesion.fechaInicio).toLocaleDateString('es-ES'),
+                fin: new Date(sesion.fechaFin).toLocaleDateString('es-ES')
+            };
+        }
+
+        // Cálculo aproximado basado en la semana (alternativa)
+        const hoy = new Date();
+        const inicioPrograma = new Date();
+        inicioPrograma.setDate(hoy.getDate() - ((hoy.getDay() + 6) % 7)); // Inicio en lunes de la semana actual
+
+        const inicioSemana = new Date(inicioPrograma);
+        inicioSemana.setDate(inicioPrograma.getDate() + (sesion.semana - 1) * 7);
+
+        const finSemana = new Date(inicioSemana);
+        finSemana.setDate(inicioSemana.getDate() + 6);
+
+        return {
+            inicio: inicioSemana.toLocaleDateString('es-ES'),
+            fin: finSemana.toLocaleDateString('es-ES')
+        };
+    };
+
+    const fechas = calcularFechas();
 
     return (
         <div
@@ -58,6 +87,11 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido }) => {
                             {sesion.tipo_contenido === 'video' && <Video className="h-4 w-4 mr-1 text-red-500" />}
                             {sesion.tipo_contenido_display}
                         </span>
+                    </div>
+                    {/* Fechas de inicio y fin */}
+                    <div className="flex items-center mt-2 text-sm text-gray-500">
+                        <Calendar className="h-4 w-4 mr-1 text-indigo-500" />
+                        <span>Semana del {fechas.inicio} al {fechas.fin}</span>
                     </div>
                 </div>
             </div>

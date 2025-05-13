@@ -19,6 +19,7 @@ const VistaPreviaCuestionario = () => {
         const fetchCuestionario = async () => {
             try {
                 const response = await api.get(`/cuestionario/${cuestionarioId}/`);
+                console.log(response.data);
                 setCuestionario(response.data);
                 const respuestasIniciales = {};
                 response.data.preguntas.forEach(pregunta => {

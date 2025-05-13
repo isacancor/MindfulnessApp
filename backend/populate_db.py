@@ -15,6 +15,36 @@ from datetime import date, timedelta
 def run():
     print("📦 Poblando base de datos...")
 
+    # Borrar todos los datos de la base de datos
+    Usuario.objects.all().delete()
+    Investigador.objects.all().delete()
+    Participante.objects.all().delete()
+    Programa.objects.all().delete()
+    Sesion.objects.all().delete()
+    Cuestionario.objects.all().delete()
+    RespuestaCuestionario.objects.all().delete()
+
+    # Crear usuario admin
+    user_admin, _ = Usuario.objects.get_or_create(
+        email="admin@gmail.com",
+        defaults={
+            "username": "admin",
+            "nombre": "Admin",
+            "apellidos": "Demo",
+            "role": "ADMIN",
+            "is_superuser": True,
+            "telefono": "123456789",
+            "genero": "masculino",
+            "fechaNacimiento": "1980-01-01",
+            "ubicacion": "Madrid, España",
+            "ocupacion": "Investigador en Mindfulness",
+            "nivelEducativo": "doctorado",
+        }
+    )
+    user_admin.set_password("12")
+    user_admin.save()
+    
+
     # Crear usuario investigador 1
     user_inv, _ = Usuario.objects.get_or_create(
         email="investigador@demo.com",
@@ -23,7 +53,6 @@ def run():
             "nombre": "Investigador",
             "apellidos": "Demo",
             "role": "INVESTIGADOR",
-            "is_staff": True,
             "is_superuser": True,
             "telefono": "123456789",
             "genero": "masculino",
@@ -51,7 +80,6 @@ def run():
             "nombre": "Beatriz",
             "apellidos": "Bernárdez",
             "role": "INVESTIGADOR",
-            "is_staff": True,
             "is_superuser": True,
             "telefono": "987654321",
             "genero": "femenino",
@@ -79,7 +107,6 @@ def run():
             "nombre": "Jon",
             "apellidos": "Kabat-Zinn",
             "role": "INVESTIGADOR",
-            "is_staff": True,
             "is_superuser": True,
             "telefono": "123456789",
             "genero": "masculino",
@@ -602,7 +629,8 @@ def run():
             "duracion_estimada": 30,
             "tipo_practica": "focus_attention",
             "tipo_contenido": "enlace",
-            "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "tipo_escala": "estres"
         },
         {
             "titulo": "Conclusión",
@@ -611,7 +639,8 @@ def run():
             "duracion_estimada": 5,
             "tipo_practica": "focus_attention",
             "tipo_contenido": "enlace",
-            "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+            "tipo_escala": "bienestar"
         }
     ]
 
@@ -621,37 +650,113 @@ def run():
             **sesion_data
         )
 
+    # Crear cuestionario para programa5
+    # Crear preguntas para el cuestionario
+    preguntas_programa5_pre = [
+        {
+            "id": 1,
+            "texto": "¿Cuáles son tus expectativas para este programa de mindfulness?",
+            "tipo": "texto"
+        },
+        {
+            "id": 2,
+            "texto": "¿Has practicado mindfulness anteriormente?",
+            "tipo": "select",
+            "opciones": ["Sí", "No", "Puede"]
+        },
+        {
+            "id": 3,
+            "texto": "Valora tu nivel actual de estrés",
+            "tipo": "likert",
+            "escala": {
+                "inicio": 1,
+                "fin": 5,
+                "etiquetas": ["Muy bajo", "Bajo", "Medio", "Alto", "Muy alto"]
+            }
+        },
+        {
+            "id": 4,
+            "texto": "Ahora un multiple choice",
+            "tipo": "checkbox",
+            "opciones": ["a", "b", "c"]
+        },
+    ]
+    
+    preguntas_programa5_post = [
+        {
+            "id": 1,
+            "texto": "Valora tu experiencia general con el programa",
+            "tipo": "calificacion",
+            "estrellas": {
+                "cantidad": 5,
+                "icono": "heart"
+            }
+        },
+        {
+            "id": 2,
+            "texto": "Rellena esta escala likert",
+            "tipo": "likert-5-puntos",
+            "likert5Puntos": {
+                "tipo": "acuerdo",
+                "filas": ["f1", "f2"]
+            }
+        }
+    ]
+    
+    # Cuestionario Pre para programa5
+    cuestionario_pre_programa5 = Cuestionario.objects.create(
+        programa=programa5,
+        tipo='pre',
+        titulo=f'Evaluación Inicial - {programa5.nombre}',
+        descripcion='Cuestionario para evaluar el estado inicial antes de comenzar el programa',
+        preguntas=preguntas_programa5_pre
+    )
+    
+    # Cuestionario Post para programa5
+    cuestionario_post_programa5 = Cuestionario.objects.create(
+        programa=programa5,
+        tipo='post',
+        titulo=f'Evaluación Final - {programa5.nombre}',
+        descripcion='Cuestionario para evaluar la experiencia con el programa',
+        preguntas=preguntas_programa5_post
+    )
+    
+    # Asignar los cuestionarios al programa5
+    programa5.cuestionario_pre = cuestionario_pre_programa5
+    programa5.cuestionario_post = cuestionario_post_programa5
+    programa5.save()
+
     #===========================================================================
     # Crear cuestionarios con preguntas y respuestas
     preguntas_base = [
         {
             "id": 1,
             "texto": "¿Con qué frecuencia te sientes estresado/a?",
-            "tipo": "escala",
+            "tipo": "select",
             "opciones": ["Nunca", "Raramente", "A veces", "Frecuentemente", "Siempre"]
         },
         {
             "id": 2,
             "texto": "¿Con qué frecuencia practicas mindfulness o meditación?",
-            "tipo": "escala",
+            "tipo": "select",
             "opciones": ["Nunca", "Raramente", "A veces", "Frecuentemente", "Siempre"]
         },
         {
             "id": 3,
             "texto": "¿Cómo calificarías tu nivel de atención plena en el momento presente?",
-            "tipo": "escala",
+            "tipo": "select",
             "opciones": ["Muy bajo", "Bajo", "Medio", "Alto", "Muy alto"]
         },
         {
             "id": 4,
             "texto": "¿Con qué frecuencia te sientes abrumado/a por tus pensamientos?",
-            "tipo": "escala",
+            "tipo": "select",
             "opciones": ["Nunca", "Raramente", "A veces", "Frecuentemente", "Siempre"]
         },
         {
             "id": 5,
             "texto": "¿Cómo calificarías tu capacidad para manejar situaciones estresantes?",
-            "tipo": "escala",
+            "tipo": "select",
             "opciones": ["Muy baja", "Baja", "Media", "Alta", "Muy alta"]
         }
     ]
@@ -691,41 +796,22 @@ def run():
     # Enrolar participantes en programas
     participantes = Participante.objects.all()
     for participante in participantes[:2]:  # Enrolar los dos primeros participantes
-        programa1.participantes.add(participante)
+        programa1.participantes.add(participante.usuario)
         ProgramaParticipante.objects.create(
             programa=programa1,
-            participante=participante
+            participante=participante.usuario
         )
 
     # Enrolar el tercer participante en el programa de Jon
-    programa_jon.participantes.add(participantes[2])
+    programa_jon.participantes.add(participantes[2].usuario)
     ProgramaParticipante.objects.create(
         programa=programa_jon,
-        participante=participantes[2]
+        participante=participantes[2].usuario
     )
 
-    # Crear respuestas de ejemplo para los cuestionarios
-    for programa in programas:
-        for participante in programa.participantes.all():
-            # Respuesta Pre
-            respuestas_pre = {
-                str(p["id"]): "A veces" for p in preguntas_base
-            }
-            RespuestaCuestionario.objects.create(
-                cuestionario=programa.cuestionario_pre,
-                usuario=participante.usuario,
-                respuestas=respuestas_pre
-            )
 
-            # Respuesta Post
-            respuestas_post = {
-                str(p["id"]): "Frecuentemente" for p in preguntas_base
-            }
-            RespuestaCuestionario.objects.create(
-                cuestionario=programa.cuestionario_post,
-                usuario=participante.usuario,
-                respuestas=respuestas_post
-            )
+
+
 
     print("✅ Base de datos poblada con datos de prueba.")
 

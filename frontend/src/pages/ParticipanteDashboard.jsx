@@ -12,17 +12,23 @@ import {
     ChevronRight,
     CheckCircle2,
     Star,
-    AlertCircle
+    AlertCircle,
+    ArrowRight,
+    ListChecks,
+    FileText
 } from 'lucide-react';
 import api from '@/config/axios';
+import ProgresoPrograma from '@/components/ProgresoPrograma';
 
 const ParticipanteDashboard = () => {
     const { user, logout } = useAuth();
-    const [proximaSesion, setProximaSesion] = useState(null);
     const [progreso, setProgreso] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [programaFinalizado, setProgramaFinalizado] = useState(false);
+    const [cuestionarioPreRespondido, setCuestionarioPreRespondido] = useState(false);
+    const [cuestionarioPostRespondido, setCuestionarioPostRespondido] = useState(false);
+    const [proximaAccion, setProximaAccion] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,6 +43,10 @@ const ParticipanteDashboard = () => {
                         setLoading(false);
                         return;
                     }
+
+                    // Obtener el estado de los cuestionarios
+                    setCuestionarioPreRespondido(programaData.cuestionario_pre_respondido || false);
+                    setCuestionarioPostRespondido(programaData.cuestionario_post_respondido || false);
 
                     // Verificar el estado de cada sesión
                     const sesionesConEstado = await Promise.all(
@@ -60,12 +70,12 @@ const ParticipanteDashboard = () => {
                     // Encontrar la próxima sesión no completada
                     const proxima = sesionesConEstado.find(s => !s.completada);
                     if (proxima) {
-                        setProximaSesion({
-                            id: proxima.id,
-                            titulo: proxima.titulo,
-                            fecha: new Date(proxima.fecha_programada).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' }),
-                            hora: new Date(proxima.fecha_programada).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-                            duracion: `${proxima.duracion_estimada} minutos`
+                        setProximaAccion({
+                            tipo: 'sesion',
+                            titulo: `Sesión ${proxima.semana}: ${proxima.titulo}`,
+                            descripcion: `Tu próxima sesión de mindfulness, duración aproximada: ${proxima.duracion_estimada} minutos.`,
+                            url: `/miprograma/sesion/${proxima.id}`,
+                            icono: <Play className="h-6 w-6 text-emerald-600" />
                         });
                     }
 
@@ -78,6 +88,25 @@ const ParticipanteDashboard = () => {
                         totalSesiones: sesionesConEstado.length,
                         minutosCompletados
                     });
+
+                    // Determinar próxima acción
+                    if (!cuestionarioPreRespondido) {
+                        setProximaAccion({
+                            tipo: 'cuestionarioPre',
+                            titulo: 'Completar cuestionario inicial',
+                            descripcion: 'Necesitas completar el cuestionario de evaluación inicial para comenzar las sesiones.',
+                            url: '/miprograma/cuestionario-pre',
+                            icono: <FileText className="h-6 w-6 text-blue-600" />
+                        });
+                    } else if (sesionesCompletadas === sesionesConEstado.length && !cuestionarioPostRespondido) {
+                        setProximaAccion({
+                            tipo: 'cuestionarioPost',
+                            titulo: 'Completar cuestionario final',
+                            descripcion: '¡Has completado todas las sesiones! Es momento de finalizar el programa con el cuestionario de evaluación.',
+                            url: '/miprograma/cuestionario-post',
+                            icono: <FileText className="h-6 w-6 text-purple-600" />
+                        });
+                    }
                 }
             } catch (err) {
                 console.error('Error al cargar los datos:', err);
@@ -118,29 +147,27 @@ const ParticipanteDashboard = () => {
                 onClose={() => setError(null)}
             />
 
-            {/* Próxima sesión */}
-            {proximaSesion && !programaFinalizado && (
+            {/* Próxima acción */}
+            {proximaAccion && !programaFinalizado && (
                 <div className="max-w-3xl mx-auto mb-8">
-                    <div className="bg-white rounded-xl shadow-sm p-6 border border-blue-100">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-semibold text-gray-900">Tu próxima sesión</h2>
-                            <Calendar className="h-6 w-6 text-blue-600" />
+                    <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-l-indigo-500">
+                        <div className="flex items-center justify-between mb-3">
+                            <h2 className="text-xl font-semibold text-gray-900">Tu próxima acción</h2>
+                            {proximaAccion.icono}
                         </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                            <div>
-                                <p className="text-lg font-medium text-gray-900 mb-1">{proximaSesion.titulo}</p>
-                                <p className="text-gray-600">
-                                    {proximaSesion.duracion}
-                                </p>
-                            </div>
-                            <Link
-                                to={`/miprograma/sesion/${proximaSesion.id}`}
-                                className="mt-4 sm:mt-0 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
-                                <Play className="h-5 w-5 mr-2" />
-                                Comenzar Sesión
-                            </Link>
+
+                        <div className="mb-4">
+                            <h3 className="text-lg font-medium text-gray-900">{proximaAccion.titulo}</h3>
+                            <p className="text-gray-600 mt-1">{proximaAccion.descripcion}</p>
                         </div>
+
+                        <Link
+                            to={proximaAccion.url}
+                            className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1"
+                        >
+                            {proximaAccion.tipo === 'sesion' ? 'Comenzar sesión' : 'Completar cuestionario'}
+                            <ArrowRight className="ml-2 h-5 w-5" />
+                        </Link>
                     </div>
                 </div>
             )}
@@ -148,39 +175,24 @@ const ParticipanteDashboard = () => {
             {/* Progreso */}
             {progreso && !programaFinalizado && (
                 <div className="max-w-3xl mx-auto mb-8">
-                    <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-semibold text-gray-900">Tu progreso</h2>
-                            <CheckCircle2 className="h-6 w-6 text-green-600" />
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-gray-600">Sesiones completadas</span>
-                                    <span className="font-medium text-gray-900">
-                                        {progreso.sesionesCompletadas} de {progreso.totalSesiones}
-                                    </span>
-                                </div>
-                                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                                    <div
-                                        className="bg-green-600 h-2.5 rounded-full"
-                                        style={{ width: `${(progreso.sesionesCompletadas / progreso.totalSesiones) * 100}%` }}
-                                    ></div>
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <p className="text-green-600 font-medium">
-                                    ¡Has meditado {progreso.minutosCompletados} minutos en total!
-                                </p>
-                                <Link
-                                    to="/miprograma"
-                                    className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                >
-                                    Ver detalles de mi programa
-                                    <ChevronRight className="h-4 w-4 ml-2" />
-                                </Link>
-                            </div>
-                        </div>
+                    <ProgresoPrograma
+                        progreso={progreso}
+                        cuestionarioPreRespondido={cuestionarioPreRespondido}
+                        cuestionarioPostRespondido={cuestionarioPostRespondido}
+                        mostrarDetalles={false}
+                    />
+
+                    <div className="flex justify-center mt-5">
+                        <Link
+                            to="/miprograma"
+                            className="group relative inline-flex items-center justify-center px-8 py-3.5 overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        >
+                            <span className="relative flex items-center text-white font-semibold">
+                                <ListChecks className="h-5 w-5 mr-3" />
+                                Ver todos los detalles de mi programa
+                                <ChevronRight className="h-5 w-5 ml-3 group-hover:translate-x-1 transition-transform" />
+                            </span>
+                        </Link>
                     </div>
                 </div>
             )}

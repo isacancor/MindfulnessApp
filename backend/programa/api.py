@@ -3,10 +3,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from .models import Programa, EstadoPublicacion, ProgramaParticipante, EstadoPrograma
 from .serializers import ProgramaSerializer
-from sesion.models import Sesion, EtiquetaPractica, TipoContenido
+from sesion.models import Sesion, EtiquetaPractica, TipoContenido, DiarioSesion
 from django.shortcuts import get_object_or_404
-from cuestionario.models import Cuestionario
+from cuestionario.models import Cuestionario, RespuestaCuestionario
 from django.utils import timezone
+from django.db.models import Count, Q
 
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -140,6 +141,7 @@ def programa_publicar(request, pk):
 @permission_classes([permissions.IsAuthenticated])
 def mi_programa(request):
     if not request.user.is_participante():
+        print("no es participante")
         return Response(
             {'error': 'Solo los participantes pueden acceder a esta vista'},
             status=status.HTTP_403_FORBIDDEN
@@ -150,6 +152,7 @@ def mi_programa(request):
             participante=request.user,
             estado_programa=EstadoPrograma.EN_PROGRESO
         )
+        
         programa = inscripcion.programa
         
         # Verificar si ha respondido el cuestionario pre
@@ -367,5 +370,94 @@ def programa_inscripciones(request, pk):
     except Exception as e:
         return Response(
             {'error': f'Error al obtener inscripciones: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def investigador_estadisticas(request):
+    """
+    Obtiene estadísticas detalladas para el dashboard del investigador.
+    Incluye conteo de sesiones completadas y cuestionarios respondidos
+    por participantes en todos los programas del investigador.
+    """
+    if not request.user.is_investigador():
+        return Response(
+            {'error': 'Solo los investigadores pueden acceder a estas estadísticas'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        # Programas creados por el investigador
+        programas = Programa.objects.filter(creado_por=request.user)
+        total_programas = programas.count()
+        
+        # Participantes activos en todos los programas
+        participantes_activos = ProgramaParticipante.objects.filter(
+            programa__creado_por=request.user,
+            estado_programa=EstadoPrograma.EN_PROGRESO
+        ).count()
+        
+        # Total de sesiones completadas (diarios registrados)
+        total_sesiones_completadas = DiarioSesion.objects.filter(
+            sesion__programa__creado_por=request.user
+        ).count()
+        
+        # Total de cuestionarios respondidos
+        total_cuestionarios_respondidos = RespuestaCuestionario.objects.filter(
+            Q(cuestionario__programas_pre__creado_por=request.user) | 
+            Q(cuestionario__programas_post__creado_por=request.user)
+        ).count()
+        
+        # Estadísticas por programa
+        programas_stats = []
+        for programa in programas:
+            # Contar participantes del programa
+            participantes_programa = programa.inscripciones.count()
+            
+            # Contar sesiones completadas en este programa
+            sesiones_completadas_programa = DiarioSesion.objects.filter(
+                sesion__programa=programa
+            ).count()
+            
+            # Contar respuestas a cuestionarios de este programa
+            respuestas_pre = RespuestaCuestionario.objects.filter(
+                cuestionario=programa.cuestionario_pre
+            ).count() if programa.cuestionario_pre else 0
+            
+            respuestas_post = RespuestaCuestionario.objects.filter(
+                cuestionario=programa.cuestionario_post
+            ).count() if programa.cuestionario_post else 0
+            
+            programas_stats.append({
+                'id': programa.id,
+                'nombre': programa.nombre,
+                'estado': programa.estado_publicacion,
+                'participantes': participantes_programa,
+                'sesiones_completadas': sesiones_completadas_programa,
+                'respuestas_pre': respuestas_pre,
+                'respuestas_post': respuestas_post,
+                'total_cuestionarios': respuestas_pre + respuestas_post
+            })
+        
+        # Programas con más participación (ordenados por participantes)
+        programas_destacados = sorted(
+            programas_stats, 
+            key=lambda x: x['participantes'], 
+            reverse=True
+        )[:3]
+        
+        return Response({
+            'total_programas': total_programas,
+            'participantes_activos': participantes_activos,
+            'sesiones_completadas': total_sesiones_completadas,
+            'cuestionarios_respondidos': total_cuestionarios_respondidos,
+            'programas_stats': programas_stats,
+            'programas_destacados': programas_destacados
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Error al obtener estadísticas: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
