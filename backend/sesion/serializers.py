@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Sesion, DiarioSesion, EtiquetaPractica, TipoContenido, Escala
-from usuario.serializers import ParticipanteSerializer
+from usuario.serializers import UsuarioSerializer
 
 class EtiquetaPracticaSerializer(serializers.Serializer):
     value = serializers.CharField(source='value')
@@ -43,8 +43,8 @@ class SesionDetalleSerializer(serializers.ModelSerializer):
     
     def get_disponible(self, obj):
         request = self.context.get('request')
-        if request and hasattr(request, 'user') and hasattr(request.user, 'participante'):
-            return obj.esta_disponible_para(request.user.participante)
+        if request and hasattr(request, 'user') and request.user.is_participante():
+            return obj.esta_disponible_para(request.user)
         return False
     
     def to_representation(self, instance):
@@ -56,7 +56,7 @@ class SesionDetalleSerializer(serializers.ModelSerializer):
         return representation
 
 class DiarioSesionSerializer(serializers.ModelSerializer):
-    participante = ParticipanteSerializer(read_only=True)
+    participante = UsuarioSerializer(read_only=True)
     sesion = SesionSerializer(read_only=True)
     sesion_id = serializers.PrimaryKeyRelatedField(
         queryset=Sesion.objects.all(),
@@ -72,5 +72,5 @@ class DiarioSesionSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
-            validated_data['participante'] = request.user.perfil_participante
+            validated_data['participante'] = request.user
         return super().create(validated_data)

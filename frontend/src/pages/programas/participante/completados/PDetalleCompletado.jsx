@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video, Scale, Lock } from 'lucide-react';
-import api from '../../config/axios';
-import SesionCard from '../../components/SesionCard';
-import ErrorAlert from '../../components/ErrorAlert';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, Star } from 'lucide-react';
+import api from '../../../../config/axios';
+import SesionCard from '../../../../components/SesionCard';
+import ErrorAlert from '../../../../components/ErrorAlert';
+import ProgramaFinalizado from '../ProgramaFinalizado';
 
-const MiPrograma = () => {
+const ProgramaCompletado = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
     const [programa, setPrograma] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -15,23 +17,16 @@ const MiPrograma = () => {
         totalSesiones: 0,
         minutosCompletados: 0
     });
-    const [cuestionarioPreRespondido, setCuestionarioPreRespondido] = useState(false);
-    const [cuestionarioPostRespondido, setCuestionarioPostRespondido] = useState(false);
-
-    const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('es-ES', options);
-    };
 
     useEffect(() => {
-        const fetchMiPrograma = async () => {
+        const fetchPrograma = async () => {
             try {
-                const response = await api.get('/programas/mi-programa/');
-                const programaData = response.data;
+                const response = await api.get(`/programas/${id}/`);
+                setPrograma(response.data);
 
                 // Verificar el estado de cada sesión
                 const sesionesConEstado = await Promise.all(
-                    programaData.sesiones?.map(async (sesion) => {
+                    response.data.sesiones?.map(async (sesion) => {
                         try {
                             const diarioResponse = await api.get(`/sesiones/${sesion.id}/diario_info/`);
                             return {
@@ -49,7 +44,7 @@ const MiPrograma = () => {
                 );
 
                 const programaActualizado = {
-                    ...programaData,
+                    ...response.data,
                     sesiones: sesionesConEstado
                 };
 
@@ -65,26 +60,22 @@ const MiPrograma = () => {
                     totalSesiones,
                     minutosCompletados
                 });
-
-                // Obtener el estado de los cuestionarios del backend
-                setCuestionarioPreRespondido(programaData.cuestionario_pre_respondido || false);
-                setCuestionarioPostRespondido(programaData.cuestionario_post_respondido || false);
             } catch (err) {
                 console.error('Error al cargar el programa:', err);
-                setError('Error al cargar tu programa. Por favor, intenta nuevamente.');
+                setError('Error al cargar el programa. Por favor, intenta nuevamente.');
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchMiPrograma();
-    }, []);
+        fetchPrograma();
+    }, [id]);
 
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p className="mt-4 text-gray-600">Cargando tu programa...</p>
+                <p className="mt-4 text-gray-600">Cargando programa...</p>
             </div>
         );
     }
@@ -94,9 +85,9 @@ const MiPrograma = () => {
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
                 <div className="bg-white rounded-xl shadow-md overflow-hidden p-8 text-center max-w-2xl">
                     <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-4 text-lg font-medium text-gray-900">No tienes un programa activo</h3>
+                    <h3 className="mt-4 text-lg font-medium text-gray-900">Programa no encontrado</h3>
                     <p className="mt-2 text-gray-500">
-                        Explora los programas disponibles y únete a uno para comenzar tu viaje de mindfulness.
+                        El programa que buscas no existe o no tienes acceso a él.
                     </p>
                     <button
                         onClick={() => navigate('/explorar')}
@@ -107,6 +98,10 @@ const MiPrograma = () => {
                 </div>
             </div>
         );
+    }
+
+    if (programa.estado_publicacion === 'finalizado') {
+        return <ProgramaFinalizado programa={programa} />;
     }
 
     return (
@@ -135,36 +130,14 @@ const MiPrograma = () => {
                             </p>
                         </div>
                         <div className="flex flex-col items-end space-y-2">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${programa.inscripciones?.[0]?.estado_programa === 'completado' || cuestionarioPostRespondido
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                {programa.inscripciones?.[0]?.estado_programa === 'completado' || cuestionarioPostRespondido
-                                    ? 'Completado'
-                                    : 'En progreso'}
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <Star className="h-4 w-4 mr-1" />
+                                Programa Completado
                             </span>
                         </div>
                     </div>
 
                     <p className="mt-4 text-gray-600">{programa.descripcion}</p>
-
-                    {/* Información de inscripción */}
-                    {programa.inscripcion_info && (
-                        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-                            <div className="flex items-start">
-                                <Lock className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
-                                <div>
-                                    <h3 className="text-sm font-medium text-blue-900">Período de dedicación exclusiva</h3>
-                                    <p className="mt-1 text-sm text-blue-700">
-                                        Estás inscrito en este programa desde el {formatDate(programa.inscripcion_info.fecha_inicio)} hasta el {formatDate(programa.inscripcion_info.fecha_fin)}.
-                                    </p>
-                                    <p className="mt-1 text-sm text-blue-700">
-                                        Durante este período, te recomendamos dedicarte exclusivamente a este programa para obtener los mejores resultados.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="flex items-center text-gray-600">
@@ -182,45 +155,6 @@ const MiPrograma = () => {
                         <div className="flex items-center text-gray-600">
                             <Users className="mr-2 text-gray-400" size={16} />
                             <span className="capitalize">{programa.tipo_contexto}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Cuestionarios */}
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Cuestionarios</h2>
-                    <p className="text-gray-600 mb-4">
-                        Completa estos cuestionarios para avanzar en el programa:
-                    </p>
-                    <div className="flex space-x-4">
-                        <div className="w-1/2">
-                            {cuestionarioPreRespondido ? (
-                                <div className="flex items-center justify-center px-6 py-3 rounded-md text-lg font-medium bg-green-100 text-green-800">
-                                    <CheckCircle2 className="mr-2 h-5 w-5" /> Cuestionario Pre Completado
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={() => navigate('/miprograma/cuestionario-pre')}
-                                    className="w-full px-6 py-3 rounded-md text-lg font-medium bg-blue-600 text-white border-2 border-blue-400 shadow-md ring-2 ring-blue-200 hover:bg-blue-700"
-                                >
-                                    Cuestionario Pre
-                                </button>
-                            )}
-                        </div>
-                        <div className="w-1/2">
-                            {cuestionarioPostRespondido ? (
-                                <div className="flex items-center justify-center px-6 py-3 rounded-md text-lg font-medium bg-green-100 text-green-800">
-                                    <CheckCircle2 className="mr-2 h-5 w-5" /> Cuestionario Post Completado
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={() => navigate('/miprograma/cuestionario-post')}
-                                    disabled={progreso.sesionesCompletadas < progreso.totalSesiones}
-                                    className={`w-full px-6 py-3 rounded-md text-lg font-medium ${progreso.sesionesCompletadas < progreso.totalSesiones ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white border-2 border-blue-400 shadow-md ring-2 ring-blue-200 hover:bg-blue-700'}`}
-                                >
-                                    Cuestionario Post
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -259,7 +193,7 @@ const MiPrograma = () => {
                                 sesion={sesion}
                                 index={index}
                                 sesiones={programa.sesiones}
-                                cuestionarioPreRespondido={cuestionarioPreRespondido}
+                                cuestionarioPreRespondido={true}
                                 permitirAccesoCompletada={true}
                             />
                         ))}
@@ -270,4 +204,4 @@ const MiPrograma = () => {
     );
 };
 
-export default MiPrograma; 
+export default ProgramaCompletado; 

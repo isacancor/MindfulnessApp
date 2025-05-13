@@ -47,7 +47,7 @@ const InvestigadorDashboard = () => {
         <InvestigadorLayout>
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-2xl font-bold text-gray-800">Bienvenido, {user.nombre}</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">Bienvenido/a, {user.nombre}</h1>
 
                     <Link
                         to="/programas/crear"

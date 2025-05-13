@@ -1,6 +1,6 @@
 from django.db import models
 from programa.models import Programa, ProgramaParticipante, EstadoPrograma
-from usuario.models import Participante
+from usuario.models import Usuario
 from django.utils import timezone
 
 class Escala(models.TextChoices):
@@ -64,11 +64,11 @@ class Sesion(models.Model):
     def get_tipo_contenido_display(self):
         return dict(TipoContenido.choices).get(self.tipo_contenido, self.tipo_contenido)
     
-    def esta_disponible_para(self, participante):
-        """Verifica si la sesión está disponible para un participante."""
-        # Verificar si el participante está inscrito en el programa
+    def esta_disponible_para(self, usuario):
+        """Verifica si la sesión está disponible para un usuario."""
+        # Verificar si el usuario está inscrito en el programa
         inscripcion = ProgramaParticipante.objects.filter(
-            participante=participante,
+            participante=usuario,
             programa=self.programa,
             estado_programa=EstadoPrograma.EN_PROGRESO
         ).first()
@@ -86,7 +86,7 @@ class Sesion(models.Model):
             return False
             
         # Verificar si ya existe un diario para esta sesión
-        if DiarioSesion.objects.filter(participante=participante, sesion=self).exists():
+        if DiarioSesion.objects.filter(participante=usuario, sesion=self).exists():
             return False
             
         # Verificar si la sesión anterior está completada
@@ -98,7 +98,7 @@ class Sesion(models.Model):
             
             if sesion_anterior:
                 diario_anterior = DiarioSesion.objects.filter(
-                    participante=participante,
+                    participante=usuario,
                     sesion=sesion_anterior
                 ).exists()
                 
@@ -109,7 +109,7 @@ class Sesion(models.Model):
 
 
 class DiarioSesion(models.Model):
-    participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='diarios')
+    participante = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='diarios')
     sesion = models.ForeignKey(Sesion, on_delete=models.CASCADE, related_name='diarios')
     valoracion = models.FloatField()  # Usamos float por si hay escalas decimales en el futuro
     comentario = models.TextField(blank=True, null=True)
@@ -120,4 +120,4 @@ class DiarioSesion(models.Model):
         ordering = ['sesion__semana', 'fecha_creacion']
 
     def __str__(self):
-        return f"Diario de {self.participante.usuario.nombre_completo} en Semana {self.sesion.semana}"
+        return f"Diario de {self.participante.nombre_completo} en Semana {self.sesion.semana}"

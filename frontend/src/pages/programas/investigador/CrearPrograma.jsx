@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import { ArrowLeft, BookOpen } from 'lucide-react';
-import api from '../../config/axios';
-import ErrorAlert from '../../components/ErrorAlert';
+import api from '../../../config/axios';
+import ErrorAlert from '../../../components/ErrorAlert';
 
 const CrearPrograma = () => {
     const navigate = useNavigate();

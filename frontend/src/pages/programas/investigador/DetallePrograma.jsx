@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion } from 'lucide-react';
-import api from '../../config/axios';
-import ErrorAlert from '../../components/ErrorAlert';
+import { useAuth } from '../../../context/AuthContext';
+import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion, CheckCircle, UserCheck } from 'lucide-react';
+import api from '../../../config/axios';
+import ErrorAlert from '../../../components/ErrorAlert';
 
 const DetallePrograma = () => {
     const { id } = useParams();
@@ -14,20 +14,20 @@ const DetallePrograma = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchPrograma = async () => {
-            try {
-                const response = await api.get(`/programas/${id}/`);
-                setPrograma(response.data);
-                setSesiones(response.data.sesiones)
-            } catch (err) {
-                setError('Error al cargar los datos');
-                console.error('Error:', err);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchPrograma = async () => {
+        try {
+            const response = await api.get(`/programas/${id}/`);
+            setPrograma(response.data);
+            setSesiones(response.data.sesiones)
+        } catch (err) {
+            setError('Error al cargar los datos');
+            console.error('Error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchPrograma();
     }, [id]);
 
@@ -96,6 +96,15 @@ const DetallePrograma = () => {
         navigate(`/programas/${id}/cuestionarios/${cuestionarioId}/editar`);
     };
 
+    const handleFinalizar = async () => {
+        try {
+            await api.post(`/programas/${id}/finalizar/`);
+            fetchPrograma();
+        } catch (error) {
+            setError(error.response?.data?.error || 'Error al finalizar el programa');
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -118,10 +127,22 @@ const DetallePrograma = () => {
                             Volver
                         </button>
                         <div className="flex items-center space-x-4">
+
                             <span className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-100 text-blue-800 text-lg font-semibold">
                                 <Clock className="h-5 w-5 mr-2" />
                                 {programa.duracion_semanas} semanas
                             </span>
+
+                            {programa.estado_publicacion !== 'borrador' &&
+                                <button
+                                    onClick={() => navigate(`/programas/${id}/participantes`)}
+                                    className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-200 transition-colors"
+                                >
+                                    <UserCheck className="h-5 w-5 mr-2" />
+                                    Ver Participantes ({programa.participantes?.length || 0})
+                                </button>
+                            }
+
                             {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
                                 <div className="flex space-x-4">
                                     <button
@@ -147,6 +168,17 @@ const DetallePrograma = () => {
                                     </button>
                                 </div>
                             )}
+                            {isInvestigador() && programa?.estado_publicacion === 'publicado' && (
+                                <div className="flex space-x-4">
+                                    <button
+                                        onClick={handleFinalizar}
+                                        className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                                    >
+                                        <CheckCircle className="h-5 w-5 mr-2" />
+                                        Finalizar Programa
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -162,9 +194,15 @@ const DetallePrograma = () => {
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">{programa.nombre}</h1>
                             <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${programa.estado_publicacion === 'publicado'
                                 ? 'bg-green-100 text-green-800'
-                                : 'bg-yellow-100 text-yellow-800'
+                                : programa.estado_publicacion === 'finalizado'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-yellow-100 text-yellow-800'
                                 }`}>
-                                {programa.estado_publicacion === 'publicado' ? 'Publicado' : 'Borrador'}
+                                {programa.estado_publicacion === 'publicado'
+                                    ? 'Publicado'
+                                    : programa.estado_publicacion === 'finalizado'
+                                        ? 'Finalizado'
+                                        : 'Borrador'}
                             </span>
                         </div>
 

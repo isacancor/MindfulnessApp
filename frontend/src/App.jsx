@@ -12,12 +12,12 @@ import RegisterInvestigador from '@/pages/auth/RegisterInvestigador';
 import RegisterParticipante from '@/pages/auth/RegisterParticipante';
 import Unauthorized from './pages/Unauthorized';
 import Perfil from './pages/Perfil';
-import CrearPrograma from './pages/programas/CrearPrograma';
-import EditarPrograma from './pages/programas/EditarPrograma';
-import ListaProgramas from './pages/programas/ListaProgramas';
-import DetallePrograma from './pages/programas/DetallePrograma';
-import ExplorarProgramas from './pages/programas/ExplorarProgramas';
-import MiPrograma from './pages/programas/MiPrograma';
+import CrearPrograma from './pages/programas/investigador/CrearPrograma';
+import EditarPrograma from './pages/programas/investigador/EditarPrograma';
+import ListaProgramas from './pages/programas/investigador/ListaProgramas';
+import DetallePrograma from './pages/programas/investigador/DetallePrograma';
+import ExplorarProgramas from './pages/programas/participante/ExplorarProgramas';
+import MiPrograma from './pages/programas/participante/MiPrograma';
 import CrearSesion from './pages/sesiones/CrearSesion';
 import EditarSesion from './pages/sesiones/EditarSesion';
 import HacerSesion from './pages/sesiones/HacerSesion';
@@ -25,8 +25,9 @@ import CrearCuestionario from './pages/cuestionarios/CrearCuestionario';
 import EditarCuestionario from './pages/cuestionarios/EditarCuestionario';
 import VistaPreviaCuestionario from './pages/cuestionarios/VistaPreviaCuestionario';
 import ResponderCuestionario from './pages/cuestionarios/ResponderCuestionario';
-import ProgramasCompletados from './pages/programas/completados/PCompletados';
-import ProgramaCompletado from './pages/programas/completados/PDetalleCompletado';
+import ProgramasCompletados from './pages/programas/participante/completados/PCompletados';
+import ProgramaCompletado from './pages/programas/participante/completados/PDetalleCompletado';
+import ListadoParticipantes from './pages/ListadoParticipantes';
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
           <Route path="/programas" element={<ListaProgramas />} />
           <Route path="/programas/crear" element={<CrearPrograma />} />
           <Route path="/programas/:id" element={<DetallePrograma />} />
+          <Route path="/programas/:id/participantes" element={<ListadoParticipantes />} />
           <Route path="/programas/:id/editar" element={<EditarPrograma />} />
 
           {/** 

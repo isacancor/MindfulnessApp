@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PlusCircle } from 'lucide-react';
-import api from '../../config/axios';
-import ProgramaCard from '../../components/ProgramaCard';
-import InvestigadorLayout from '../../components/InvestigadorLayout';
-import ErrorAlert from '../../components/ErrorAlert';
+import api from '../../../config/axios';
+import ProgramaCard from '../../../components/ProgramaCard';
+import InvestigadorLayout from '../../../components/InvestigadorLayout';
+import ErrorAlert from '../../../components/ErrorAlert';
 
 const ListaProgramas = () => {
     const navigate = useNavigate();

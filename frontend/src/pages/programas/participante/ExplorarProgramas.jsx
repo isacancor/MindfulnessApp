@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle, Star } from 'lucide-react';
-import api from '../../config/axios';
-import ErrorAlert from '../../components/ErrorAlert';
+import api from '../../../config/axios';
+import ErrorAlert from '../../../components/ErrorAlert';
 
 const ExplorarProgramas = () => {
     const navigate = useNavigate();

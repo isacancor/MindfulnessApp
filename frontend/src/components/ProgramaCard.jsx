@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Calendar, Users, FileText, Edit, Trash2, Send, BookOpen, Clock } from 'lucide-react';
+import { Calendar, Users, FileText, Edit, Trash2, Send, BookOpen, Clock, UserCheck } from 'lucide-react';
 import api from '../config/axios';
 import PublicarProgramaModal from './modals/PublicarProgramaModal';
 import EliminarProgramaModal from './modals/EliminarProgramaModal';
@@ -75,12 +75,20 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                 </div>
 
                 <div className="mb-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${programa.estado_publicacion === 'publicado'
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                        {programa.estado_publicacion === 'publicado' ? 'Publicado' : 'Borrador'}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${programa.estado_publicacion === 'publicado'
+                            ? 'bg-green-100 text-green-800'
+                            : programa.estado_publicacion === 'finalizado'
+                                ? 'bg-red-100 text-red-800'
+                                : 'bg-yellow-100 text-yellow-800'
+                            }`}>
+                            {programa.estado_publicacion === 'publicado'
+                                ? 'Publicado'
+                                : programa.estado_publicacion === 'finalizado'
+                                    ? 'Finalizado'
+                                    : 'Borrador'}
+                        </span>
+                    </div>
                 </div>
 
                 <p className="text-gray-600 mb-4 line-clamp-2">{programa.descripcion}</p>
@@ -104,13 +112,22 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                     </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t">
+                <div className="mt-4 pt-4 border-t flex justify-between items-center">
                     <Link
                         to={`/programas/${programa.id}`}
                         className="text-blue-600 hover:text-blue-700 text-sm font-medium"
                     >
                         Ver detalles →
                     </Link>
+                    {programa.participantes?.length > 0 && (
+                        <Link
+                            to={`/programas/${programa.id}/participantes`}
+                            className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
+                        >
+                            <UserCheck className="h-4 w-4 mr-1" />
+                            Ver participantes ({programa.participantes.length})
+                        </Link>
+                    )}
                 </div>
             </div>
 

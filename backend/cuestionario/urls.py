@@ -5,8 +5,6 @@ urlpatterns = [
     # URLs para cuestionarios
     path('<int:cuestionario_id>/', api.cuestionario_detail, name='cuestionario-detail'),
 
-    #path('programa/<int:programa_id>/cuestionarios/', api.obtener_cuestionarios_programa, name='cuestionarios-programa'),
-
     # Endpoints para obtener cuestionarios
     path('pre/', api.obtener_cuestionario_pre, name='cuestionario-pre'),
     path('post/', api.obtener_cuestionario_post, name='cuestionario-post'),

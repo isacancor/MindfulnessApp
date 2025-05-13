@@ -51,9 +51,9 @@ def sesion_list_create(request):
                 queryset = queryset.filter(programa=programa)
                 
                 # Si el usuario es participante, mostrar solo sesiones disponibles
-                if hasattr(request.user, 'participante'):
+                if request.user.is_participante():
                     inscripciones = ProgramaParticipante.objects.filter(
-                        participante=request.user.participante,
+                        participante=request.user,
                         estado_programa=EstadoPrograma.EN_PROGRESO,
                         programa=programa
                     )
@@ -74,7 +74,7 @@ def sesion_list_create(request):
                         queryset = queryset.filter(id__in=sesiones_disponibles)
                 
                 # Si el usuario es investigador, mostrar solo sesiones de sus programas
-                elif hasattr(request.user, 'investigador'):
+                elif request.user.is_investigador():
                     if programa.creado_por != request.user:
                         return Response([], status=status.HTTP_200_OK)
             
@@ -279,14 +279,14 @@ def tipos_escala(request):
 def diario_sesion_list_create(request):
     if request.method == 'GET':
         # Verificar que el usuario es un participante
-        if not hasattr(request.user, 'perfil_participante'):
+        if not request.user.is_participante():
             return Response(
                 {"error": "Solo los participantes pueden ver sus diarios"}, 
                 status=status.HTTP_403_FORBIDDEN
             )
         
         # Filtrar por participante
-        queryset = DiarioSesion.objects.filter(participante=request.user.perfil_participante)
+        queryset = DiarioSesion.objects.filter(participante=request.user)
         
         # Filtrar por sesión si se proporciona
         sesion_id = request.query_params.get('sesion')
@@ -298,7 +298,7 @@ def diario_sesion_list_create(request):
     
     elif request.method == 'POST':
         # Verificar que el usuario es un participante
-        if not hasattr(request.user, 'perfil_participante'):
+        if not request.user.is_participante():
             return Response(
                 {"error": "Solo los participantes pueden enviar diarios"}, 
                 status=status.HTTP_403_FORBIDDEN
@@ -321,7 +321,7 @@ def diario_sesion_list_create(request):
             )
             
         # Verificar si ya existe un diario para esta sesión
-        if DiarioSesion.objects.filter(participante=request.user.perfil_participante, sesion=sesion).exists():
+        if DiarioSesion.objects.filter(participante=request.user, sesion=sesion).exists():
             return Response(
                 {"error": "Ya has completado el diario para esta sesión"}, 
                 status=status.HTTP_400_BAD_REQUEST
@@ -329,7 +329,7 @@ def diario_sesion_list_create(request):
         
         # Verificar que el participante está inscrito en el programa
         inscripcion = ProgramaParticipante.objects.filter(
-            participante=request.user.perfil_participante,
+            participante=request.user,
             programa=sesion.programa,
             estado_programa=EstadoPrograma.EN_PROGRESO,
         ).first()
@@ -365,7 +365,7 @@ def diario_sesion_detail(request, pk):
 
     elif request.method == 'PUT':
         # Verificar que el usuario es el participante que creó el diario
-        if not hasattr(request.user, 'perfil_participante') or diario.participante != request.user.perfil_participante:
+        if not request.user.is_participante() or diario.participante != request.user:
             return Response(
                 {"error": "No tienes permiso para modificar este diario"},
                 status=status.HTTP_403_FORBIDDEN
@@ -379,7 +379,7 @@ def diario_sesion_detail(request, pk):
 
     elif request.method == 'DELETE':
         # Verificar que el usuario es el participante que creó el diario
-        if not hasattr(request.user, 'perfil_participante') or diario.participante != request.user.perfil_participante:
+        if not request.user.is_participante() or diario.participante != request.user:
             return Response(
                 {"error": "No tienes permiso para eliminar este diario"},
                 status=status.HTTP_403_FORBIDDEN
@@ -397,7 +397,7 @@ def diario_info(request, sesion_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     # Verificar que el usuario es un participante
-    if not hasattr(request.user, 'perfil_participante'):
+    if not request.user.is_participante():
         return Response(
             {"error": "Solo los participantes pueden ver sus diarios"}, 
             status=status.HTTP_403_FORBIDDEN
@@ -406,7 +406,7 @@ def diario_info(request, sesion_id):
     # Buscar el diario para esta sesión
     try:
         diario = DiarioSesion.objects.get(
-            participante=request.user.perfil_participante,
+            participante=request.user,
             sesion=sesion
         )
         serializer = DiarioSesionSerializer(diario)

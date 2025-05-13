@@ -9,23 +9,6 @@ from programa.models import Programa
 from usuario.models import Usuario
 from programa.models import ProgramaParticipante, EstadoPrograma
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def obtener_cuestionarios_programa(request, programa_id):
-    """
-    Obtiene los cuestionarios (pre y post) de un programa específico
-    """
-    try:
-        programa = get_object_or_404(Programa, id=programa_id)
-        cuestionarios = Cuestionario.objects.filter(programa=programa)
-        serializer = CuestionarioSerializer(cuestionarios, many=True)
-        return Response(serializer.data)
-    except Exception as e:
-        return Response(
-            {'error': str(e)},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def cuestionario_list(request, programa_id):
@@ -150,11 +133,8 @@ def obtener_cuestionario_pre(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Obtener el participante 
-        participante = request.user.perfil_participante
-        
         # Verificar si está inscrito en algún programa
-        if not participante.programas_inscritos.exists():
+        if not request.user.programas_inscritos.exists():
             return Response(
                 {'error': 'No estás inscrito en ningún programa'},
                 status=status.HTTP_404_NOT_FOUND
@@ -162,8 +142,9 @@ def obtener_cuestionario_pre(request):
         
         # Obtener el programa más reciente donde está inscrito
         # (Asumimos que el participante está activo en un programa a la vez)
-        programa = participante.programas_inscritos.filter(
-            inscripciones__estado_programa='en progreso'
+        programa = request.user.programas_inscritos.filter(
+            inscripciones__estado_programa='en progreso',
+            inscripciones__participante=request.user
         ).order_by('-inscripciones__fecha_inicio').first()
         
         if not programa:
@@ -213,11 +194,8 @@ def obtener_cuestionario_post(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Obtener el participante 
-        participante = request.user.perfil_participante
-        
         # Verificar si está inscrito en algún programa
-        if not participante.programas_inscritos.exists():
+        if not request.user.programas_inscritos.exists():
             return Response(
                 {'error': 'No estás inscrito en ningún programa'},
                 status=status.HTTP_404_NOT_FOUND
@@ -225,8 +203,9 @@ def obtener_cuestionario_post(request):
         
         # Obtener el programa más reciente donde está inscrito
         # (Asumimos que el participante está activo en un programa a la vez)
-        programa = participante.programas_inscritos.filter(
-            inscripciones__estado_programa='en progreso'
+        programa = request.user.programas_inscritos.filter(
+            inscripciones__estado_programa='en progreso',
+            inscripciones__participante=request.user
         ).order_by('-inscripciones__fecha_inicio').first()
         
         if not programa:
@@ -243,7 +222,7 @@ def obtener_cuestionario_post(request):
             )
             
         cuestionario = programa.cuestionario_post
-        
+
         # Verificar si el usuario ya respondió este cuestionario
         if RespuestaCuestionario.objects.filter(
             cuestionario=cuestionario,
@@ -253,7 +232,7 @@ def obtener_cuestionario_post(request):
                 {'error': 'Ya has respondido este cuestionario post'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
+            
         serializer = CuestionarioSerializer(cuestionario)
         return Response(serializer.data)
     except Exception as e:
@@ -276,19 +255,17 @@ def responder_cuestionario_pre(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Obtener el participante 
-        participante = request.user.perfil_participante
-        
         # Verificar si está inscrito en algún programa
-        if not participante.programas_inscritos.exists():
+        if not request.user.programas_inscritos.exists():
             return Response(
                 {'error': 'No estás inscrito en ningún programa'},
                 status=status.HTTP_404_NOT_FOUND
             )
         
         # Obtener el programa más reciente donde está inscrito
-        programa = participante.programas_inscritos.filter(
-            inscripciones__estado_programa='en progreso'
+        programa = request.user.programas_inscritos.filter(
+            inscripciones__estado_programa='en progreso',
+            inscripciones__participante=request.user
         ).order_by('-inscripciones__fecha_inicio').first()
         
         if not programa:
@@ -348,19 +325,17 @@ def responder_cuestionario_post(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Obtener el participante 
-        participante = request.user.perfil_participante
-        
         # Verificar si está inscrito en algún programa
-        if not participante.programas_inscritos.exists():
+        if not request.user.programas_inscritos.exists():
             return Response(
                 {'error': 'No estás inscrito en ningún programa'},
                 status=status.HTTP_404_NOT_FOUND
             )
         
         # Obtener el programa más reciente donde está inscrito
-        programa = participante.programas_inscritos.filter(
-            inscripciones__estado_programa='en progreso'
+        programa = request.user.programas_inscritos.filter(
+            inscripciones__estado_programa='en progreso',
+            inscripciones__participante=request.user
         ).order_by('-inscripciones__fecha_inicio').first()
         
         if not programa:
@@ -402,7 +377,7 @@ def responder_cuestionario_post(request):
             # Marcar el programa como completado
             inscripcion = ProgramaParticipante.objects.get(
                 programa=programa,
-                participante=participante,
+                participante=request.user,
                 estado_programa=EstadoPrograma.EN_PROGRESO
             )
             inscripcion.estado_programa = EstadoPrograma.COMPLETADO

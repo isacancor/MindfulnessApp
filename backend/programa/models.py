@@ -77,7 +77,7 @@ class Programa(models.Model):
     
     # Relaciones
     creado_por = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='programas')
-    participantes = models.ManyToManyField(Participante, related_name='programas_inscritos', blank=True)
+    participantes = models.ManyToManyField(Usuario, related_name='programas_inscritos', blank=True)
     
     # Metadatos
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -141,6 +141,9 @@ class Programa(models.Model):
     def puede_agregar_participantes(self):
         return self.estado_publicacion == EstadoPublicacion.PUBLICADO
 
+    def puede_enviar_cuestionarios(self):
+        return self.estado_publicacion == EstadoPublicacion.PUBLICADO
+
     def save(self, *args, **kwargs):
         if not self.pk:  # Si es un nuevo programa
             # Forzar que los programas nuevos siempre se creen como BORRADOR
@@ -178,7 +181,7 @@ class Programa(models.Model):
 
 class ProgramaParticipante(models.Model):
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='inscripciones')
-    participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='inscripciones')
+    participante = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='inscripciones')
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_fin = models.DateTimeField(null=True, blank=True)
     estado_programa = models.CharField(max_length=20, choices=EstadoPrograma.choices, default=EstadoPrograma.EN_PROGRESO)
@@ -203,7 +206,8 @@ class ProgramaParticipante(models.Model):
                 self.estado_programa = EstadoPrograma.COMPLETADO
 
             # o si todas las sesiones están completadas
-            sesiones_completadas = self.programa.sesiones.filter(completadas__participante=self.participante).count()
+            usuario = self.participante
+            sesiones_completadas = self.programa.sesiones.filter(completadas__participante=usuario).count()
             if sesiones_completadas == self.programa.sesiones.count():
                 self.estado_programa = EstadoPrograma.COMPLETADO
 

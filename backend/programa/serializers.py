@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Programa, TipoContexto, EnfoqueMetodologico, EstadoPublicacion, ProgramaParticipante, EstadoPrograma
-from usuario.serializers import UsuarioSerializer, ParticipanteSerializer
+from usuario.serializers import UsuarioSerializer
 from sesion.serializers import SesionSerializer
 from django.utils import timezone
 from cuestionario.serializers import CuestionarioSerializer
@@ -16,7 +16,7 @@ class ProgramaParticipanteSerializer(serializers.ModelSerializer):
 
 class ProgramaSerializer(serializers.ModelSerializer):
     creado_por = UsuarioSerializer(read_only=True)
-    participantes = ParticipanteSerializer(many=True, read_only=True)
+    participantes = UsuarioSerializer(many=True, read_only=True)
     sesiones = SesionSerializer(many=True, read_only=True)
     inscripcion_info = serializers.SerializerMethodField()
     cuestionario_pre = CuestionarioSerializer(read_only=True)
@@ -47,10 +47,10 @@ class ProgramaSerializer(serializers.ModelSerializer):
 
     def get_inscripcion_info(self, obj):
         request = self.context.get('request')
-        if request and hasattr(request.user, 'perfil_participante'):
+        if request and request.user.is_authenticated:
             # Buscar cualquier inscripción del usuario en este programa
             inscripcion = ProgramaParticipante.objects.filter(
-                participante=request.user.perfil_participante,
+                participante=request.user,
                 programa=obj
             ).first()
             

@@ -11,7 +11,8 @@ import {
     User,
     ChevronRight,
     CheckCircle2,
-    Star
+    Star,
+    AlertCircle
 } from 'lucide-react';
 import api from '@/config/axios';
 
@@ -21,6 +22,7 @@ const ParticipanteDashboard = () => {
     const [progreso, setProgreso] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [programaFinalizado, setProgramaFinalizado] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -29,6 +31,13 @@ const ParticipanteDashboard = () => {
                 const programaData = response.data;
 
                 if (programaData) {
+                    // Verificar si el programa está finalizado
+                    if (programaData.estado_publicacion === 'finalizado') {
+                        setProgramaFinalizado(true);
+                        setLoading(false);
+                        return;
+                    }
+
                     // Verificar el estado de cada sesión
                     const sesionesConEstado = await Promise.all(
                         programaData.sesiones?.map(async (sesion) => {
@@ -109,8 +118,8 @@ const ParticipanteDashboard = () => {
                 onClose={() => setError(null)}
             />
 
-            {/* Próxima sesión - Card grande y llamativa */}
-            {proximaSesion && (
+            {/* Próxima sesión */}
+            {proximaSesion && !programaFinalizado && (
                 <div className="max-w-3xl mx-auto mb-8">
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-blue-100">
                         <div className="flex items-center justify-between mb-4">
@@ -136,8 +145,8 @@ const ParticipanteDashboard = () => {
                 </div>
             )}
 
-            {/* Progreso - Visual y motivador */}
-            {progreso && (
+            {/* Progreso */}
+            {progreso && !programaFinalizado && (
                 <div className="max-w-3xl mx-auto mb-8">
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-green-100">
                         <div className="flex items-center justify-between mb-4">
@@ -176,7 +185,7 @@ const ParticipanteDashboard = () => {
                 </div>
             )}
 
-            {/* Acciones principales - Botones grandes y claros */}
+            {/* Acciones principales */}
             <div className="max-w-3xl mx-auto grid gap-4 sm:grid-cols-2">
                 <Link
                     to="/explorar"
