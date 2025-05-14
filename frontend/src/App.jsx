@@ -29,6 +29,8 @@ import ResponderCuestionario from './pages/cuestionarios/ResponderCuestionario';
 import ProgramasCompletados from './pages/programas/participante/completados/PCompletados';
 import ProgramaCompletado from './pages/programas/participante/completados/PDetalleCompletado';
 import ListadoParticipantes from './pages/ListadoParticipantes';
+import Analisis from './pages/investigador/Analisis';
+import ExportarDatos from './pages/investigador/ExportarDatos';
 
 function App() {
   return (
@@ -55,10 +57,9 @@ function App() {
           <Route path="/programas/:id/participantes" element={<ListadoParticipantes />} />
           <Route path="/programas/:id/editar" element={<EditarPrograma />} />
 
-          {/** 
-          <Route path="/programas/:id/analisis" element={<div>Análisis Programa</div>} />
-          <Route path="/programas/:id/exportar" element={<div>Exportar Programa</div>} />
-          */}
+          {/* Análisis y Exportación */}
+          <Route path="/analisis" element={<Analisis />} />
+          <Route path="/exportar" element={<ExportarDatos />} />
 
           {/* Sesiones */}
           <Route path="/programas/:id/sesiones/nueva" element={<CrearSesion />} />

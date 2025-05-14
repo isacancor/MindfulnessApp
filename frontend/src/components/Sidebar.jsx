@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LogOut, FileText, BarChart2, Calendar, ClipboardList, Settings } from 'lucide-react';
+import { LogOut, FileText, BarChart2, Calendar, ClipboardList, Settings, PieChart, Download } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const Sidebar = () => {
@@ -9,6 +9,10 @@ const Sidebar = () => {
     const getNavButtonClass = (path) => {
         return `flex items-center space-x-3 w-full px-4 py-2 text-gray-700 rounded-lg ${location.pathname === path ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'
             }`;
+    };
+
+    const isActivePath = (basePath) => {
+        return location.pathname.startsWith(basePath);
     };
 
     return (
@@ -30,12 +34,27 @@ const Sidebar = () => {
 
                     <Link
                         to="/programas"
-                        className={getNavButtonClass('/programas')}
+                        className={`flex items-center space-x-3 w-full px-4 py-2 text-gray-700 rounded-lg ${isActivePath('/programas') ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'}`}
                     >
                         <FileText size={20} />
                         <span>Mis Programas</span>
                     </Link>
 
+                    <Link
+                        to="/analisis"
+                        className={`flex items-center space-x-3 w-full px-4 py-2 text-gray-700 rounded-lg ${isActivePath('/analisis') ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'}`}
+                    >
+                        <PieChart size={20} />
+                        <span>Análisis</span>
+                    </Link>
+
+                    <Link
+                        to="/exportar"
+                        className={`flex items-center space-x-3 w-full px-4 py-2 text-gray-700 rounded-lg ${isActivePath('/exportar') ? 'bg-blue-50 text-blue-600' : 'hover:bg-gray-100'}`}
+                    >
+                        <Download size={20} />
+                        <span>Exportar Datos</span>
+                    </Link>
                 </div>
             </nav>
 

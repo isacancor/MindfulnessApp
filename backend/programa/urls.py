@@ -15,4 +15,5 @@ urlpatterns = [
     path('<int:pk>/finalizar/', programa_finalizar, name='programa_finalizar'),
     path('<int:pk>/inscripciones/', api.programa_inscripciones, name='programa-inscripciones'),
     path('estadisticas/', investigador_estadisticas, name='investigador-estadisticas'),
+    path('<int:pk>/exportar/', api.exportar_datos_programa, name='exportar-datos-programa'),
 ]

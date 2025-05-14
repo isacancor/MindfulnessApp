@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../../../../config/axios';
-import ProgramaDetalle from '../../../../components/ProgramaDetalle';
+import ProgramaDetalle from '../../../../components/ProgramaDetalleParticipante';
 
 const ProgramaCompletado = () => {
     const { id } = useParams();

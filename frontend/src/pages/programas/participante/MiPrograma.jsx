@@ -6,7 +6,7 @@ import SesionCard from '../../../components/SesionCard';
 import ErrorAlert from '../../../components/ErrorAlert';
 import ProgramaFinalizado from './ProgramaFinalizado';
 import ProgresoPrograma from '../../../components/ProgresoPrograma';
-import ProgramaDetalle from '../../../components/ProgramaDetalle';
+import ProgramaDetalle from '../../../components/ProgramaDetalleParticipante';
 
 const MiPrograma = () => {
     const navigate = useNavigate();
