@@ -1,13 +1,12 @@
 from django.db import models
-from programa.models import Programa, ProgramaParticipante, EstadoPrograma
-from usuario.models import Usuario
+from programa.models import Programa, InscripcionPrograma, EstadoPrograma
+from usuario.models import Participante
 from django.utils import timezone
 
 class Escala(models.TextChoices):
     EMOCIONAL = 'emocional', 'Estado emocional [1–5]'
     UTILIDAD = 'utilidad', 'Utilidad de la sesión [1–5]'
     ESTRES = 'estres', 'PSS (estrés) [0–4]'
-    COMPROMISO = 'compromiso', 'UWES-3 (compromiso) [1–5]'
     BIENESTAR = 'bienestar', 'VAS (bienestar general) [0–10]'
 
 class EtiquetaPractica(models.TextChoices):
@@ -67,7 +66,7 @@ class Sesion(models.Model):
     def esta_disponible_para(self, usuario):
         """Verifica si la sesión está disponible para un usuario."""
         # Verificar si el usuario está inscrito en el programa
-        inscripcion = ProgramaParticipante.objects.filter(
+        inscripcion = InscripcionPrograma.objects.filter(
             participante=usuario,
             programa=self.programa,
             estado_programa=EstadoPrograma.EN_PROGRESO
@@ -109,7 +108,7 @@ class Sesion(models.Model):
 
 
 class DiarioSesion(models.Model):
-    participante = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='diarios')
+    participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='diarios')
     sesion = models.ForeignKey(Sesion, on_delete=models.CASCADE, related_name='diarios')
     valoracion = models.FloatField()  # Usamos float por si hay escalas decimales en el futuro
     comentario = models.TextField(blank=True, null=True)
@@ -120,4 +119,4 @@ class DiarioSesion(models.Model):
         ordering = ['sesion__semana', 'fecha_creacion']
 
     def __str__(self):
-        return f"Diario de {self.participante.nombre_completo} en Semana {self.sesion.semana}"
+        return f"Diario de {self.participante.usuario.nombre} {self.participante.usuario.apellidos} en Semana {self.sesion.semana}"

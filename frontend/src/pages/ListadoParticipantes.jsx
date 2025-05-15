@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Calendar, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, User, Mail, Calendar, Phone, CheckCircle, Clock, Users, Loader2 } from 'lucide-react';
 import api from '../config/axios';
 import ErrorAlert from '../components/ErrorAlert';
 
@@ -13,31 +13,41 @@ const ListadoParticipantes = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const fetchPrograma = async () => {
+    useEffect(() => {
+        const fetchParticipantes = async () => {
+            try {
+                const response = await api.get(`/programas/${id}/participantes/`);
+                setPrograma(response.data);
+                setParticipantes(response.data.participantes);
+            } catch (err) {
+                console.error('Error al cargar participantes:', err);
+                setError('Error al cargar la lista de participantes. Por favor, intenta nuevamente.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchParticipantes();
+    }, [id]);
+
+    const fetchInscripciones = async () => {
         try {
-            const response = await api.get(`/programas/${id}/`);
-            setPrograma(response.data);
-            setParticipantes(response.data.participantes || []);
-
-            // Obtener inscripciones
             const inscrip = await api.get(`/programas/${id}/inscripciones/`);
-
-            // Crear un objeto con las inscripciones indexadas por id de participante
             const inscripcionesMap = {};
             inscrip.data.forEach(inscripcion => {
                 inscripcionesMap[inscripcion.participante] = inscripcion;
             });
-
             setInscripciones(inscripcionesMap);
+
         } catch (error) {
-            setError(error.response?.data?.error || 'Error al cargar los datos del programa');
+            setError(error.response?.data?.error || 'Error al cargar las inscripciones del programa');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchPrograma();
+        fetchInscripciones();
     }, [id]);
 
     if (loading) {
@@ -123,17 +133,13 @@ const ListadoParticipantes = () => {
                                                 </div>
                                                 <div className="flex items-center text-sm text-gray-500">
                                                     <Calendar className="h-4 w-4 mr-2" />
-                                                    Fecha de inscripción: {inscripciones[participante.id] ?
-                                                        new Date(inscripciones[participante.id].fecha_inicio).toLocaleDateString('es-ES', {
+                                                    Fecha de inscripción: {inscripciones[participante.perfil_participante.id] ?
+                                                        new Date(inscripciones[participante.perfil_participante.id].fecha_inicio).toLocaleDateString('es-ES', {
                                                             year: 'numeric',
                                                             month: 'long',
                                                             day: 'numeric'
                                                         }) :
-                                                        new Date(participante.date_joined).toLocaleDateString('es-ES', {
-                                                            year: 'numeric',
-                                                            month: 'long',
-                                                            day: 'numeric'
-                                                        })}
+                                                        'No disponible'}
                                                 </div>
                                             </div>
                                         </div>

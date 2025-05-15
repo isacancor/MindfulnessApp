@@ -6,13 +6,13 @@ from django.shortcuts import get_object_or_404
 from .models import Cuestionario, RespuestaCuestionario
 from .serializers import CuestionarioSerializer, RespuestaCuestionarioSerializer
 from programa.models import Programa
-from usuario.models import Usuario
-from programa.models import ProgramaParticipante, EstadoPrograma
+from usuario.models import Participante
+from programa.models import InscripcionPrograma, EstadoPrograma
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
-def cuestionario_list(request, programa_id):
-    programa = get_object_or_404(Programa, id=programa_id)
+def cuestionario_list(request, pk):
+    programa = get_object_or_404(Programa, id=pk)
     
     if request.method == 'GET':
         cuestionarios = Cuestionario.objects.filter(programa=programa)
@@ -123,7 +123,7 @@ def cuestionario_detail(request, cuestionario_id):
 @permission_classes([IsAuthenticated])
 def obtener_cuestionario_pre(request):
     """
-    Obtiene el cuestionario pre del programa en que está enrolado el usuario
+    Obtiene el cuestionario pre del programa en que está enrolado el participante
     """
     try:
         # Verificar que el usuario es participante
@@ -133,25 +133,19 @@ def obtener_cuestionario_pre(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Verificar si está inscrito en algún programa
-        if not request.user.programas_inscritos.exists():
-            return Response(
-                {'error': 'No estás inscrito en ningún programa'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # Obtener la inscripción activa del participante
+        inscripcion = InscripcionPrograma.objects.filter(
+            participante=request.user.perfil_participante,
+            estado_programa=EstadoPrograma.EN_PROGRESO
+        ).select_related('programa').first()
         
-        # Obtener el programa más reciente donde está inscrito
-        # (Asumimos que el participante está activo en un programa a la vez)
-        programa = request.user.programas_inscritos.filter(
-            inscripciones__estado_programa='en progreso',
-            inscripciones__participante=request.user
-        ).order_by('-inscripciones__fecha_inicio').first()
-        
-        if not programa:
+        if not inscripcion:
             return Response(
                 {'error': 'No tienes programas activos actualmente'},
                 status=status.HTTP_404_NOT_FOUND
             )
+            
+        programa = inscripcion.programa
             
         # Obtener el cuestionario pre del programa
         if not programa.cuestionario_pre:
@@ -162,10 +156,10 @@ def obtener_cuestionario_pre(request):
             
         cuestionario = programa.cuestionario_pre
         
-        # Verificar si el usuario ya respondió este cuestionario
+        # Verificar si el participante ya respondió este cuestionario
         if RespuestaCuestionario.objects.filter(
             cuestionario=cuestionario,
-            usuario=request.user
+            participante=request.user.perfil_participante
         ).exists():
             return Response(
                 {'error': 'Ya has respondido este cuestionario pre'},
@@ -184,7 +178,7 @@ def obtener_cuestionario_pre(request):
 @permission_classes([IsAuthenticated])
 def obtener_cuestionario_post(request):
     """
-    Obtiene el cuestionario post del programa en que está enrolado el usuario
+    Obtiene el cuestionario post del programa en que está enrolado el participante
     """
     try:
         # Verificar que el usuario es participante
@@ -194,25 +188,19 @@ def obtener_cuestionario_post(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Verificar si está inscrito en algún programa
-        if not request.user.programas_inscritos.exists():
-            return Response(
-                {'error': 'No estás inscrito en ningún programa'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # Obtener la inscripción activa del participante
+        inscripcion = InscripcionPrograma.objects.filter(
+            participante=request.user.perfil_participante,
+            estado_programa=EstadoPrograma.EN_PROGRESO
+        ).select_related('programa').first()
         
-        # Obtener el programa más reciente donde está inscrito
-        # (Asumimos que el participante está activo en un programa a la vez)
-        programa = request.user.programas_inscritos.filter(
-            inscripciones__estado_programa='en progreso',
-            inscripciones__participante=request.user
-        ).order_by('-inscripciones__fecha_inicio').first()
-        
-        if not programa:
+        if not inscripcion:
             return Response(
                 {'error': 'No tienes programas activos actualmente'},
                 status=status.HTTP_404_NOT_FOUND
             )
+            
+        programa = inscripcion.programa
             
         # Obtener el cuestionario post del programa
         if not programa.cuestionario_post:
@@ -222,17 +210,17 @@ def obtener_cuestionario_post(request):
             )
             
         cuestionario = programa.cuestionario_post
-
-        # Verificar si el usuario ya respondió este cuestionario
+        
+        # Verificar si el participante ya respondió este cuestionario
         if RespuestaCuestionario.objects.filter(
             cuestionario=cuestionario,
-            usuario=request.user
+            participante=request.user.perfil_participante
         ).exists():
             return Response(
                 {'error': 'Ya has respondido este cuestionario post'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
+
         serializer = CuestionarioSerializer(cuestionario)
         return Response(serializer.data)
     except Exception as e:
@@ -255,24 +243,19 @@ def responder_cuestionario_pre(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Verificar si está inscrito en algún programa
-        if not request.user.programas_inscritos.exists():
-            return Response(
-                {'error': 'No estás inscrito en ningún programa'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # Obtener la inscripción activa del participante
+        inscripcion = InscripcionPrograma.objects.filter(
+            participante=request.user.perfil_participante,
+            estado_programa=EstadoPrograma.EN_PROGRESO
+        ).select_related('programa').first()
         
-        # Obtener el programa más reciente donde está inscrito
-        programa = request.user.programas_inscritos.filter(
-            inscripciones__estado_programa='en progreso',
-            inscripciones__participante=request.user
-        ).order_by('-inscripciones__fecha_inicio').first()
-        
-        if not programa:
+        if not inscripcion:
             return Response(
                 {'error': 'No tienes programas activos actualmente'},
                 status=status.HTTP_404_NOT_FOUND
             )
+            
+        programa = inscripcion.programa
             
         # Obtener el cuestionario pre del programa
         if not programa.cuestionario_pre:
@@ -286,7 +269,7 @@ def responder_cuestionario_pre(request):
         # Verificar si el usuario ya respondió este cuestionario
         if RespuestaCuestionario.objects.filter(
             cuestionario=cuestionario,
-            usuario=request.user
+            participante=request.user.perfil_participante
         ).exists():
             return Response(
                 {'error': 'Ya has respondido este cuestionario pre'},
@@ -296,7 +279,7 @@ def responder_cuestionario_pre(request):
         # Crear la respuesta
         data = {
             'cuestionario': cuestionario.id,
-            'usuario': request.user.id,
+            'participante': request.user.perfil_participante.id,
             'respuestas': request.data.get('respuestas', {})
         }
 
@@ -325,24 +308,19 @@ def responder_cuestionario_post(request):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # Verificar si está inscrito en algún programa
-        if not request.user.programas_inscritos.exists():
-            return Response(
-                {'error': 'No estás inscrito en ningún programa'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # Obtener la inscripción activa del participante
+        inscripcion = InscripcionPrograma.objects.filter(
+            participante=request.user.perfil_participante,
+            estado_programa=EstadoPrograma.EN_PROGRESO
+        ).select_related('programa').first()
         
-        # Obtener el programa más reciente donde está inscrito
-        programa = request.user.programas_inscritos.filter(
-            inscripciones__estado_programa='en progreso',
-            inscripciones__participante=request.user
-        ).order_by('-inscripciones__fecha_inicio').first()
-        
-        if not programa:
+        if not inscripcion:
             return Response(
                 {'error': 'No tienes programas activos actualmente'},
                 status=status.HTTP_404_NOT_FOUND
             )
+            
+        programa = inscripcion.programa
             
         # Obtener el cuestionario post del programa
         if not programa.cuestionario_post:
@@ -356,7 +334,7 @@ def responder_cuestionario_post(request):
         # Verificar si el usuario ya respondió este cuestionario
         if RespuestaCuestionario.objects.filter(
             cuestionario=cuestionario,
-            usuario=request.user
+            participante=request.user.perfil_participante
         ).exists():
             return Response(
                 {'error': 'Ya has respondido este cuestionario post'},
@@ -366,7 +344,7 @@ def responder_cuestionario_post(request):
         # Crear la respuesta
         data = {
             'cuestionario': cuestionario.id,
-            'usuario': request.user.id,
+            'participante': request.user.perfil_participante.id,
             'respuestas': request.data.get('respuestas', {})
         }
 
@@ -375,15 +353,14 @@ def responder_cuestionario_post(request):
             serializer.save()
             
             # Marcar el programa como completado
-            inscripcion = ProgramaParticipante.objects.get(
-                programa=programa,
-                participante=request.user,
-                estado_programa=EstadoPrograma.EN_PROGRESO
-            )
             inscripcion.estado_programa = EstadoPrograma.COMPLETADO
             inscripcion.save()
             
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({
+                'pk': programa.id,
+                'message': 'Cuestionario respondido y programa completado exitosamente'
+            }, status=status.HTTP_201_CREATED)
+            
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response(

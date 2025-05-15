@@ -143,7 +143,7 @@ const PerfilInvestigador = () => {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Experiencia en Investigación</p>
-                                <p className="text-gray-800 font-medium">{formatExperienciaInvestigacion(user.perfil_investigador?.experienciaInvestigacion)}</p>
+                                <p className="text-gray-800 font-medium">{formatExperienciaInvestigacion(user.investigador?.experienciaInvestigacion)}</p>
                             </div>
                         </div>
                     </div>
@@ -176,9 +176,9 @@ const PerfilInvestigador = () => {
                         Áreas de Interés
                     </h3>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        {user.perfil_investigador?.areasInteres?.length > 0 ? (
+                        {user.investigador?.areasInteres?.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
-                                {user.perfil_investigador.areasInteres.map((area) => (
+                                {user.investigador.areasInteres.map((area) => (
                                     <span
                                         key={area}
                                         className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"
@@ -202,9 +202,9 @@ const PerfilInvestigador = () => {
                         Programas Activos
                     </h3>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        {user.perfil_investigador?.estudiosActivos?.length > 0 ? (
+                        {user.investigador?.estudiosActivos?.length > 0 ? (
                             <div className="divide-y divide-gray-100">
-                                {user.perfil_investigador.estudiosActivos.map((estudio) => (
+                                {user.investigador.estudiosActivos.map((estudio) => (
                                     <div key={estudio.id} className="py-4 first:pt-0 last:pb-0">
                                         <div className="flex justify-between items-start">
                                             <div>

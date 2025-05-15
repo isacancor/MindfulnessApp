@@ -50,7 +50,6 @@ const EditarSesion = () => {
         { value: 'emocional', label: 'Estado Emocional (1-5)' },
         { value: 'utilidad', label: 'Utilidad de la Sesión (1-5)' },
         { value: 'estres', label: 'PSS - Estrés (0-4)' },
-        { value: 'compromiso', label: 'UWES-3 - Compromiso (1-5)' },
         { value: 'bienestar', label: 'VAS - Bienestar General (0-10)' }
     ];
 

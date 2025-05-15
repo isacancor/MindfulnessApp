@@ -10,7 +10,7 @@ class CuestionarioAdmin(admin.ModelAdmin):
 
 @admin.register(RespuestaCuestionario)
 class RespuestaCuestionarioAdmin(admin.ModelAdmin):
-    list_display = ('cuestionario', 'usuario', 'fecha_respuesta')
-    list_filter = ('cuestionario', 'usuario')
-    search_fields = ('usuario__email', 'cuestionario__titulo')
+    list_display = ('cuestionario', 'participante', 'fecha_respuesta')
+    list_filter = ('cuestionario', 'participante')
+    search_fields = ('cuestionario__titulo', 'participante__email')
     readonly_fields = ('fecha_respuesta',)

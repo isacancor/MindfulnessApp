@@ -2,6 +2,11 @@ from django.db import models
 from programa.models import Programa
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from usuario.models import Participante
+
+class TipoCuestionario(models.TextChoices):
+    PRE = 'pre', 'Pre'
+    POST = 'post', 'Post'
 
 class Cuestionario(models.Model):
     programa = models.ForeignKey(
@@ -12,8 +17,8 @@ class Cuestionario(models.Model):
     )
     tipo = models.CharField(
         max_length=10, 
-        choices=[('pre', 'Pre'), ('post', 'Post')],
-        default='pre'
+        choices=TipoCuestionario.choices,
+        default=TipoCuestionario.PRE
     )
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField(default='Sin descripción')
@@ -47,8 +52,8 @@ class RespuestaCuestionario(models.Model):
         on_delete=models.CASCADE, 
         related_name='respuestas'
     )
-    usuario = models.ForeignKey(
-        'usuario.Usuario', 
+    participante = models.ForeignKey(
+        Participante, 
         on_delete=models.CASCADE, 
         related_name='respuestas_cuestionario'
     )
@@ -56,10 +61,10 @@ class RespuestaCuestionario(models.Model):
     fecha_respuesta = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ['cuestionario', 'usuario']
+        unique_together = ['cuestionario', 'participante']
         verbose_name = 'Respuesta de Cuestionario'
         verbose_name_plural = 'Respuestas de Cuestionarios'
         db_table = 'cuestionario_respuestacuestionario'
 
     def __str__(self):
-        return f"Respuesta de {self.usuario} a {self.cuestionario}"
+        return f"Respuesta de {self.participante} a {self.cuestionario}"

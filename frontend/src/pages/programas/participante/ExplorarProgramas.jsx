@@ -82,7 +82,7 @@ const ExplorarProgramas = () => {
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <button
-                    onClick={() => navigate(-1)}
+                    onClick={() => navigate('/home')}
                     className="absolute top-8 left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
                     aria-label="Volver atrás"
                 >

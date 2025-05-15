@@ -36,7 +36,8 @@ const CrearPrograma = () => {
         { value: 'ACT', label: 'ACT (Acceptance and Commitment Therapy)' },
         { value: 'DBT', label: 'DBT (Dialectical Behavior Therapy)' },
         { value: 'MSC', label: 'MSC (Mindful Self-Compassion)' },
-        { value: 'MMT', label: 'MMT (Mindfulness Meditation Training)' },
+        { value: 'MBRP', label: 'MBRP (Mindfulness-Based Relapse Prevention)' },
+        { value: 'MBPM', label: 'MBPM (Mindfulness-Based Pain Management)' },
         { value: 'propio', label: 'Enfoque propio' },
         { value: 'otro', label: 'Otro' }
     ];

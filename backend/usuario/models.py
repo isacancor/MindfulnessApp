@@ -9,6 +9,14 @@ class RoleUsuario(models.TextChoices):
     INVESTIGADOR = 'INVESTIGADOR', 'Investigador'
     PARTICIPANTE = 'PARTICIPANTE', 'Participante'
 
+class Genero(models.TextChoices):
+    MASCULINO = 'masculino', _('Masculino')
+    FEMENINO = 'femenino', _('Femenino')
+    TRANSGENERO = 'transgenero', _('Transgenero')
+    NO_BINARIO = 'no_binario', _('No binario')
+    OTRO = 'otro', _('Otro')
+    PREFIERO_NO_DECIR = 'prefiero_no_decir', _('Prefiero no decir')
+
 class NivelEducativo(models.TextChoices):
     SIN_ESTUDIOS = 'sin_estudios', _('Sin Estudios')
     PRIMARIA = 'primaria', _('Primaria')
@@ -27,31 +35,34 @@ class ExperienciaMindfulness(models.TextChoices):
     ENTRE_1_2_ANOS = '1_2_anos', _('1 - 2 años')
     MAS_2_ANOS = 'mas_de_2_anos', _('Más de 2 años')
 
+class ExperienciaInvestigacion(models.TextChoices):
+    SI = 'si', _('Sí')
+    NO = 'no', _('No')
+    EN_PARTE = 'en_parte', _('En parte')
+
 class Usuario(AbstractUser):
-    # Campos base comunes
     nombre = models.CharField(_("first name"), max_length=150, blank=True)
     apellidos = models.CharField(_("last name"), max_length=150, blank=True)
     username = models.CharField(
         max_length=150,
         unique=True,
-        help_text='Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.',
         validators=[UnicodeUsernameValidator()],
         error_messages={
-            'unique': "A user with that username already exists.",
+            'unique': "Ya existe un usuario con este nombre de usuario.",
         },
     )
     password = models.CharField(_("password"), max_length=128)
-    email = models.EmailField(unique=True)
+    email = models.EmailField(
+        unique=True,
+        error_messages={
+            'unique': "Ya existe un usuario con este email.",
+        },
+    )
     telefono = models.CharField(max_length=20, blank=True, null=True)
     genero = models.CharField(
         max_length=20,
-        choices=[
-            ('masculino', _('Masculino')),
-            ('femenino', _('Femenino')),
-            ('otro', _('Otro')),
-            ('prefiero_no_decir', _('Prefiero no decir')),
-        ],
-        default='prefiero_no_decir'
+        choices=Genero.choices,
+        default=Genero.PREFIERO_NO_DECIR
     )
     fechaNacimiento = models.DateField(null=True)
     ubicacion = models.CharField(max_length=100, blank=True)
@@ -93,12 +104,8 @@ class Investigador(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_investigador')
     experienciaInvestigacion = models.CharField(
         max_length=20,
-        choices=[
-            ('Sí', _('Sí')),
-            ('No', _('No')),
-            ('En parte', _('En parte')),
-        ],
-        default='No',
+        choices=ExperienciaInvestigacion.choices,
+        default=ExperienciaInvestigacion.NO,
         blank=True
     )
     areasInteres = models.JSONField(default=list, blank=True)

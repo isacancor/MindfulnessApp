@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Cuestionario, RespuestaCuestionario
-from usuario.models import Usuario
+from usuario.models import Participante
 
 class CuestionarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -51,28 +51,28 @@ class CuestionarioSerializer(serializers.ModelSerializer):
         return value
 
 class RespuestaCuestionarioSerializer(serializers.ModelSerializer):
-    usuario_nombre = serializers.SerializerMethodField()
+    participante_nombre = serializers.SerializerMethodField()
     cuestionario_titulo = serializers.SerializerMethodField()
 
     class Meta:
         model = RespuestaCuestionario
-        fields = ['id', 'cuestionario', 'usuario', 'usuario_nombre', 'cuestionario_titulo', 
+        fields = ['id', 'cuestionario', 'participante', 'participante_nombre', 'cuestionario_titulo', 
                  'respuestas', 'fecha_respuesta']
         read_only_fields = ['fecha_respuesta']
 
-    def get_usuario_nombre(self, obj):
-        return obj.usuario.nombre_completo
+    def get_participante_nombre(self, obj):
+        return f"{obj.participante.usuario.nombre} {obj.participante.usuario.apellidos}"
 
     def get_cuestionario_titulo(self, obj):
         return obj.cuestionario.titulo
 
     def validate(self, data):
-        # Verificar que el usuario no haya respondido este cuestionario antes
+        # Verificar que el participante no haya respondido este cuestionario antes
         if RespuestaCuestionario.objects.filter(
             cuestionario=data['cuestionario'],
-            usuario=data['usuario']
+            participante=data['participante']
         ).exists():
             raise serializers.ValidationError(
-                "Este usuario ya ha respondido este cuestionario"
+                "Este participante ya ha respondido este cuestionario"
             )
         return data

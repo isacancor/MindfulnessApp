@@ -93,7 +93,7 @@ const ParticipanteDashboard = () => {
                     });
 
                     // Determinar próxima acción
-                    if (!cuestionarioPreRespondido) {
+                    if (!programaData.cuestionario_pre_respondido) {
                         setProximaAccion({
                             tipo: 'cuestionarioPre',
                             titulo: 'Completar cuestionario inicial',
@@ -101,7 +101,7 @@ const ParticipanteDashboard = () => {
                             url: '/miprograma/cuestionario-pre',
                             icono: <FileText className="h-6 w-6 text-blue-600" />
                         });
-                    } else if (sesionesCompletadas === sesionesConEstado.length && !cuestionarioPostRespondido) {
+                    } else if (sesionesCompletadas === sesionesConEstado.length && !programaData.cuestionario_post_respondido) {
                         setProximaAccion({
                             tipo: 'cuestionarioPost',
                             titulo: 'Completar cuestionario final',
@@ -113,7 +113,13 @@ const ParticipanteDashboard = () => {
                 }
             } catch (err) {
                 console.error('Error al cargar los datos:', err);
-                setError('Error al cargar los datos');
+                if (err.response?.status === 403) {
+                    setError('No tienes permisos de participante. Por favor, contacta al administrador.');
+                } else if (err.response?.status === 404) {
+                    setError('')
+                } else {
+                    setError('Error al cargar los datos. Por favor, intenta nuevamente.');
+                }
             } finally {
                 setLoading(false);
             }
@@ -151,19 +157,6 @@ const ParticipanteDashboard = () => {
                                 Bienvenido/a a tu espacio personal de mindfulness
                             </p>
                         </div>
-
-                        <div className="mt-4 md:mt-0">
-                            <div className="flex space-x-1 items-center">
-                                <span className="inline-block w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
-                                <span className="text-sm text-gray-500">En línea</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="border-t border-gray-100 pt-4 mt-2">
-                        <p className="text-gray-600 italic">
-                            "La paz comienza con una sonrisa" - Madre Teresa
-                        </p>
                     </div>
                 </div>
             </div>

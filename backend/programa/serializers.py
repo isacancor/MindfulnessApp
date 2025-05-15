@@ -1,22 +1,23 @@
 from rest_framework import serializers
-from .models import Programa, TipoContexto, EnfoqueMetodologico, EstadoPublicacion, ProgramaParticipante, EstadoPrograma
-from usuario.serializers import UsuarioSerializer
+from .models import Programa, TipoContexto, EnfoqueMetodologico, EstadoPublicacion, InscripcionPrograma, EstadoPrograma
+from usuario.serializers import ParticipanteSerializer, InvestigadorSerializer, UsuarioSerializer
 from sesion.serializers import SesionSerializer
 from django.utils import timezone
 from cuestionario.serializers import CuestionarioSerializer
 from rest_framework.exceptions import ValidationError
 
-class ProgramaParticipanteSerializer(serializers.ModelSerializer):
+class InscripcionProgramaSerializer(serializers.ModelSerializer):
+    participante = ParticipanteSerializer(read_only=True)
     fecha_fin = serializers.DateTimeField(read_only=True)
     estado_programa = serializers.ChoiceField(choices=EstadoPrograma.choices, read_only=True)
 
     class Meta:
-        model = ProgramaParticipante
-        fields = ['fecha_inicio', 'fecha_fin', 'estado_programa']
+        model = InscripcionPrograma
+        fields = ['participante', 'fecha_inicio', 'fecha_fin', 'estado_programa']
 
 class ProgramaSerializer(serializers.ModelSerializer):
-    creado_por = UsuarioSerializer(read_only=True)
-    participantes = UsuarioSerializer(many=True, read_only=True)
+    creado_por = InvestigadorSerializer(read_only=True)
+    participantes = ParticipanteSerializer(many=True, read_only=True)
     sesiones = SesionSerializer(many=True, read_only=True)
     inscripcion_info = serializers.SerializerMethodField()
     cuestionario_pre = CuestionarioSerializer(read_only=True)
@@ -47,10 +48,10 @@ class ProgramaSerializer(serializers.ModelSerializer):
 
     def get_inscripcion_info(self, obj):
         request = self.context.get('request')
-        if request and request.user.is_authenticated:
+        if request and request.user.is_authenticated and hasattr(request.user, 'perfil_participante'):
             # Buscar cualquier inscripción del usuario en este programa
-            inscripcion = ProgramaParticipante.objects.filter(
-                participante=request.user,
+            inscripcion = InscripcionPrograma.objects.filter(
+                participante=request.user.perfil_participante,
                 programa=obj
             ).first()
             
@@ -75,3 +76,15 @@ class ProgramaSerializer(serializers.ModelSerializer):
                     "No se puede publicar el programa porque faltan campos requeridos, sesiones o cuestionarios"
                 )
         return value
+
+class ParticipantesProgramaSerializer(serializers.ModelSerializer):
+    participantes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Programa
+        fields = ['id', 'nombre', 'participantes']
+
+    def get_participantes(self, obj):
+        # Obtenemos los usuarios asociados a los participantes del programa
+        usuarios = [participante.usuario for participante in obj.participantes.all()]
+        return UsuarioSerializer(usuarios, many=True).data

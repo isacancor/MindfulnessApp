@@ -1,5 +1,5 @@
 from django.db import models
-from usuario.models import Usuario, Participante
+from usuario.models import Participante, Investigador
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
@@ -18,7 +18,8 @@ class EnfoqueMetodologico(models.TextChoices):
     ACT = 'ACT', 'ACT (Acceptance and Commitment Therapy)'
     DBT = 'DBT', 'DBT (Dialectical Behavior Therapy)'
     MSC = 'MSC', 'MSC (Mindful Self-Compassion)'
-    MMT = 'MMT', 'MMT (Mindfulness Meditation Training)'
+    MBRP = 'MBRP', 'MBRP (Mindfulness-Based Relapse Prevention)'
+    MBPM = 'MBPM', 'MBPM (Mindfulness-Based Pain Management)'
     PROPIO = 'propio', 'Enfoque propio'
     OTRO = 'otro', 'Otro'
 
@@ -76,8 +77,8 @@ class Programa(models.Model):
     )
     
     # Relaciones
-    creado_por = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='programas')
-    participantes = models.ManyToManyField(Usuario, related_name='programas_inscritos', blank=True)
+    creado_por = models.ForeignKey(Investigador, on_delete=models.CASCADE, related_name='programas')
+    participantes = models.ManyToManyField(Participante, related_name='programas_inscritos', blank=True)
     
     # Metadatos
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -179,9 +180,9 @@ class Programa(models.Model):
     class Meta:
         ordering = ['-fecha_creacion']
 
-class ProgramaParticipante(models.Model):
+class InscripcionPrograma(models.Model):
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='inscripciones')
-    participante = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='inscripciones')
+    participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='inscripciones')
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_fin = models.DateTimeField(null=True, blank=True)
     estado_programa = models.CharField(max_length=20, choices=EstadoPrograma.choices, default=EstadoPrograma.EN_PROGRESO)

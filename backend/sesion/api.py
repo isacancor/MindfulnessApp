@@ -10,7 +10,7 @@ from .serializers import (
     TipoContenidoSerializer,
     EscalaSerializer
 )
-from programa.models import Programa, ProgramaParticipante, EstadoPublicacion, EstadoPrograma
+from programa.models import Programa, InscripcionPrograma, EstadoPublicacion, EstadoPrograma
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -52,8 +52,8 @@ def sesion_list_create(request):
                 
                 # Si el usuario es participante, mostrar solo sesiones disponibles
                 if request.user.is_participante():
-                    inscripciones = ProgramaParticipante.objects.filter(
-                        participante=request.user,
+                    inscripciones = InscripcionPrograma.objects.filter(
+                        participante=request.user.perfil_participante,
                         estado_programa=EstadoPrograma.EN_PROGRESO,
                         programa=programa
                     )
@@ -75,7 +75,7 @@ def sesion_list_create(request):
                 
                 # Si el usuario es investigador, mostrar solo sesiones de sus programas
                 elif request.user.is_investigador():
-                    if programa.creado_por != request.user:
+                    if programa.creado_por != request.user.perfil_investigador:
                         return Response([], status=status.HTTP_200_OK)
             
             except Programa.DoesNotExist:
@@ -96,7 +96,7 @@ def sesion_list_create(request):
         programa_id = request.data.get('programa')
         try:
             programa = Programa.objects.get(id=programa_id)
-            if programa.creado_por != request.user:
+            if programa.creado_por != request.user.perfil_investigador:
                 return Response(
                     {"error": "No tienes permiso para crear sesiones en este programa"},
                     status=status.HTTP_403_FORBIDDEN
@@ -132,6 +132,11 @@ def sesion_list_create(request):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        # comprobar que el numero de semana no existe y enviar los posibles numeros de semana que quedan disponibles
+        if Sesion.objects.filter(programa=programa, semana=request.data.get('semana')).exists():
+            return Response({'error': 'El número de semana ya existe. Prueba con otro número de semana'}, status=status.HTTP_400_BAD_REQUEST)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -156,7 +161,7 @@ def sesion_detail(request, pk):
             )
         
         # Verificar que el programa pertenece al investigador
-        if sesion.programa.creado_por != request.user:
+        if sesion.programa.creado_por != request.user.perfil_investigador:
             return Response(
                 {"error": "No tienes permiso para modificar esta sesión"},
                 status=status.HTTP_403_FORBIDDEN
@@ -224,7 +229,7 @@ def sesion_detail(request, pk):
             )
         
         # Verificar que el programa pertenece al investigador
-        if sesion.programa.creado_por != request.user:
+        if sesion.programa.creado_por != request.user.perfil_investigador:
             return Response(
                 {"error": "No tienes permiso para eliminar esta sesión"},
                 status=status.HTTP_403_FORBIDDEN
@@ -278,76 +283,23 @@ def tipos_escala(request):
 @permission_classes([permissions.IsAuthenticated])
 def diario_sesion_list_create(request):
     if request.method == 'GET':
-        # Verificar que el usuario es un participante
-        if not request.user.is_participante():
-            return Response(
-                {"error": "Solo los participantes pueden ver sus diarios"}, 
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Filtrar por participante
-        queryset = DiarioSesion.objects.filter(participante=request.user)
-        
-        # Filtrar por sesión si se proporciona
-        sesion_id = request.query_params.get('sesion')
-        if sesion_id:
-            queryset = queryset.filter(sesion_id=sesion_id)
-        
-        serializer = DiarioSesionSerializer(queryset, many=True)
+        if request.user.is_participante():
+            diarios = DiarioSesion.objects.filter(participante=request.user.perfil_participante)
+        else:
+            diarios = DiarioSesion.objects.none()
+        serializer = DiarioSesionSerializer(diarios, many=True)
         return Response(serializer.data)
     
     elif request.method == 'POST':
-        # Verificar que el usuario es un participante
         if not request.user.is_participante():
             return Response(
-                {"error": "Solo los participantes pueden enviar diarios"}, 
+                {"error": "Solo los participantes pueden crear diarios"},
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Verificar que la sesión existe
-        sesion_id = request.data.get('sesion_id')
-        if not sesion_id:
-            return Response(
-                {"error": "Se requiere el ID de la sesión"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-            
-        try:
-            sesion = Sesion.objects.get(id=sesion_id)
-        except Sesion.DoesNotExist:
-            return Response(
-                {"error": "La sesión no existe"}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
-            
-        # Verificar si ya existe un diario para esta sesión
-        if DiarioSesion.objects.filter(participante=request.user, sesion=sesion).exists():
-            return Response(
-                {"error": "Ya has completado el diario para esta sesión"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Verificar que el participante está inscrito en el programa
-        inscripcion = ProgramaParticipante.objects.filter(
-            participante=request.user,
-            programa=sesion.programa,
-            estado_programa=EstadoPrograma.EN_PROGRESO,
-        ).first()
-        
-        if not inscripcion:
-            return Response(
-                {"error": "No estás inscrito en este programa"}, 
-                status=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Crear el serializador con el contexto necesario
-        serializer = DiarioSesionSerializer(
-            data=request.data,
-            context={'request': request}
-        )
-        
+        serializer = DiarioSesionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(participante=request.user.perfil_participante)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -360,17 +312,20 @@ def diario_sesion_detail(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
+        if request.user.is_participante() and diario.participante != request.user.perfil_participante:
+            return Response(
+                {"error": "No tienes permiso para ver este diario"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         serializer = DiarioSesionSerializer(diario)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        # Verificar que el usuario es el participante que creó el diario
-        if not request.user.is_participante() or diario.participante != request.user:
+        if not request.user.is_participante() or diario.participante != request.user.perfil_participante:
             return Response(
                 {"error": "No tienes permiso para modificar este diario"},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
         serializer = DiarioSesionSerializer(diario, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -378,13 +333,11 @@ def diario_sesion_detail(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        # Verificar que el usuario es el participante que creó el diario
-        if not request.user.is_participante() or diario.participante != request.user:
+        if not request.user.is_participante() or diario.participante != request.user.perfil_participante:
             return Response(
                 {"error": "No tienes permiso para eliminar este diario"},
                 status=status.HTTP_403_FORBIDDEN
             )
-        
         diario.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -406,7 +359,7 @@ def diario_info(request, sesion_id):
     # Buscar el diario para esta sesión
     try:
         diario = DiarioSesion.objects.get(
-            participante=request.user,
+            participante=request.user.perfil_participante,
             sesion=sesion
         )
         serializer = DiarioSesionSerializer(diario)

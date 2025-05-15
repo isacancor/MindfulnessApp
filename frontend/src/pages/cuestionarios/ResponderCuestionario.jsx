@@ -93,21 +93,13 @@ const ResponderCuestionario = ({ tipo }) => {
             setEnviando(true);
             setError(null);
 
-            await api.post(`/cuestionario/responder/${tipo}/`, {
+            const response = await api.post(`/cuestionario/responder/${tipo}/`, {
                 respuestas
             });
 
-            // Si es el cuestionario post, marcar el programa como completado
+            // Si es post, navegar a completados con el ID del programa
             if (tipo === 'post') {
-                try {
-                    const programaResponse = await api.get('/programas/mi-programa/');
-                    if (programaResponse.data) {
-                        await api.post(`/programas/${programaResponse.data.id}/completar/`);
-                    }
-                    navigate(`/completados/${cuestionario.programa}`);
-                } catch (err) {
-                    console.error('Error al marcar programa como completado:', err);
-                }
+                navigate(`/completados/${response.data.programa_id}`);
             } else {
                 navigate('/miprograma');
             }

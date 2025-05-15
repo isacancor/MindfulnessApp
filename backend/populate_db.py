@@ -6,7 +6,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
 from usuario.models import Usuario, Investigador, Participante
-from programa.models import Programa, EstadoPublicacion, ProgramaParticipante
+from programa.models import Programa, EstadoPublicacion, InscripcionPrograma
 from sesion.models import Sesion
 from cuestionario.models import Cuestionario, RespuestaCuestionario
 
@@ -125,6 +125,7 @@ def run():
             "areasInteres": ["Mindfulness", "Neurociencia", "Psicología", "Educación", "Meditación", "Bienestar"],
         }
     )
+    inv3.save()
 
     # Crear usuarios participantes base (p1, p2, p3)
     participantes_base = [
@@ -187,13 +188,14 @@ def run():
         )
         user.set_password(p_data["username"])  # password igual al username
         user.save()
-        Participante.objects.get_or_create(
+        participante, _ = Participante.objects.get_or_create(
             usuario=user,
             defaults={
                 "experienciaMindfulness": p_data["experienciaMindfulness"],
                 "condicionesSalud": p_data["condicionesSalud"],
             }
         )
+        participante.save()
 
     # Crear mi usuario de prueba 1
     yo, _ = Usuario.objects.get_or_create(
@@ -219,6 +221,7 @@ def run():
             "condicionesSalud": "Nada",
         }
     )
+    yopart.save()
 
     # Crear mis usuarios de prueba (yo1, yo2, yo3)
     participantes_base = [
@@ -281,13 +284,16 @@ def run():
         )
         user.set_password("12")  # password igual al username
         user.save()
-        Participante.objects.get_or_create(
+        
+        # Asegurarnos de que se crea el perfil de participante
+        participante, _ = Participante.objects.get_or_create(
             usuario=user,
             defaults={
                 "experienciaMindfulness": p_data["experienciaMindfulness"],
                 "condicionesSalud": p_data["condicionesSalud"],
             }
         )
+        participante.save()
 
     # Crear programas para Bea
     programa1 = Programa.objects.create(
@@ -297,7 +303,7 @@ def run():
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Adultos en general",
         duracion_semanas=3,
-        creado_por=user_inv2
+        creado_por=inv2
     )
 
     # Crear sesiones para programa1
@@ -345,7 +351,7 @@ def run():
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Practicantes de mindfulness con experiencia previa",
         duracion_semanas=12,
-        creado_por=user_inv3
+        creado_por=inv3
     )
 
     # Crear sesiones para programa de Jon
@@ -473,7 +479,7 @@ def run():
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Personas con estrés crónico o ansiedad",
         duracion_semanas=8,
-        creado_por=user_inv3
+        creado_por=inv3
     )
     
     # Crear sesiones para programa3
@@ -566,7 +572,7 @@ def run():
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Personas con problemas de salud crónicos",
         duracion_semanas=2,
-        creado_por=user_inv3
+        creado_por=inv3
     )
     
     # Crear sesiones para programa4
@@ -608,7 +614,7 @@ def run():
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Adultos en general",
         duracion_semanas=3,
-        creado_por=user_inv3
+        creado_por=inv3
     )
 
     # Crear sesiones para programa5
@@ -796,17 +802,17 @@ def run():
     # Enrolar participantes en programas
     participantes = Participante.objects.all()
     for participante in participantes[:2]:  # Enrolar los dos primeros participantes
-        programa1.participantes.add(participante.usuario)
-        ProgramaParticipante.objects.create(
+        programa1.participantes.add(participante)
+        InscripcionPrograma.objects.create(
             programa=programa1,
-            participante=participante.usuario
+            participante=participante
         )
 
     # Enrolar el tercer participante en el programa de Jon
-    programa_jon.participantes.add(participantes[2].usuario)
-    ProgramaParticipante.objects.create(
+    programa_jon.participantes.add(participantes[2])
+    InscripcionPrograma.objects.create(
         programa=programa_jon,
-        participante=participantes[2].usuario
+        participante=participantes[2]
     )
 
 

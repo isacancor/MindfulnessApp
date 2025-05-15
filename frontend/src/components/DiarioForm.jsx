@@ -17,8 +17,6 @@ const DiarioForm = ({ sesion, onClose }) => {
                 return { min: 1, max: 5, label: 'Utilidad de la sesión' };
             case 'estres':
                 return { min: 0, max: 4, label: 'PSS (estrés)' };
-            case 'compromiso':
-                return { min: 1, max: 5, label: 'UWES-3 (compromiso)' };
             case 'bienestar':
                 return { min: 0, max: 10, label: 'VAS (bienestar general)' };
             default:

@@ -1,8 +1,10 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from .models import Programa, EstadoPublicacion, ProgramaParticipante, EstadoPrograma
-from .serializers import ProgramaSerializer
+from rest_framework.permissions import IsAuthenticated
+from usuario.permissions import IsInvestigador, IsParticipante
+from .models import Programa, EstadoPublicacion, InscripcionPrograma, EstadoPrograma
+from .serializers import ProgramaSerializer, ParticipantesProgramaSerializer
 from sesion.models import Sesion, EtiquetaPractica, TipoContenido, DiarioSesion
 from django.shortcuts import get_object_or_404
 from cuestionario.models import Cuestionario, RespuestaCuestionario
@@ -14,18 +16,16 @@ import pandas as pd
 from io import StringIO, BytesIO
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.db.models import Avg, Count, Q, F, Sum
+from usuario.models import Participante
 
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
 def programa_list_create(request):
     if request.method == 'GET':
         if request.user.is_investigador():
-            programas = Programa.objects.filter(creado_por=request.user)
+            programas = Programa.objects.filter(creado_por=request.user.perfil_investigador)
         else:
-            print("participante")
             programas = Programa.objects.filter(estado_publicacion=EstadoPublicacion.PUBLICADO)
-            print(programas)
-            print("============================")
         serializer = ProgramaSerializer(programas, many=True, context={'request': request})
         return Response(serializer.data)
     
@@ -36,17 +36,9 @@ def programa_list_create(request):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # usuario investigador
-        investigador = request.user
-        if not investigador:
-            return Response(
-                {'error': 'El usuario no tiene un perfil de investigador configurado'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-                
         serializer = ProgramaSerializer(data=request.data)
         if serializer.is_valid():
-            programa = serializer.save(creado_por=investigador)
+            programa = serializer.save(creado_por=request.user.perfil_investigador)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
    
@@ -65,7 +57,7 @@ def programa_detail(request, pk):
 
     elif request.method == 'PUT':
         # Verificar que el usuario es el investigador
-        if programa.creado_por != request.user:
+        if programa.creado_por != request.user.perfil_investigador:
             return Response(
                 {'error': 'Solo el investigador puede modificar el programa'},
                 status=status.HTTP_403_FORBIDDEN
@@ -102,7 +94,7 @@ def programa_detail(request, pk):
             )
         
         # Verificar que el usuario es el investigador
-        if programa.creado_por != request.user:
+        if programa.creado_por != request.user.perfil_investigador:
             return Response(
                 {'error': 'Solo el investigador puede eliminar el programa'},
                 status=status.HTTP_403_FORBIDDEN
@@ -123,7 +115,7 @@ def programa_publicar(request, pk):
     programa = get_object_or_404(Programa, pk=pk)
     
     # Verificar que el usuario es el investigador del programa
-    if programa.creado_por != request.user:
+    if programa.creado_por != request.user.perfil_investigador:
         return Response(
             {"error": "No tienes permiso para publicar este programa"},
             status=status.HTTP_403_FORBIDDEN
@@ -144,49 +136,64 @@ def programa_publicar(request, pk):
         )
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def mi_programa(request):
-    if not request.user.is_participante():
-        print("no es participante")
-        return Response(
-            {'error': 'Solo los participantes pueden acceder a esta vista'},
-            status=status.HTTP_403_FORBIDDEN
-        )
-
+    """
+    Obtiene el programa actual del participante
+    """
     try:
-        inscripcion = ProgramaParticipante.objects.get(
-            participante=request.user,
-            estado_programa=EstadoPrograma.EN_PROGRESO
+        # Verificar si el usuario es participante
+        if not request.user.is_participante():
+            return Response(
+                {"detail": "El usuario no es un participante"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Obtener el objeto Participante asociado al usuario
+        participante = get_object_or_404(Participante, usuario=request.user)
+        
+        # Buscar la inscripción activa del participante
+        try:
+            inscripcion = InscripcionPrograma.objects.get(
+                participante=participante,
+                estado_programa=EstadoPrograma.EN_PROGRESO
+            )
+            programa = inscripcion.programa
+
+            # Verificar si ha respondido el cuestionario pre
+            cuestionario_pre_respondido = False
+            if programa.cuestionario_pre:
+                cuestionario_pre_respondido = RespuestaCuestionario.objects.filter(
+                    cuestionario=programa.cuestionario_pre,
+                    participante=participante
+                ).exists()
+            
+            # Verificar si ha respondido el cuestionario post
+            cuestionario_post_respondido = False
+            if programa.cuestionario_post:
+                cuestionario_post_respondido = RespuestaCuestionario.objects.filter(
+                    cuestionario=programa.cuestionario_post,
+                    participante=participante
+                ).exists()
+            
+            serializer = ProgramaSerializer(programa, context={'request': request})
+            response_data = serializer.data
+            response_data['cuestionario_pre_respondido'] = cuestionario_pre_respondido
+            response_data['cuestionario_post_respondido'] = cuestionario_post_respondido
+
+            return Response(response_data)
+            
+        except InscripcionPrograma.DoesNotExist:
+            return Response(
+                {"detail": "No tienes ningún programa activo"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+    except Participante.DoesNotExist:
+        return Response(
+            {"detail": "No se encontró el perfil de participante"},
+            status=status.HTTP_404_NOT_FOUND
         )
-        
-        programa = inscripcion.programa
-        
-        # Verificar si ha respondido el cuestionario pre
-        cuestionario_pre_respondido = False
-        if programa.cuestionario_pre:
-            from cuestionario.models import RespuestaCuestionario
-            cuestionario_pre_respondido = RespuestaCuestionario.objects.filter(
-                cuestionario=programa.cuestionario_pre,
-                usuario=request.user
-            ).exists()
-        
-        # Verificar si ha respondido el cuestionario post
-        cuestionario_post_respondido = False
-        if programa.cuestionario_post:
-            from cuestionario.models import RespuestaCuestionario
-            cuestionario_post_respondido = RespuestaCuestionario.objects.filter(
-                cuestionario=programa.cuestionario_post,
-                usuario=request.user
-            ).exists()
-        
-        serializer = ProgramaSerializer(programa, context={'request': request})
-        response_data = serializer.data
-        response_data['cuestionario_pre_respondido'] = cuestionario_pre_respondido
-        response_data['cuestionario_post_respondido'] = cuestionario_post_respondido
-        
-        return Response(response_data)
-    except ProgramaParticipante.DoesNotExist:
-        return Response(None)
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -209,7 +216,10 @@ def programa_enrolar(request, pk):
         )
 
     # Verificar si el participante ya está enrolado en algún programa en progreso
-    if ProgramaParticipante.objects.filter(participante=request.user, estado_programa=EstadoPrograma.EN_PROGRESO).exists():
+    if InscripcionPrograma.objects.filter(
+        participante=request.user.perfil_participante,
+        estado_programa=EstadoPrograma.EN_PROGRESO
+    ).exists():
         return Response(
             {'error': 'Ya estás enrolado en un programa en progreso'},
             status=status.HTTP_400_BAD_REQUEST
@@ -217,56 +227,18 @@ def programa_enrolar(request, pk):
 
     try:
         # Crear la inscripción
-        inscripcion = ProgramaParticipante.objects.create(
+        inscripcion = InscripcionPrograma.objects.create(
             programa=programa,
-            participante=request.user,
+            participante=request.user.perfil_participante,
             estado_programa=EstadoPrograma.EN_PROGRESO
         )
         inscripcion.calcular_fecha_fin()
-
+        
         # Agregar al participante al programa
-        programa.participantes.add(request.user)
+        programa.participantes.add(request.user.perfil_participante)
         
         return Response({'status': 'Enrolamiento exitoso'})
     except ValueError as e:
-        return Response(
-            {'error': str(e)},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def programa_completar(request, pk):
-    try:
-        programa = Programa.objects.get(pk=pk)
-    except Programa.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if not request.user.is_participante():
-        return Response(
-            {'error': 'Solo los participantes pueden completar programas'},
-            status=status.HTTP_403_FORBIDDEN
-        )
-
-    try:
-        inscripcion = ProgramaParticipante.objects.get(
-            programa=programa,
-            participante=request.user,
-            estado_programa=EstadoPrograma.EN_PROGRESO
-        )
-    except ProgramaParticipante.DoesNotExist:
-        return Response(
-            {'error': 'No estás enrolado en este programa o ya está completado'},
-            status=status.HTTP_404_NOT_FOUND
-        )
-
-    try:
-        inscripcion.completar_programa()
-        return Response({
-            'status': 'Programa completado exitosamente',
-            'estado_programa': inscripcion.estado_programa
-        })
-    except Exception as e:
         return Response(
             {'error': str(e)},
             status=status.HTTP_400_BAD_REQUEST
@@ -286,8 +258,8 @@ def mis_programas_completados(request):
 
     try:
         # Obtener todos los programas en los que el usuario está inscrito y están completados
-        programas_completados = ProgramaParticipante.objects.filter(
-            participante=request.user,
+        programas_completados = InscripcionPrograma.objects.filter(
+            participante=request.user.perfil_participante,
             estado_programa=EstadoPrograma.COMPLETADO
         ).select_related('programa')
 
@@ -311,7 +283,7 @@ def programa_finalizar(request, pk):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     # Verificar que el usuario es el investigador del programa
-    if programa.creado_por != request.user:
+    if programa.creado_por != request.user.perfil_investigador:
         return Response(
             {"error": "No tienes permiso para finalizar este programa"},
             status=status.HTTP_403_FORBIDDEN
@@ -345,14 +317,14 @@ def programa_inscripciones(request, pk):
         programa = Programa.objects.get(pk=pk)
         
         # Verificar permisos: solo el creador del programa puede ver las inscripciones
-        if programa.creado_por != request.user:
+        if programa.creado_por != request.user.perfil_investigador:
             return Response(
                 {'error': 'No tienes permiso para ver las inscripciones de este programa'},
                 status=status.HTTP_403_FORBIDDEN
             )
         
         # Obtener todas las inscripciones del programa
-        inscripciones = ProgramaParticipante.objects.filter(
+        inscripciones = InscripcionPrograma.objects.filter(
             programa=programa
         ).select_related('participante')
         
@@ -395,24 +367,24 @@ def investigador_estadisticas(request):
 
     try:
         # Programas creados por el investigador
-        programas = Programa.objects.filter(creado_por=request.user)
+        programas = Programa.objects.filter(creado_por=request.user.perfil_investigador)
         total_programas = programas.count()
         
         # Participantes activos en todos los programas
-        participantes_activos = ProgramaParticipante.objects.filter(
-            programa__creado_por=request.user,
+        participantes_activos = InscripcionPrograma.objects.filter(
+            programa__creado_por=request.user.perfil_investigador,
             estado_programa=EstadoPrograma.EN_PROGRESO
         ).count()
         
         # Total de sesiones completadas (diarios registrados)
         total_sesiones_completadas = DiarioSesion.objects.filter(
-            sesion__programa__creado_por=request.user
+            sesion__programa__creado_por=request.user.perfil_investigador
         ).count()
         
         # Total de cuestionarios respondidos
         total_cuestionarios_respondidos = RespuestaCuestionario.objects.filter(
-            Q(cuestionario__programas_pre__creado_por=request.user) | 
-            Q(cuestionario__programas_post__creado_por=request.user)
+            Q(cuestionario__programas_pre__creado_por=request.user.perfil_investigador) | 
+            Q(cuestionario__programas_post__creado_por=request.user.perfil_investigador)
         ).count()
         
         # Estadísticas por programa
@@ -463,6 +435,7 @@ def investigador_estadisticas(request):
         })
         
     except Exception as e:
+        print("Error al obtener estadísticas:", str(e))
         return Response(
             {'error': f'Error al obtener estadísticas: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -487,7 +460,7 @@ def exportar_datos_programa(request, pk):
         programa = Programa.objects.get(pk=pk)
         
         # Verificar que el programa pertenece al investigador actual
-        if programa.creado_por != request.user:
+        if programa.creado_por != request.user.perfil_investigador:
             return Response(
                 {"error": "No tienes permiso para exportar datos de este programa"}, 
                 status=status.HTTP_403_FORBIDDEN
@@ -548,238 +521,280 @@ def recopilar_datos(programa, tipo_exportacion):
     """
     datos = {}
     
-    # Información básica del programa (siempre se incluye)
-    datos['programa'] = {
-        'id': programa.id,
-        'nombre': programa.nombre,
-        'descripcion': programa.descripcion,
-        'tipo_contexto': programa.tipo_contexto,
-        'enfoque_metodologico': programa.enfoque_metodologico,
-        'poblacion_objetivo': programa.poblacion_objetivo,
-        'duracion_semanas': programa.duracion_semanas,
-        'fecha_creacion': programa.fecha_creacion,
-        'fecha_publicacion': programa.fecha_publicacion,
-        'fecha_finalizacion': programa.fecha_finalizacion
-    }
-    
-    # Datos de participantes
-    if tipo_exportacion in ['todos', 'participantes']:
-        datos['participantes'] = []
-        inscripciones = ProgramaParticipante.objects.filter(programa=programa)
-        
-        for inscripcion in inscripciones:
-            participante = inscripcion.participante
-            
-            # Obtener datos anónimos del participante
-            datos_participante = {
-                'id_anonimo': f"P{participante.id}",  # ID anónimo
-                'genero': getattr(participante, 'genero', 'No especificado'),
-                'fecha_inicio': inscripcion.fecha_inicio,
-                'fecha_fin': inscripcion.fecha_fin,
-                'estado_programa': inscripcion.estado_programa
-            }
-            
-            # Añadir estadísticas de participación
-            sesiones_totales = programa.sesiones.count()
-            sesiones_completadas = DiarioSesion.objects.filter(
-                participante=participante,
-                sesion__programa=programa
-            ).count()
-            
-            datos_participante['sesiones_completadas'] = sesiones_completadas
-            datos_participante['porcentaje_completado'] = (sesiones_completadas / sesiones_totales * 100) if sesiones_totales > 0 else 0
-            
-            # Verificar si completó los cuestionarios
-            datos_participante['cuestionario_pre_completado'] = RespuestaCuestionario.objects.filter(
-                usuario=participante,
-                cuestionario__programa=programa,
-                cuestionario__tipo='pre'
-            ).exists()
-            
-            datos_participante['cuestionario_post_completado'] = RespuestaCuestionario.objects.filter(
-                usuario=participante,
-                cuestionario__programa=programa,
-                cuestionario__tipo='post'
-            ).exists()
-            
-            datos['participantes'].append(datos_participante)
-    
-    # Datos de cuestionarios
-    if tipo_exportacion in ['todos', 'cuestionarios']:
-        datos['cuestionarios'] = {
-            'pre': {'preguntas': [], 'respuestas': []},
-            'post': {'preguntas': [], 'respuestas': []}
+    try:
+        # Información básica del programa (siempre se incluye)
+        datos['programa'] = {
+            'id': programa.id,
+            'nombre': programa.nombre,
+            'descripcion': programa.descripcion,
+            'tipo_contexto': programa.tipo_contexto,
+            'enfoque_metodologico': programa.enfoque_metodologico,
+            'poblacion_objetivo': programa.poblacion_objetivo,
+            'duracion_semanas': programa.duracion_semanas,
+            'fecha_creacion': programa.fecha_creacion,
+            'fecha_publicacion': programa.fecha_publicacion,
+            'fecha_finalizacion': programa.fecha_finalizacion
         }
         
-        # Obtener cuestionarios pre y post
-        cuestionario_pre = Cuestionario.objects.filter(programa=programa, tipo='pre').first()
-        cuestionario_post = Cuestionario.objects.filter(programa=programa, tipo='post').first()
-        
-        if cuestionario_pre:
-            datos['cuestionarios']['pre']['id'] = cuestionario_pre.id
-            datos['cuestionarios']['pre']['titulo'] = cuestionario_pre.titulo
-            datos['cuestionarios']['pre']['preguntas'] = cuestionario_pre.preguntas
+        # Datos de participantes
+        if tipo_exportacion in ['todos', 'participantes']:
+            datos['participantes'] = []
+            inscripciones = InscripcionPrograma.objects.filter(programa=programa).select_related('participante')
             
-            # Obtener respuestas anónimas
-            respuestas_pre = RespuestaCuestionario.objects.filter(cuestionario=cuestionario_pre)
-            for resp in respuestas_pre:
-                respuesta_anonima = {
-                    'id_participante_anonimo': f"P{resp.usuario.id}",
-                    'fecha_respuesta': resp.fecha_respuesta,
-                    'respuestas': resp.respuestas
-                }
-                datos['cuestionarios']['pre']['respuestas'].append(respuesta_anonima)
+            for inscripcion in inscripciones:
+                try:
+                    participante = inscripcion.participante
+                    if not participante:
+                        print(f"Advertencia: Inscripción {inscripcion.id} sin participante asociado")
+                        continue
+                        
+                    # Obtener datos anónimos del participante
+                    datos_participante = {
+                        'id_anonimo': f"P{participante.id}",  # ID anónimo
+                        'genero': getattr(participante.usuario, 'genero', 'No especificado'),
+                        'fecha_inicio': inscripcion.fecha_inicio,
+                        'fecha_fin': inscripcion.fecha_fin,
+                        'estado_programa': inscripcion.estado_programa
+                    }
+                    
+                    # Añadir estadísticas de participación
+                    sesiones_totales = programa.sesiones.count()
+                    sesiones_completadas = DiarioSesion.objects.filter(
+                        participante=participante,
+                        sesion__programa=programa
+                    ).count()
+                    
+                    datos_participante['sesiones_completadas'] = sesiones_completadas
+                    datos_participante['porcentaje_completado'] = round((sesiones_completadas / sesiones_totales * 100) if sesiones_totales > 0 else 0, 2)
+                    
+                    # Verificar si completó los cuestionarios
+                    datos_participante['cuestionario_pre_completado'] = RespuestaCuestionario.objects.filter(
+                        usuario=participante.usuario,
+                        cuestionario__programa=programa,
+                        cuestionario__tipo='pre'
+                    ).exists()
+                    
+                    datos_participante['cuestionario_post_completado'] = RespuestaCuestionario.objects.filter(
+                        usuario=participante.usuario,
+                        cuestionario__programa=programa,
+                        cuestionario__tipo='post'
+                    ).exists()
+                    
+                    datos['participantes'].append(datos_participante)
+                except Exception as e:
+                    print(f"Error procesando participante de inscripción {inscripcion.id}: {str(e)}")
+                    continue
         
-        if cuestionario_post:
-            datos['cuestionarios']['post']['id'] = cuestionario_post.id
-            datos['cuestionarios']['post']['titulo'] = cuestionario_post.titulo
-            datos['cuestionarios']['post']['preguntas'] = cuestionario_post.preguntas
-            
-            # Obtener respuestas anónimas
-            respuestas_post = RespuestaCuestionario.objects.filter(cuestionario=cuestionario_post)
-            for resp in respuestas_post:
-                respuesta_anonima = {
-                    'id_participante_anonimo': f"P{resp.usuario.id}",
-                    'fecha_respuesta': resp.fecha_respuesta,
-                    'respuestas': resp.respuestas
-                }
-                datos['cuestionarios']['post']['respuestas'].append(respuesta_anonima)
-    
-    # Datos de diarios de sesión
-    if tipo_exportacion in ['todos', 'diarios']:
-        datos['diarios'] = []
-        
-        # Obtener todas las sesiones y diarios
-        sesiones = Sesion.objects.filter(programa=programa).order_by('semana')
-        
-        for sesion in sesiones:
-            datos_sesion = {
-                'id': sesion.id,
-                'titulo': sesion.titulo,
-                'semana': sesion.semana,
-                'duracion_estimada': sesion.duracion_estimada,
-                'tipo_practica': sesion.tipo_practica,
-                'diarios': []
+        # Datos de cuestionarios
+        if tipo_exportacion in ['todos', 'cuestionarios']:
+            datos['cuestionarios'] = {
+                'pre': {'preguntas': [], 'respuestas': []},
+                'post': {'preguntas': [], 'respuestas': []}
             }
             
-            diarios = DiarioSesion.objects.filter(sesion=sesion)
-            for diario in diarios:
-                diario_anonimo = {
-                    'id_participante_anonimo': f"P{diario.participante.id}",
-                    'fecha_creacion': diario.fecha_creacion,
-                    'valoracion': diario.valoracion,
-                    'comentario': diario.comentario
-                }
-                datos_sesion['diarios'].append(diario_anonimo)
+            # Obtener cuestionarios pre y post
+            cuestionario_pre = Cuestionario.objects.filter(programa=programa, tipo='pre').first()
+            cuestionario_post = Cuestionario.objects.filter(programa=programa, tipo='post').first()
+            
+            if cuestionario_pre:
+                datos['cuestionarios']['pre']['id'] = cuestionario_pre.id
+                datos['cuestionarios']['pre']['titulo'] = cuestionario_pre.titulo
+                datos['cuestionarios']['pre']['preguntas'] = cuestionario_pre.preguntas
                 
-            datos['diarios'].append(datos_sesion)
-    
-    return datos
+                # Obtener respuestas anónimas
+                respuestas_pre = RespuestaCuestionario.objects.filter(cuestionario=cuestionario_pre)
+                for resp in respuestas_pre:
+                    respuesta_anonima = {
+                        'id_participante_anonimo': f"P{resp.usuario.id}",
+                        'fecha_respuesta': resp.fecha_respuesta,
+                        'respuestas': resp.respuestas
+                    }
+                    datos['cuestionarios']['pre']['respuestas'].append(respuesta_anonima)
+            
+            if cuestionario_post:
+                datos['cuestionarios']['post']['id'] = cuestionario_post.id
+                datos['cuestionarios']['post']['titulo'] = cuestionario_post.titulo
+                datos['cuestionarios']['post']['preguntas'] = cuestionario_post.preguntas
+                
+                # Obtener respuestas anónimas
+                respuestas_post = RespuestaCuestionario.objects.filter(cuestionario=cuestionario_post)
+                for resp in respuestas_post:
+                    respuesta_anonima = {
+                        'id_participante_anonimo': f"P{resp.usuario.id}",
+                        'fecha_respuesta': resp.fecha_respuesta,
+                        'respuestas': resp.respuestas
+                    }
+                    datos['cuestionarios']['post']['respuestas'].append(respuesta_anonima)
+        
+        # Datos de diarios de sesión
+        if tipo_exportacion in ['todos', 'diarios']:
+            datos['diarios'] = []
+            
+            # Obtener todas las sesiones y diarios
+            sesiones = Sesion.objects.filter(programa=programa).order_by('semana')
+            
+            for sesion in sesiones:
+                datos_sesion = {
+                    'id': sesion.id,
+                    'titulo': sesion.titulo,
+                    'semana': sesion.semana,
+                    'duracion_estimada': sesion.duracion_estimada,
+                    'tipo_practica': sesion.tipo_practica,
+                    'diarios': []
+                }
+                
+                diarios = DiarioSesion.objects.filter(sesion=sesion)
+                for diario in diarios:
+                    diario_anonimo = {
+                        'id_participante_anonimo': f"P{diario.participante.id}",
+                        'fecha_creacion': diario.fecha_creacion,
+                        'valoracion': diario.valoracion,
+                        'comentario': diario.comentario
+                    }
+                    datos_sesion['diarios'].append(diario_anonimo)
+                
+                datos['diarios'].append(datos_sesion)
+        
+        return datos
+    except Exception as e:
+        print(f"Error en recopilar_datos: {str(e)}")
+        raise
 
 def exportar_csv(datos, nombre_programa, tipo_exportacion):
     """
     Exporta los datos en formato CSV
     """
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = f'attachment; filename="{nombre_programa}_{tipo_exportacion}.csv"'
-    
-    writer = csv.writer(response)
-    
-    # Exportar según el tipo de datos
-    if tipo_exportacion == 'participantes' or tipo_exportacion == 'todos':
-        # Encabezados para participantes
-        if 'participantes' in datos:
-            writer.writerow(['ID Anónimo', 'Género', 'Fecha Inicio', 'Fecha Fin', 'Estado', 
-                             'Sesiones Completadas', 'Porcentaje Completado', 
-                             'Cuestionario Pre Completado', 'Cuestionario Post Completado'])
-            
-            for p in datos['participantes']:
-                writer.writerow([
-                    p['id_anonimo'],
-                    p['genero'],
-                    p['fecha_inicio'],
-                    p['fecha_fin'] if p['fecha_fin'] else 'N/A',
-                    p['estado_programa'],
-                    p['sesiones_completadas'],
-                    f"{p['porcentaje_completado']:.2f}%",
-                    'Sí' if p['cuestionario_pre_completado'] else 'No',
-                    'Sí' if p['cuestionario_post_completado'] else 'No'
-                ])
-    
-    if tipo_exportacion == 'cuestionarios' or tipo_exportacion == 'todos':
-        if 'cuestionarios' in datos:
-            # Cuestionario Pre
-            if datos['cuestionarios']['pre'].get('preguntas'):
-                writer.writerow([])
-                writer.writerow(['CUESTIONARIO PRE'])
-                # Crear encabezados dinámicos según las preguntas
-                encabezados = ['ID Participante', 'Fecha Respuesta']
+    try:
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{nombre_programa}_{tipo_exportacion}.csv"'
+        
+        writer = csv.writer(response)
+        
+        # Exportar según el tipo de datos
+        if tipo_exportacion == 'participantes' or tipo_exportacion == 'todos':
+            # Encabezados para participantes
+            if 'participantes' in datos:
+                writer.writerow(['ID Anónimo', 'Género', 'Fecha Inicio', 'Fecha Fin', 'Estado', 
+                                'Sesiones Completadas', 'Porcentaje Completado', 
+                                'Cuestionario Pre Completado', 'Cuestionario Post Completado'])
                 
-                # Añadir títulos de las preguntas a los encabezados
-                for pregunta in datos['cuestionarios']['pre']['preguntas']:
-                    encabezados.append(pregunta.get('titulo', f"Pregunta {pregunta.get('id', '')}")[:50])
+                for p in datos['participantes']:
+                    try:
+                        writer.writerow([
+                            p.get('id_anonimo', 'N/A'),
+                            p.get('genero', 'No especificado'),
+                            p.get('fecha_inicio', 'N/A'),
+                            p.get('fecha_fin', 'N/A') if p.get('fecha_fin') else 'N/A',
+                            p.get('estado_programa', 'N/A'),
+                            p.get('sesiones_completadas', 0),
+                            f"{p.get('porcentaje_completado', 0):.2f}%",
+                            'Sí' if p.get('cuestionario_pre_completado', False) else 'No',
+                            'Sí' if p.get('cuestionario_post_completado', False) else 'No'
+                        ])
+                    except Exception as e:
+                        print(f"Error escribiendo fila de participante: {str(e)}")
+                        continue
+        
+        if tipo_exportacion == 'cuestionarios' or tipo_exportacion == 'todos':
+            if 'cuestionarios' in datos:
+                # Cuestionario Pre
+                if datos['cuestionarios']['pre'].get('preguntas'):
+                    try:
+                        writer.writerow([])
+                        writer.writerow(['CUESTIONARIO PRE'])
+                        # Crear encabezados dinámicos según las preguntas
+                        encabezados = ['ID Participante', 'Fecha Respuesta']
+                        
+                        # Añadir títulos de las preguntas a los encabezados
+                        for pregunta in datos['cuestionarios']['pre']['preguntas']:
+                            encabezados.append(pregunta.get('titulo', f"Pregunta {pregunta.get('id', '')}")[:50])
+                        
+                        writer.writerow(encabezados)
+                        
+                        # Añadir respuestas
+                        for respuesta in datos['cuestionarios']['pre']['respuestas']:
+                            try:
+                                fila = [
+                                    respuesta.get('id_participante_anonimo', 'N/A'),
+                                    respuesta.get('fecha_respuesta', 'N/A')
+                                ]
+                                
+                                # Para cada pregunta en el cuestionario, buscar la respuesta correspondiente
+                                for pregunta in datos['cuestionarios']['pre']['preguntas']:
+                                    pregunta_id = str(pregunta.get('id', ''))
+                                    respuestas = respuesta.get('respuestas', {})
+                                    fila.append(respuestas.get(pregunta_id, 'N/A'))
+                                
+                                writer.writerow(fila)
+                            except Exception as e:
+                                print(f"Error escribiendo respuesta pre: {str(e)}")
+                                continue
+                    except Exception as e:
+                        print(f"Error procesando cuestionario pre: {str(e)}")
                 
-                writer.writerow(encabezados)
-                
-                # Añadir respuestas
-                for respuesta in datos['cuestionarios']['pre']['respuestas']:
-                    fila = [respuesta['id_participante_anonimo'], respuesta['fecha_respuesta']]
+                # Cuestionario Post
+                if datos['cuestionarios']['post'].get('preguntas'):
+                    try:
+                        writer.writerow([])
+                        writer.writerow(['CUESTIONARIO POST'])
+                        # Crear encabezados dinámicos según las preguntas
+                        encabezados = ['ID Participante', 'Fecha Respuesta']
+                        
+                        # Añadir títulos de las preguntas a los encabezados
+                        for pregunta in datos['cuestionarios']['post']['preguntas']:
+                            encabezados.append(pregunta.get('titulo', f"Pregunta {pregunta.get('id', '')}")[:50])
+                        
+                        writer.writerow(encabezados)
+                        
+                        # Añadir respuestas
+                        for respuesta in datos['cuestionarios']['post']['respuestas']:
+                            try:
+                                fila = [
+                                    respuesta.get('id_participante_anonimo', 'N/A'),
+                                    respuesta.get('fecha_respuesta', 'N/A')
+                                ]
+                                
+                                # Para cada pregunta en el cuestionario, buscar la respuesta correspondiente
+                                for pregunta in datos['cuestionarios']['post']['preguntas']:
+                                    pregunta_id = str(pregunta.get('id', ''))
+                                    respuestas = respuesta.get('respuestas', {})
+                                    fila.append(respuestas.get(pregunta_id, 'N/A'))
+                                
+                                writer.writerow(fila)
+                            except Exception as e:
+                                print(f"Error escribiendo respuesta post: {str(e)}")
+                                continue
+                    except Exception as e:
+                        print(f"Error procesando cuestionario post: {str(e)}")
+        
+        if tipo_exportacion == 'diarios' or tipo_exportacion == 'todos':
+            if 'diarios' in datos:
+                try:
+                    writer.writerow([])
+                    writer.writerow(['DIARIOS DE SESIONES'])
+                    writer.writerow(['Semana', 'Sesión', 'ID Participante', 'Fecha', 'Valoración', 'Comentario'])
                     
-                    # Para cada pregunta en el cuestionario, buscar la respuesta correspondiente
-                    for pregunta in datos['cuestionarios']['pre']['preguntas']:
-                        pregunta_id = str(pregunta.get('id', ''))
-                        if pregunta_id in respuesta['respuestas']:
-                            fila.append(respuesta['respuestas'][pregunta_id])
-                        else:
-                            fila.append('N/A')
-                    
-                    writer.writerow(fila)
-            
-            # Cuestionario Post
-            if datos['cuestionarios']['post'].get('preguntas'):
-                writer.writerow([])
-                writer.writerow(['CUESTIONARIO POST'])
-                # Crear encabezados dinámicos según las preguntas
-                encabezados = ['ID Participante', 'Fecha Respuesta']
-                
-                # Añadir títulos de las preguntas a los encabezados
-                for pregunta in datos['cuestionarios']['post']['preguntas']:
-                    encabezados.append(pregunta.get('titulo', f"Pregunta {pregunta.get('id', '')}")[:50])
-                
-                writer.writerow(encabezados)
-                
-                # Añadir respuestas
-                for respuesta in datos['cuestionarios']['post']['respuestas']:
-                    fila = [respuesta['id_participante_anonimo'], respuesta['fecha_respuesta']]
-                    
-                    # Para cada pregunta en el cuestionario, buscar la respuesta correspondiente
-                    for pregunta in datos['cuestionarios']['post']['preguntas']:
-                        pregunta_id = str(pregunta.get('id', ''))
-                        if pregunta_id in respuesta['respuestas']:
-                            fila.append(respuesta['respuestas'][pregunta_id])
-                        else:
-                            fila.append('N/A')
-                    
-                    writer.writerow(fila)
-    
-    if tipo_exportacion == 'diarios' or tipo_exportacion == 'todos':
-        if 'diarios' in datos:
-            writer.writerow([])
-            writer.writerow(['DIARIOS DE SESIONES'])
-            writer.writerow(['Semana', 'Sesión', 'ID Participante', 'Fecha', 'Valoración', 'Comentario'])
-            
-            for sesion in datos['diarios']:
-                for diario in sesion['diarios']:
-                    writer.writerow([
-                        sesion['semana'],
-                        sesion['titulo'],
-                        diario['id_participante_anonimo'],
-                        diario['fecha_creacion'],
-                        diario['valoracion'],
-                        diario['comentario'] if diario['comentario'] else 'N/A'
-                    ])
-    
-    return response
+                    for sesion in datos['diarios']:
+                        for diario in sesion.get('diarios', []):
+                            try:
+                                writer.writerow([
+                                    sesion.get('semana', 'N/A'),
+                                    sesion.get('titulo', 'N/A'),
+                                    diario.get('id_participante_anonimo', 'N/A'),
+                                    diario.get('fecha_creacion', 'N/A'),
+                                    diario.get('valoracion', 'N/A'),
+                                    diario.get('comentario', 'N/A')
+                                ])
+                            except Exception as e:
+                                print(f"Error escribiendo diario: {str(e)}")
+                                continue
+                except Exception as e:
+                    print(f"Error procesando diarios: {str(e)}")
+        
+        return response
+    except Exception as e:
+        print(f"Error en exportar_csv: {str(e)}")
+        raise
 
 def exportar_excel(datos, nombre_programa, tipo_exportacion):
     """
@@ -928,3 +943,28 @@ def exportar_json(datos, nombre_programa, tipo_exportacion):
     response['Content-Disposition'] = f'attachment; filename="{nombre_programa}_{tipo_exportacion}.json"'
     
     return response
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def listar_participantes_programa(request, pk):
+    # Verificar que el usuario es investigador
+    if not request.user.is_investigador():
+        return Response(
+            {"error": "No tienes permisos para ver los participantes del programa"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Obtener el programa
+    programa = get_object_or_404(Programa, id=pk)
+    
+    # Verificar que el investigador es el creador del programa
+    if programa.creado_por != request.user.perfil_investigador:
+        return Response(
+            {"error": "Solo el investigador creador puede ver los participantes del programa"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Serializar y devolver los datos
+    serializer = ParticipantesProgramaSerializer(programa)
+    return Response(serializer.data) 
