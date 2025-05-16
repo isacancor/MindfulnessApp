@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
+import { TipoContexto, EnfoqueMetodologico, EstadoPublicacion, getEnumArray } from '../../../constants/enums';
 
 const EditarPrograma = () => {
     const navigate = useNavigate();
@@ -14,34 +15,16 @@ const EditarPrograma = () => {
     const [formData, setFormData] = useState({
         nombre: '',
         descripcion: '',
-        tipo_contexto: '',
-        enfoque_metodologico: '',
+        tipo_contexto: TipoContexto.PERSONAL.value,
+        enfoque_metodologico: EnfoqueMetodologico.MBSR.value,
         duracion_semanas: '',
         poblacion_objetivo: '',
         creado_por: user.id,
-        estado_publicacion: 'borrador'
+        estado_publicacion: EstadoPublicacion.BORRADOR.value
     });
 
-    const tiposContexto = [
-        { value: 'académico', label: 'Académico' },
-        { value: 'laboral', label: 'Laboral' },
-        { value: 'clínico/terapéutico', label: 'Clínico/Terapéutico' },
-        { value: 'deportivo', label: 'Deportivo' },
-        { value: 'personal/desarrollo individual', label: 'Personal/Desarrollo Individual' },
-        { value: 'otro', label: 'Otro' }
-    ];
-
-    const enfoquesMetodologicos = [
-        { value: 'MBSR', label: 'MBSR (Mindfulness-Based Stress Reduction)' },
-        { value: 'MBCT', label: 'MBCT (Mindfulness-Based Cognitive Therapy)' },
-        { value: 'ACT', label: 'ACT (Acceptance and Commitment Therapy)' },
-        { value: 'DBT', label: 'DBT (Dialectical Behavior Therapy)' },
-        { value: 'MSC', label: 'MSC (Mindful Self-Compassion)' },
-        { value: 'MBRP', label: 'MBRP (Mindfulness-Based Relapse Prevention)' },
-        { value: 'MBPM', label: 'MBPM (Mindfulness-Based Pain Management)' },
-        { value: 'propio', label: 'Enfoque propio' },
-        { value: 'otro', label: 'Otro' }
-    ];
+    const tiposContexto = getEnumArray(TipoContexto);
+    const enfoquesMetodologicos = getEnumArray(EnfoqueMetodologico);
 
     useEffect(() => {
         const fetchPrograma = async () => {

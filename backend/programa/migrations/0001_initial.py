@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ('nombre', models.CharField(max_length=255)),
                 ('descripcion', models.TextField()),
                 ('tipo_contexto', models.CharField(choices=[('académico', 'Académico'), ('laboral', 'Laboral'), ('clínico/terapéutico', 'Clínico/Terapéutico'), ('deportivo', 'Deportivo'), ('personal/desarrollo individual', 'Personal/Desarrollo Individual'), ('otro', 'Otro')], default='personal/desarrollo individual', max_length=50)),
-                ('enfoque_metodologico', models.CharField(choices=[('MBSR', 'MBSR (Mindfulness-Based Stress Reduction)'), ('MBCT', 'MBCT (Mindfulness-Based Cognitive Therapy)'), ('ACT', 'ACT (Acceptance and Commitment Therapy)'), ('DBT', 'DBT (Dialectical Behavior Therapy)'), ('MSC', 'MSC (Mindful Self-Compassion)'), ('MBRP', 'MBRP (Mindfulness-Based Relapse Prevention)'), ('MBPM', 'MBPM (Mindfulness-Based Pain Management)'), ('propio', 'Enfoque propio'), ('otro', 'Otro')], default='MBSR', max_length=50)),
+                ('enfoque_metodologico', models.CharField(choices=[('MBSR', 'MBSR (Mindfulness-Based Stress Reduction)'), ('MBCT', 'MBCT (Mindfulness-Based Cognitive Therapy)'), ('MSC', 'MSC (Mindful Self-Compassion)'), ('MBRP', 'MBRP (Mindfulness-Based Relapse Prevention)'), ('MBPM', 'MBPM (Mindfulness-Based Pain Management)'), ('propio', 'Enfoque propio'), ('otro', 'Otro')], default='MBSR', max_length=50)),
                 ('poblacion_objetivo', models.CharField(blank=True, max_length=255, null=True)),
                 ('duracion_semanas', models.PositiveIntegerField()),
                 ('estado_publicacion', models.CharField(choices=[('borrador', 'Borrador'), ('publicado', 'Publicado'), ('finalizado', 'Finalizado')], default='borrador', max_length=20)),

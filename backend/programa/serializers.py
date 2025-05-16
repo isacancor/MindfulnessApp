@@ -1,10 +1,11 @@
 from rest_framework import serializers
-from .models import Programa, TipoContexto, EnfoqueMetodologico, EstadoPublicacion, InscripcionPrograma, EstadoPrograma
+from .models import Programa, InscripcionPrograma
 from usuario.serializers import ParticipanteSerializer, InvestigadorSerializer, UsuarioSerializer
 from sesion.serializers import SesionSerializer
 from django.utils import timezone
 from cuestionario.serializers import CuestionarioSerializer
 from rest_framework.exceptions import ValidationError
+from config.enums import TipoContexto, EnfoqueMetodologico, EstadoPublicacion, EstadoPrograma
 
 class InscripcionProgramaSerializer(serializers.ModelSerializer):
     participante = ParticipanteSerializer(read_only=True)

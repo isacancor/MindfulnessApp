@@ -99,7 +99,7 @@ const ResponderCuestionario = ({ tipo }) => {
 
             // Si es post, navegar a completados con el ID del programa
             if (tipo === 'post') {
-                navigate(`/completados/${response.data.programa_id}`);
+                navigate(`/completados/${response.data.id}`);
             } else {
                 navigate('/miprograma');
             }

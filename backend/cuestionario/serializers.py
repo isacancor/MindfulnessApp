@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Cuestionario, RespuestaCuestionario
 from usuario.models import Participante
+from config.enums import TipoCuestionario
 
 class CuestionarioSerializer(serializers.ModelSerializer):
     class Meta:

@@ -14,8 +14,43 @@ const ListadoParticipantes = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const [programaResponse, inscrip] = await Promise.all([
+                    api.get(`/programas/${id}/participantes/`),
+                    api.get(`/programas/${id}/inscripciones/`)
+                ]);
+
+                setPrograma(programaResponse.data);
+                setParticipantes(programaResponse.data.participantes);
+
+                const inscripcionesMap = {};
+                inscrip.data.forEach(inscripcion => {
+                    inscripcionesMap[inscripcion.participante] = inscripcion;
+                });
+                setInscripciones(inscripcionesMap);
+            } catch (error) {
+                console.error('Error al cargar los datos:', error);
+                setError('Error al cargar los datos');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [id]);
+
+    /*
+
+    useEffect(() => {
         const fetchParticipantes = async () => {
             try {
+                setLoading(true);
+                setError(null);
+
                 const response = await api.get(`/programas/${id}/participantes/`);
                 setPrograma(response.data);
                 setParticipantes(response.data.participantes);
@@ -32,6 +67,9 @@ const ListadoParticipantes = () => {
 
     const fetchInscripciones = async () => {
         try {
+            setLoading(true);
+            setError(null);
+
             const inscrip = await api.get(`/programas/${id}/inscripciones/`);
             const inscripcionesMap = {};
             inscrip.data.forEach(inscripcion => {
@@ -48,7 +86,7 @@ const ListadoParticipantes = () => {
 
     useEffect(() => {
         fetchInscripciones();
-    }, [id]);
+    }, [id]);*/
 
     if (loading) {
         return (
@@ -107,12 +145,12 @@ const ListadoParticipantes = () => {
                                                 <h3 className="text-lg font-medium text-gray-900">
                                                     {participante.nombre} {participante.apellidos}
                                                 </h3>
-                                                {inscripciones[participante.id] && (
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inscripciones[participante.id].estado_programa === 'completado'
+                                                {inscripciones[participante.perfil_participante.id] && (
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${inscripciones[participante.perfil_participante.id].estado_programa === 'completado'
                                                         ? 'bg-green-100 text-green-800'
                                                         : 'bg-blue-100 text-blue-800'
                                                         }`}>
-                                                        {inscripciones[participante.id].estado_programa === 'completado' ? (
+                                                        {inscripciones[participante.perfil_participante.id].estado_programa === 'completado' ? (
                                                             <>
                                                                 <CheckCircle className="h-3 w-3 mr-1" />
                                                                 Completado

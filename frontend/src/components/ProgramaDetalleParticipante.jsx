@@ -6,20 +6,6 @@ import ErrorAlert from './ErrorAlert';
 import ProgresoPrograma from './ProgresoPrograma';
 import ProgramaFinalizado from '../pages/programas/participante/ProgramaFinalizado';
 
-/**
- * Componente reutilizable para mostrar los detalles de un programa
- * 
- * @param {Object} props - Props del componente
- * @param {Object} props.programa - Datos del programa a mostrar
- * @param {boolean} props.loading - Indica si está cargando
- * @param {string} props.error - Mensaje de error, si existe
- * @param {function} props.setError - Función para limpiar el error
- * @param {Object} props.progreso - Datos de progreso (sesionesCompletadas, totalSesiones, minutosCompletados)
- * @param {boolean} props.cuestionarioPreRespondido - Indica si el cuestionario pre ha sido respondido
- * @param {boolean} props.cuestionarioPostRespondido - Indica si el cuestionario post ha sido respondido
- * @param {boolean} props.esCompletado - Indica si se está mostrando un programa completado
- * @param {boolean} props.permitirNavegacionCuestionarios - Indica si se debe permitir la navegación a los cuestionarios
- */
 const ProgramaDetalle = ({
     programa,
     loading,
@@ -98,7 +84,7 @@ const ProgramaDetalle = ({
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">{programa.nombre}</h1>
                             <p className="text-sm text-gray-500 mt-1">
-                                Por {programa.creado_por.nombre} {programa.creado_por.apellidos}
+                                Por {programa.creado_por.nombre_completo_investigador}
                             </p>
                         </div>
                         <div className="flex flex-col items-end space-y-2">

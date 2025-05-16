@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion, CheckCircle, UserCheck } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
+import { EstadoPublicacion } from '../../../constants/enums';
 
 const DetallePrograma = () => {
     const { id } = useParams();
@@ -192,15 +193,15 @@ const DetallePrograma = () => {
                         {/* Título y Estado */}
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 mb-2">{programa.nombre}</h1>
-                            <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${programa.estado_publicacion === 'publicado'
+                            <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${programa.estado_publicacion === EstadoPublicacion.PUBLICADO.value
                                 ? 'bg-green-100 text-green-800'
-                                : programa.estado_publicacion === 'finalizado'
+                                : programa.estado_publicacion === EstadoPublicacion.FINALIZADO.value
                                     ? 'bg-red-100 text-red-800'
                                     : 'bg-yellow-100 text-yellow-800'
                                 }`}>
-                                {programa.estado_publicacion === 'publicado'
+                                {programa.estado_publicacion === EstadoPublicacion.PUBLICADO.value
                                     ? 'Publicado'
-                                    : programa.estado_publicacion === 'finalizado'
+                                    : programa.estado_publicacion === EstadoPublicacion.FINALIZADO.value
                                         ? 'Finalizado'
                                         : 'Borrador'}
                             </span>
@@ -412,7 +413,7 @@ const DetallePrograma = () => {
                                             </div>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${sesion.tipo_practica === 'focus_attention' ? 'bg-blue-100 text-blue-800' :
+                                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${(sesion.tipo_practica === 'breath' || sesion.tipo_practica === 'sounds' || sesion.tipo_practica === 'visual_object' || sesion.tipo_practica === 'senses' || sesion.tipo_practica === 'open_awareness') ? 'bg-blue-100 text-blue-800' :
                                                 sesion.tipo_practica === 'open_monitoring' ? 'bg-green-100 text-green-800' :
                                                     sesion.tipo_practica === 'loving_kindness' ? 'bg-purple-100 text-purple-800' :
                                                         sesion.tipo_practica === 'body_scan' ? 'bg-yellow-100 text-yellow-800' :

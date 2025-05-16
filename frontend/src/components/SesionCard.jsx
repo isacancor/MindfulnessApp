@@ -1,10 +1,46 @@
+import React from 'react';
 import { CheckCircle2, AlertCircle, Timer, Music, Video, Clock, Link, Repeat, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { EtiquetaPractica, TipoContenido } from '../constants/enums';
 
-const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido }) => {
+const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, programa, isInvestigador }) => {
     const navigate = useNavigate();
     const isAvailable = cuestionarioPreRespondido && (index === 0 || sesiones[index - 1]?.completada);
     const isCompleted = sesion.completada;
+
+    const getTipoPracticaColor = (tipo) => {
+        switch (tipo) {
+            case EtiquetaPractica.BREATH.value:
+                return 'bg-blue-100 text-blue-800';
+            case EtiquetaPractica.OPEN_AWARENESS.value:
+                return 'bg-green-100 text-green-800';
+            case EtiquetaPractica.LOVING_KINDNESS.value:
+                return 'bg-purple-100 text-purple-800';
+            case EtiquetaPractica.BODY_SCAN.value:
+                return 'bg-yellow-100 text-yellow-800';
+            case EtiquetaPractica.MINDFUL_MOVEMENT.value:
+                return 'bg-red-100 text-red-800';
+            case EtiquetaPractica.SELF_COMPASSION.value:
+                return 'bg-pink-100 text-pink-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const getTipoContenidoIcon = (tipo) => {
+        switch (tipo) {
+            case TipoContenido.TEMPORIZADOR.value:
+                return <Timer className="h-4 w-4 mr-1 text-blue-500" />;
+            case TipoContenido.ENLACE.value:
+                return <Link className="h-4 w-4 mr-1 text-green-500" />;
+            case TipoContenido.AUDIO.value:
+                return <Music className="h-4 w-4 mr-1 text-purple-500" />;
+            case TipoContenido.VIDEO.value:
+                return <Video className="h-4 w-4 mr-1 text-red-500" />;
+            default:
+                return null;
+        }
+    };
 
     // Calcular fechas de inicio y fin de la semana correspondiente a la sesión
     const calcularFechas = () => {
@@ -69,22 +105,12 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido }) => {
                         <Clock className="h-4 w-4 mr-1" />
                         <span>{sesion.duracion_estimada} minutos</span>
                         <span className="mx-2">•</span>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${sesion.tipo_practica === 'focus_attention' ? 'bg-blue-100 text-blue-800' :
-                            sesion.tipo_practica === 'open_monitoring' ? 'bg-green-100 text-green-800' :
-                                sesion.tipo_practica === 'loving_kindness' ? 'bg-purple-100 text-purple-800' :
-                                    sesion.tipo_practica === 'body_scan' ? 'bg-yellow-100 text-yellow-800' :
-                                        sesion.tipo_practica === 'mindful_movement' ? 'bg-red-100 text-red-800' :
-                                            sesion.tipo_practica === 'self_compassion' ? 'bg-pink-100 text-pink-800' :
-                                                'bg-gray-100 text-gray-800'
-                            }`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTipoPracticaColor(sesion.tipo_practica)}`}>
                             {sesion.tipo_practica_display}
                         </span>
                         <span className="mx-2">•</span>
                         <span className="flex items-center">
-                            {sesion.tipo_contenido === 'temporizador' && <Timer className="h-4 w-4 mr-1 text-blue-500" />}
-                            {sesion.tipo_contenido === 'enlace' && <Link className="h-4 w-4 mr-1 text-green-500" />}
-                            {sesion.tipo_contenido === 'audio' && <Music className="h-4 w-4 mr-1 text-purple-500" />}
-                            {sesion.tipo_contenido === 'video' && <Video className="h-4 w-4 mr-1 text-red-500" />}
+                            {getTipoContenidoIcon(sesion.tipo_contenido)}
                             {sesion.tipo_contenido_display}
                         </span>
                     </div>

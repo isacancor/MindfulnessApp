@@ -3,10 +3,7 @@ from programa.models import Programa
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from usuario.models import Participante
-
-class TipoCuestionario(models.TextChoices):
-    PRE = 'pre', 'Pre'
-    POST = 'post', 'Post'
+from config.enums import TipoCuestionario
 
 class Cuestionario(models.Model):
     programa = models.ForeignKey(

@@ -3,42 +3,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.validators import UnicodeUsernameValidator
-
-class RoleUsuario(models.TextChoices):
-    ADMIN = 'ADMIN', 'Administrador'
-    INVESTIGADOR = 'INVESTIGADOR', 'Investigador'
-    PARTICIPANTE = 'PARTICIPANTE', 'Participante'
-
-class Genero(models.TextChoices):
-    MASCULINO = 'masculino', _('Masculino')
-    FEMENINO = 'femenino', _('Femenino')
-    TRANSGENERO = 'transgenero', _('Transgenero')
-    NO_BINARIO = 'no_binario', _('No binario')
-    OTRO = 'otro', _('Otro')
-    PREFIERO_NO_DECIR = 'prefiero_no_decir', _('Prefiero no decir')
-
-class NivelEducativo(models.TextChoices):
-    SIN_ESTUDIOS = 'sin_estudios', _('Sin Estudios')
-    PRIMARIA = 'primaria', _('Primaria')
-    SECUNDARIA = 'secundaria', _('Secundaria')
-    BACHILLERATO = 'bachillerato', _('Bachillerato')
-    FP = 'formacion_profesional', _('Formación Profesional')
-    UNIVERSIDAD = 'universidad', _('Universidad')
-    MASTER = 'master', _('Master')
-    DOCTORADO = 'doctorado', _('Doctorado')
-    OTROS = 'otros', _('Otros')
-
-class ExperienciaMindfulness(models.TextChoices):
-    NINGUNA = 'ninguna', _('Ninguna')
-    MENOS_6_MESES = 'menos_de_6_meses', _('Menos de 6 meses')
-    ENTRE_6_12_MESES = '6_meses_1_ano', _('6 meses - 1 año')
-    ENTRE_1_2_ANOS = '1_2_anos', _('1 - 2 años')
-    MAS_2_ANOS = 'mas_de_2_anos', _('Más de 2 años')
-
-class ExperienciaInvestigacion(models.TextChoices):
-    SI = 'si', _('Sí')
-    NO = 'no', _('No')
-    EN_PARTE = 'en_parte', _('En parte')
+from config.enums import (
+    RoleUsuario, Genero, NivelEducativo,
+    ExperienciaMindfulness, ExperienciaInvestigacion
+)
 
 class Usuario(AbstractUser):
     nombre = models.CharField(_("first name"), max_length=150, blank=True)
@@ -99,7 +67,6 @@ class Usuario(AbstractUser):
 
     def is_admin(self):
         return self.role == RoleUsuario.ADMIN
-
 class Investigador(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_investigador')
     experienciaInvestigacion = models.CharField(
@@ -125,3 +92,4 @@ class Participante(models.Model):
 
     def __str__(self):
         return f"Participante: {self.usuario.nombre_completo}"
+

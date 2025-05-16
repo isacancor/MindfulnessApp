@@ -31,7 +31,22 @@ class Migration(migrations.Migration):
                 ('descripcion', models.TextField(blank=True, null=True)),
                 ('semana', models.PositiveIntegerField(help_text='Número de semana en el programa')),
                 ('duracion_estimada', models.PositiveIntegerField(blank=True, help_text='Duración estimada en minutos', null=True)),
-                ('tipo_practica', models.CharField(choices=[('focus_attention', 'Atención Focalizada'), ('open_monitoring', 'Monitoreo Abierto'), ('loving_kindness', 'Amorosa Bondad'), ('body_scan', 'Escaneo Corporal'), ('mindful_movement', 'Movimiento Consciente'), ('self_compassion', 'Auto-compasión'), ('otro', 'Otro')], default='focus_attention', max_length=50)),
+                ('tipo_practica', models.CharField(
+                    choices=[
+                        ('breath', 'Atención Focalizada en la Respiración'),
+                        ('sounds', 'Atención Focalizada en los Sonidos'),
+                        ('visual_object', 'Atención Focalizada en un Objeto visual'),
+                        ('senses', 'Atención Focalizada en los Sentidos'),
+                        ('open_awareness', 'Conciencia Abierta'),
+                        ('loving_kindness', 'Loving Kindness (Bondad Amorosa)'),
+                        ('body_scan', 'Escaneo Corporal'),
+                        ('self_compassion', 'Auto-compasión'),
+                        ('mindful_movement', 'Movimiento Consciente'),
+                        ('otro', 'Otro'),
+                    ],
+                    default='breath',
+                    max_length=50
+                )),
                 ('tipo_contenido', models.CharField(choices=[('temporizador', 'Temporizador'), ('enlace', 'Enlace'), ('audio', 'Audio'), ('video', 'Video')], default='temporizador', max_length=50)),
                 ('tipo_escala', models.CharField(choices=[('emocional', 'Estado emocional [1–5]'), ('utilidad', 'Utilidad de la sesión [1–5]'), ('estres', 'PSS (estrés) [0–4]'), ('bienestar', 'VAS (bienestar general) [0–10]')], default='emocional', max_length=50)),
                 ('contenido_temporizador', models.PositiveIntegerField(blank=True, help_text='Duración del temporizador en minutos', null=True)),

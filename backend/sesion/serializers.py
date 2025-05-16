@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from .models import Sesion, DiarioSesion, EtiquetaPractica, TipoContenido, Escala
+from .models import Sesion, DiarioSesion
 from usuario.serializers import ParticipanteSerializer
+from config.enums import EtiquetaPractica, TipoContenido, Escala
 
 class EtiquetaPracticaSerializer(serializers.Serializer):
     value = serializers.CharField(source='value')

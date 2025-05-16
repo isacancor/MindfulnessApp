@@ -2,6 +2,7 @@ import { User, Mail, Calendar, BookOpen, Briefcase, MapPin, Phone, ClipboardList
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ErrorAlert from '../ErrorAlert';
+import { Genero, NivelEducativo, ExperienciaInvestigacion } from '../../constants/enums';
 
 const PerfilInvestigador = () => {
     const { user, error, resetError } = useAuth();
@@ -24,39 +25,17 @@ const PerfilInvestigador = () => {
 
     // Función para formatear el género
     const formatGenero = (genero) => {
-        const generos = {
-            'masculino': 'Masculino',
-            'femenino': 'Femenino',
-            'otro': 'Otro',
-            'prefiero_no_decir': 'Prefiero no decir'
-        };
-        return generos[genero] || 'No especificado';
+        return Genero[genero?.toUpperCase()]?.label || 'No especificado';
     };
 
     // Función para formatear el nivel educativo
     const formatNivelEducativo = (nivel) => {
-        const niveles = {
-            'sin_estudios': 'Sin Estudios',
-            'primaria': 'Primaria',
-            'secundaria': 'Secundaria',
-            'bachillerato': 'Bachillerato',
-            'formacion_profesional': 'Formación Profesional',
-            'universidad': 'Universidad',
-            'master': 'Master',
-            'doctorado': 'Doctorado',
-            'otros': 'Otros'
-        };
-        return niveles[nivel] || 'No especificado';
+        return NivelEducativo[nivel?.toUpperCase()]?.label || 'No especificado';
     };
 
     // Función para formatear la experiencia en investigación
     const formatExperienciaInvestigacion = (experiencia) => {
-        const experiencias = {
-            'Sí': 'Sí',
-            'No': 'No',
-            'En parte': 'En parte'
-        };
-        return experiencias[experiencia] || 'No especificada';
+        return ExperienciaInvestigacion[experiencia?.toUpperCase()]?.label || 'No especificada';
     };
 
     return (
@@ -143,7 +122,7 @@ const PerfilInvestigador = () => {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Experiencia en Investigación</p>
-                                <p className="text-gray-800 font-medium">{formatExperienciaInvestigacion(user.investigador?.experienciaInvestigacion)}</p>
+                                <p className="text-gray-800 font-medium">{formatExperienciaInvestigacion(user.perfil_investigador?.experienciaInvestigacion)}</p>
                             </div>
                         </div>
                     </div>
@@ -176,9 +155,9 @@ const PerfilInvestigador = () => {
                         Áreas de Interés
                     </h3>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        {user.investigador?.areasInteres?.length > 0 ? (
+                        {user.perfil_investigador?.areasInteres?.length > 0 ? (
                             <div className="flex flex-wrap gap-2">
-                                {user.investigador.areasInteres.map((area) => (
+                                {user.perfil_investigador.areasInteres.map((area) => (
                                     <span
                                         key={area}
                                         className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"

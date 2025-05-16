@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, Users } from 'lucide-react';
 import ErrorAlert from '../../components/ErrorAlert';
+import { Genero, NivelEducativo, ExperienciaMindfulness } from '../../constants/enums';
 
 const RegisterParticipante = () => {
     const { register, loading, error, resetError, isAuthenticated, user } = useAuth();
@@ -25,26 +26,6 @@ const RegisterParticipante = () => {
     });
 
     const [errorEdad, setErrorEdad] = useState('');
-
-    const nivelesEducativos = [
-        'Sin Estudios',
-        'Primaria',
-        'Secundaria',
-        'Bachillerato',
-        'Formación Profesional',
-        'Universidad',
-        'Master',
-        'Doctorado',
-        'Otros'
-    ];
-
-    const experienciaMindfulnessOptions = [
-        { value: 'ninguna', label: 'Ninguna' },
-        { value: 'menos_de_6_meses', label: 'Menos de 6 meses' },
-        { value: '6_meses_1_ano', label: '6 meses - 1 año' },
-        { value: '1_2_anos', label: '1 - 2 años' },
-        { value: 'mas_de_2_anos', label: 'Más de 2 años' }
-    ];
 
     const validarEdad = (fechaNacimiento) => {
         const hoy = new Date();
@@ -243,10 +224,9 @@ const RegisterParticipante = () => {
                                     disabled={loading}
                                 >
                                     <option value="">Selecciona tu género</option>
-                                    <option value="masculino">Masculino</option>
-                                    <option value="femenino">Femenino</option>
-                                    <option value="otro">Otro</option>
-                                    <option value="prefiero_no_decir">Prefiero no decir</option>
+                                    {Object.values(Genero).map(({ value, label }) => (
+                                        <option key={value} value={value}>{label}</option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -288,7 +268,7 @@ const RegisterParticipante = () => {
 
                             <div>
                                 <label htmlFor="experienciaMindfulness" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Experiencia con mindfulness *
+                                    Experiencia en Mindfulness *
                                 </label>
                                 <select
                                     id="experienciaMindfulness"
@@ -299,9 +279,11 @@ const RegisterParticipante = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
-                                    <option value="">Selecciona una opción</option>
-                                    {experienciaMindfulnessOptions.map((opcion) => (
-                                        <option key={opcion.value} value={opcion.value}>{opcion.label}</option>
+                                    <option value="">Selecciona tu experiencia</option>
+                                    {Object.values(ExperienciaMindfulness).map(({ value, label }) => (
+                                        <option key={value} value={value}>
+                                            {label}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
@@ -325,7 +307,7 @@ const RegisterParticipante = () => {
 
                             <div>
                                 <label htmlFor="nivelEducativo" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Nivel educativo *
+                                    Nivel Educativo *
                                 </label>
                                 <select
                                     id="nivelEducativo"
@@ -337,8 +319,10 @@ const RegisterParticipante = () => {
                                     disabled={loading}
                                 >
                                     <option value="">Selecciona tu nivel educativo</option>
-                                    {nivelesEducativos.map((nivel) => (
-                                        <option key={nivel} value={nivel.toLowerCase().replace(/\s+/g, '_')}>{nivel}</option>
+                                    {Object.values(NivelEducativo).map(({ value, label }) => (
+                                        <option key={value} value={value}>
+                                            {label}
+                                        </option>
                                     ))}
                                 </select>
                             </div>

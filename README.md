@@ -60,7 +60,7 @@ Antes de comenzar, asegúrate de tener instalados los siguientes programas en tu
    pip install -r requirements.txt
    ```
 
-4. **Configura las variables de entorno:**:
+4. **Configura las variables de entorno del backend:**:
    Copia el archivo `.env.example` a `.env` en la carpeta /backend y edítalo con la información correcta (como el nombre de la base de datos y credenciales):
 
    ```bash
@@ -105,7 +105,7 @@ Ahora tu backend debería estar corriendo en `http://localhost:8000`.
    npm install
    ```
 
-3. **Configura las variables de entorno:**:
+3. **Configura las variables de entorno del frontend:**:
    Copia el archivo `.env.example` a `.env` en la carpeta /frontend y edítalo con la información correcta:
 
    ```bash

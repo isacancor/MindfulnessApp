@@ -1,12 +1,20 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
-from .models import Usuario, Investigador, Participante, NivelEducativo, ExperienciaMindfulness
+from .models import Usuario, Investigador, Participante
+from config.enums import Genero, NivelEducativo, ExperienciaMindfulness, ExperienciaInvestigacion
 
 class InvestigadorSerializer(serializers.ModelSerializer):
+    nombre_completo_investigador = serializers.SerializerMethodField()
+
     class Meta:
         model = Investigador
-        fields = '__all__'
+        fields = ['id', 'usuario', 'experienciaInvestigacion', 'areasInteres', 'programas', 'nombre_completo_investigador']
+
+    def get_nombre_completo_investigador(self, obj):
+        if obj.usuario:
+            return f"{obj.usuario.nombre} {obj.usuario.apellidos}".strip()
+        return None
 
 class ParticipanteSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,12 +54,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     telefono = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     fechaNacimiento = serializers.DateField(required=False, allow_null=True)
     genero = serializers.ChoiceField(
-        choices=[
-            ('masculino', 'Masculino'),
-            ('femenino', 'Femenino'),
-            ('otro', 'Otro'),
-            ('prefiero_no_decir', 'Prefiero no decir'),
-        ],
+        choices=Genero.choices,
         required=False,
         allow_blank=True
     )
@@ -65,11 +68,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     # Campos específicos de investigador
     experienciaInvestigacion = serializers.ChoiceField(
-        choices=[
-            ('Sí', 'Sí'),
-            ('No', 'No'),
-            ('En parte', 'En parte'),
-        ],
+        choices=ExperienciaInvestigacion.choices,
         required=False,
         allow_blank=True
     )

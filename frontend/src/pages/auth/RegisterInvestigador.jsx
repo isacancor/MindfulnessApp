@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import ErrorAlert from '../../components/ErrorAlert';
+import { Genero, NivelEducativo, ExperienciaInvestigacion } from '../../constants/enums';
 
 const RegisterInvestigador = () => {
     const { register, loading, error, resetError, isAuthenticated, user } = useAuth();
@@ -34,18 +35,6 @@ const RegisterInvestigador = () => {
         'Tecnología',
         'Meditación',
         'Bienestar'
-    ];
-
-    const nivelesEducativos = [
-        'Sin Estudios',
-        'Primaria',
-        'Secundaria',
-        'Bachillerato',
-        'Formación Profesional',
-        'Universidad',
-        'Master',
-        'Doctorado',
-        'Otros'
     ];
 
     const validarEdad = (fechaNacimiento) => {
@@ -254,10 +243,9 @@ const RegisterInvestigador = () => {
                                     disabled={loading}
                                 >
                                     <option value="">Selecciona tu género</option>
-                                    <option value="masculino">Masculino</option>
-                                    <option value="femenino">Femenino</option>
-                                    <option value="otro">Otro</option>
-                                    <option value="prefiero_no_decir">Prefiero no decir</option>
+                                    {Object.values(Genero).map(({ value, label }) => (
+                                        <option key={value} value={value}>{label}</option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -311,9 +299,11 @@ const RegisterInvestigador = () => {
                                     disabled={loading}
                                 >
                                     <option value="">Selecciona una opción</option>
-                                    <option value="Sí">Sí</option>
-                                    <option value="No">No</option>
-                                    <option value="En parte">En parte</option>
+                                    {Object.values(ExperienciaInvestigacion).map(({ value, label }) => (
+                                        <option key={value} value={value}>
+                                            {label}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -348,8 +338,8 @@ const RegisterInvestigador = () => {
                                     disabled={loading}
                                 >
                                     <option value="">Selecciona tu nivel educativo</option>
-                                    {nivelesEducativos.map((nivel) => (
-                                        <option key={nivel} value={nivel.toLowerCase().replace(/\s+/g, '_')}>{nivel}</option>
+                                    {Object.values(NivelEducativo).map(({ value, label }) => (
+                                        <option key={value} value={value}>{label}</option>
                                     ))}
                                 </select>
                             </div>

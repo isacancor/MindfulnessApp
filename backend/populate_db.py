@@ -322,7 +322,7 @@ def run():
             "descripcion": "Aprender a usar la respiración como punto de atención",
             "semana": 2,
             "duracion_estimada": 25,
-            "tipo_practica": "focus_attention",
+            "tipo_practica": "breath",
             "tipo_contenido": "temporizador",
             "contenido_temporizador": 20
         },
@@ -331,7 +331,7 @@ def run():
             "descripcion": "Aprender a usar la respiración como punto de atención",
             "semana": 3,
             "duracion_estimada": 10,
-            "tipo_practica": "focus_attention",
+            "tipo_practica": "breath",
             "tipo_contenido": "temporizador",
             "contenido_temporizador": 10
         }
@@ -507,7 +507,7 @@ def run():
             "descripcion": "Profundizar en la práctica de la atención a la respiración como anclaje al momento presente.",
             "semana": 3,
             "duracion_estimada": 45,
-            "tipo_practica": "focus_attention",
+            "tipo_practica": "breath",
             "tipo_contenido": "temporizador",
             "contenido_temporizador": 20
         },
@@ -516,7 +516,7 @@ def run():
             "descripcion": "Desarrollar la capacidad de permanecer presente frente al estrés y la incomodidad.",
             "semana": 4,
             "duracion_estimada": 45,
-            "tipo_practica": "focus_attention",
+            "tipo_practica": "breath",
             "tipo_contenido": "temporizador",
             "contenido_temporizador": 20
         },
@@ -591,7 +591,7 @@ def run():
             "descripcion": "Prácticas de mindfulness para el cuidado del cuerpo",
             "semana": 2,
             "duracion_estimada": 45,
-            "tipo_practica": "focus_attention",
+            "tipo_practica": "breath",
             "tipo_contenido": "temporizador",
             "contenido_temporizador": 20
         }
@@ -633,7 +633,7 @@ def run():
             "descripcion": "Aprender a usar la respiración como punto de atención",
             "semana": 2,
             "duracion_estimada": 30,
-            "tipo_practica": "focus_attention",
+            "tipo_practica": "breath",
             "tipo_contenido": "enlace",
             "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
             "tipo_escala": "estres"
@@ -643,7 +643,7 @@ def run():
             "descripcion": "Aprender a usar la respiración como punto de atención",
             "semana": 3,
             "duracion_estimada": 5,
-            "tipo_practica": "focus_attention",
+            "tipo_practica": "breath",
             "tipo_contenido": "enlace",
             "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
             "tipo_escala": "bienestar"

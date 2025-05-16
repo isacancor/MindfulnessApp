@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import api from '../config/axios';
 import { useNavigate } from 'react-router-dom';
+import { Escala } from '../constants/enums';
 
 const DiarioForm = ({ sesion, onClose }) => {
     const navigate = useNavigate();
@@ -11,13 +12,13 @@ const DiarioForm = ({ sesion, onClose }) => {
 
     const getEscalaInfo = () => {
         switch (sesion.tipo_escala) {
-            case 'emocional':
+            case Escala.EMOCIONAL.value:
                 return { min: 1, max: 5, label: 'Estado emocional' };
-            case 'utilidad':
+            case Escala.UTILIDAD.value:
                 return { min: 1, max: 5, label: 'Utilidad de la sesión' };
-            case 'estres':
+            case Escala.ESTRES.value:
                 return { min: 0, max: 4, label: 'PSS (estrés)' };
-            case 'bienestar':
+            case Escala.BIENESTAR.value:
                 return { min: 0, max: 10, label: 'VAS (bienestar general)' };
             default:
                 return { min: 1, max: 5, label: 'Valoración' };

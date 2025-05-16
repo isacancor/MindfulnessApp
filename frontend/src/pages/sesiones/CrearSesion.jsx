@@ -5,6 +5,7 @@ import { ArrowLeft, Clock } from 'lucide-react';
 import api from '../../config/axios';
 import { prepareSessionFormData } from '../../utils/formData';
 import ErrorAlert from '../../components/ErrorAlert';
+import { EtiquetaPractica, TipoContenido, Escala, getEnumArray } from '../../constants/enums';
 
 const CrearSesion = () => {
     const navigate = useNavigate();
@@ -19,38 +20,18 @@ const CrearSesion = () => {
         descripcion: '',
         semana: '',
         duracion_estimada: '',
-        tipo_practica: 'focus_attention',
-        tipo_contenido: 'temporizador',
-        tipo_escala: 'emocional',
+        tipo_practica: EtiquetaPractica.BREATH.value,
+        tipo_contenido: TipoContenido.TEMPORIZADOR.value,
+        tipo_escala: Escala.EMOCIONAL.value,
         contenido_temporizador: 0,
         contenido_url: '',
         contenido_audio: null,
         contenido_video: null
     });
 
-    const tiposPractica = [
-        { value: 'focus_attention', label: 'Atención Focalizada' },
-        { value: 'open_monitoring', label: 'Monitoreo Abierto' },
-        { value: 'loving_kindness', label: 'Amorosa Bondad' },
-        { value: 'body_scan', label: 'Escaneo Corporal' },
-        { value: 'mindful_movement', label: 'Movimiento Consciente' },
-        { value: 'self_compassion', label: 'Auto-compasión' },
-        { value: 'otro', label: 'Otro' }
-    ];
-
-    const tiposContenido = [
-        { value: 'temporizador', label: 'Temporizador' },
-        { value: 'enlace', label: 'Enlace' },
-        { value: 'audio', label: 'Audio' },
-        { value: 'video', label: 'Video' }
-    ];
-
-    const tiposEscala = [
-        { value: 'emocional', label: 'Estado Emocional (1-5)' },
-        { value: 'utilidad', label: 'Utilidad de la Sesión (1-5)' },
-        { value: 'estres', label: 'PSS - Estrés (0-4)' },
-        { value: 'bienestar', label: 'VAS - Bienestar General (0-10)' }
-    ];
+    const tiposPractica = getEnumArray(EtiquetaPractica);
+    const tiposContenido = getEnumArray(TipoContenido);
+    const tiposEscala = getEnumArray(Escala);
 
     useEffect(() => {
         const fetchPrograma = async () => {

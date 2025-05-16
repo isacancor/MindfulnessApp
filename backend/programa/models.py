@@ -3,34 +3,10 @@ from usuario.models import Participante, Investigador
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
-
-class TipoContexto(models.TextChoices):
-    ACADEMICO = 'académico', 'Académico'
-    LABORAL = 'laboral', 'Laboral'
-    CLINICO = 'clínico/terapéutico', 'Clínico/Terapéutico'
-    DEPORTIVO = 'deportivo', 'Deportivo'
-    PERSONAL = 'personal/desarrollo individual', 'Personal/Desarrollo Individual'
-    OTRO = 'otro', 'Otro'
-
-class EnfoqueMetodologico(models.TextChoices):
-    MBSR = 'MBSR', 'MBSR (Mindfulness-Based Stress Reduction)'
-    MBCT = 'MBCT', 'MBCT (Mindfulness-Based Cognitive Therapy)'
-    ACT = 'ACT', 'ACT (Acceptance and Commitment Therapy)'
-    DBT = 'DBT', 'DBT (Dialectical Behavior Therapy)'
-    MSC = 'MSC', 'MSC (Mindful Self-Compassion)'
-    MBRP = 'MBRP', 'MBRP (Mindfulness-Based Relapse Prevention)'
-    MBPM = 'MBPM', 'MBPM (Mindfulness-Based Pain Management)'
-    PROPIO = 'propio', 'Enfoque propio'
-    OTRO = 'otro', 'Otro'
-
-class EstadoPublicacion(models.TextChoices):
-    BORRADOR = 'borrador', 'Borrador'
-    PUBLICADO = 'publicado', 'Publicado'
-    FINALIZADO = 'finalizado', 'Finalizado'
-
-class EstadoPrograma(models.TextChoices):
-    EN_PROGRESO = 'en progreso', 'En progreso'
-    COMPLETADO = 'completado', 'Completado'
+from config.enums import (
+    TipoContexto, EnfoqueMetodologico,
+    EstadoPublicacion, EstadoPrograma
+)
 
 class Programa(models.Model):
     # Identificación y Metadatos Generales

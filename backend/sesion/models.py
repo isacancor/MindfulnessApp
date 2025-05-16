@@ -2,27 +2,7 @@ from django.db import models
 from programa.models import Programa, InscripcionPrograma, EstadoPrograma
 from usuario.models import Participante
 from django.utils import timezone
-
-class Escala(models.TextChoices):
-    EMOCIONAL = 'emocional', 'Estado emocional [1–5]'
-    UTILIDAD = 'utilidad', 'Utilidad de la sesión [1–5]'
-    ESTRES = 'estres', 'PSS (estrés) [0–4]'
-    BIENESTAR = 'bienestar', 'VAS (bienestar general) [0–10]'
-
-class EtiquetaPractica(models.TextChoices):
-    FOCUS_ATTENTION = 'focus_attention', 'Atención Focalizada'
-    OPEN_MONITORING = 'open_monitoring', 'Monitoreo Abierto'
-    LOVING_KINDNESS = 'loving_kindness', 'Amorosa Bondad'
-    BODY_SCAN = 'body_scan', 'Escaneo Corporal'
-    MINDFUL_MOVEMENT = 'mindful_movement', 'Movimiento Consciente'
-    SELF_COMPASSION = 'self_compassion', 'Auto-compasión'
-    OTRO = 'otro', 'Otro'
-
-class TipoContenido(models.TextChoices):
-    TEMPORIZADOR = 'temporizador', 'Temporizador'
-    ENLACE = 'enlace', 'Enlace'
-    AUDIO = 'audio', 'Audio'
-    VIDEO = 'video', 'Video'
+from config.enums import EtiquetaPractica, TipoContenido, Escala
 
 class Sesion(models.Model):
     programa = models.ForeignKey(Programa, on_delete=models.CASCADE, related_name='sesiones')
@@ -33,7 +13,7 @@ class Sesion(models.Model):
     tipo_practica = models.CharField(
         max_length=50,
         choices=EtiquetaPractica.choices,
-        default=EtiquetaPractica.FOCUS_ATTENTION
+        default=EtiquetaPractica.BREATH
     )
     tipo_contenido = models.CharField(
         max_length=50,

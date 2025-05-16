@@ -2,6 +2,7 @@ import { User, Mail, Calendar, Heart, Activity, Phone, MapPin, BookOpen, Clock, 
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ErrorAlert from '../ErrorAlert';
+import { Genero, NivelEducativo, ExperienciaMindfulness } from '../../constants/enums';
 
 const PerfilParticipante = () => {
     const { user, error, resetError } = useAuth();
@@ -24,41 +25,17 @@ const PerfilParticipante = () => {
 
     // Función para formatear el género
     const formatGenero = (genero) => {
-        const generos = {
-            'masculino': 'Masculino',
-            'femenino': 'Femenino',
-            'otro': 'Otro',
-            'prefiero_no_decir': 'Prefiero no decir'
-        };
-        return generos[genero] || 'No especificado';
+        return Genero[genero?.toUpperCase()]?.label || 'No especificado';
     };
 
     // Función para formatear el nivel educativo
     const formatNivelEducativo = (nivel) => {
-        const niveles = {
-            'sin_estudios': 'Sin Estudios',
-            'primaria': 'Primaria',
-            'secundaria': 'Secundaria',
-            'bachillerato': 'Bachillerato',
-            'formacion_profesional': 'Formación Profesional',
-            'universidad': 'Universidad',
-            'master': 'Master',
-            'doctorado': 'Doctorado',
-            'otros': 'Otros'
-        };
-        return niveles[nivel] || 'No especificado';
+        return NivelEducativo[nivel?.toUpperCase()]?.label || 'No especificado';
     };
 
     // Función para formatear la experiencia en mindfulness
     const formatExperienciaMindfulness = (experiencia) => {
-        const experiencias = {
-            'ninguna': 'Ninguna',
-            'menos_de_6_meses': 'Menos de 6 meses',
-            '6_meses_1_ano': '6 meses - 1 año',
-            '1_2_anos': '1 - 2 años',
-            'mas_de_2_anos': 'Más de 2 años'
-        };
-        return experiencias[experiencia] || 'No especificada';
+        return ExperienciaMindfulness[experiencia?.toUpperCase()]?.label || 'No especificada';
     };
 
     return (
@@ -145,7 +122,7 @@ const PerfilParticipante = () => {
                             </div>
                             <div>
                                 <p className="text-sm text-gray-500">Experiencia en Mindfulness</p>
-                                <p className="text-gray-800 font-medium">{formatExperienciaMindfulness(user.participante?.experienciaMindfulness)}</p>
+                                <p className="text-gray-800 font-medium">{formatExperienciaMindfulness(user.perfil_participante?.experienciaMindfulness)}</p>
                             </div>
                         </div>
                     </div>
@@ -170,7 +147,7 @@ const PerfilParticipante = () => {
                         </div>
                         <div>
                             <p className="text-sm text-gray-500">Condiciones de Salud</p>
-                            <p className="text-gray-800 font-medium">{user.participante?.condicionesSalud || 'No especificadas'}</p>
+                            <p className="text-gray-800 font-medium">{user.perfil_participante?.condicionesSalud || 'No especificadas'}</p>
                         </div>
                     </div>
                 </div>
@@ -182,8 +159,8 @@ const PerfilParticipante = () => {
                         Progreso Actual
                     </h3>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        {user.participante?.estudiosActivos?.length > 0 ? (
-                            user.participante.estudiosActivos.map((estudio) => (
+                        {user.perfil_participante?.estudiosActivos?.length > 0 ? (
+                            user.perfil_participante.estudiosActivos.map((estudio) => (
                                 <div key={estudio.id} className="mb-6 last:mb-0">
                                     <div className="flex justify-between items-center mb-2">
                                         <h4 className="font-medium text-gray-800">{estudio.nombre}</h4>
@@ -212,9 +189,9 @@ const PerfilParticipante = () => {
                         Programas Completados
                     </h3>
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        {user.participante?.estudiosCompletados?.length > 0 ? (
+                        {user.perfil_participante?.estudiosCompletados?.length > 0 ? (
                             <div className="divide-y divide-gray-100">
-                                {user.participante.estudiosCompletados.map((estudio) => (
+                                {user.perfil_participante.estudiosCompletados.map((estudio) => (
                                     <div key={estudio.id} className="py-4 first:pt-0 last:pb-0">
                                         <div className="flex justify-between items-start">
                                             <div>

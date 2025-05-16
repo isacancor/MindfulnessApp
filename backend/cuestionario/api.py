@@ -357,7 +357,7 @@ def responder_cuestionario_post(request):
             inscripcion.save()
             
             return Response({
-                'pk': programa.id,
+                'id': programa.id,
                 'message': 'Cuestionario respondido y programa completado exitosamente'
             }, status=status.HTTP_201_CREATED)
             
