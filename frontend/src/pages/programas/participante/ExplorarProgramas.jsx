@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BookOpen, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle, Star } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
+import EnrolarProgramaModal from '../../../components/modals/EnrolarProgramaModal';
 
 const ExplorarProgramas = () => {
     const navigate = useNavigate();
@@ -12,6 +13,8 @@ const ExplorarProgramas = () => {
     const [enrolando, setEnrolando] = useState(false);
     const [miProgramaId, setMiProgramaId] = useState(null);
     const [yaEnrolado, setYaEnrolado] = useState(false);
+    const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
+    const [showEnrolarModal, setShowEnrolarModal] = useState(false);
 
     const fetchProgramas = async () => {
         try {
@@ -53,9 +56,14 @@ const ExplorarProgramas = () => {
     }, []);
 
     const handleEnrolar = async (programaId) => {
+        setProgramaSeleccionado(programas.find(p => p.id === programaId));
+        setShowEnrolarModal(true);
+    };
+
+    const confirmarEnrolamiento = async () => {
         setEnrolando(true);
         try {
-            await api.post(`/programas/${programaId}/enrolar/`);
+            await api.post(`/programas/${programaSeleccionado.id}/enrolar/`);
             navigate('/miprograma');
         } catch (error) {
             console.error('Error al enrolarse:', error);
@@ -66,6 +74,7 @@ const ExplorarProgramas = () => {
             }
         } finally {
             setEnrolando(false);
+            setShowEnrolarModal(false);
         }
     };
 
@@ -126,10 +135,9 @@ const ExplorarProgramas = () => {
                         {programas.map((programa) => (
                             <div
                                 key={programa.id}
-                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col" // flex-col para organizar el contenido verticalmente
+                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col"
                             >
-                                {/* Contenido de la tarjeta */}
-                                <div className="p-6 flex-grow"> {/* flex-grow para que ocupe todo el espacio disponible */}
+                                <div className="p-6 flex-grow">
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <h3 className="text-xl font-bold text-gray-900">{programa.nombre}</h3>
@@ -160,8 +168,7 @@ const ExplorarProgramas = () => {
                                     </div>
                                 </div>
 
-                                {/* Botón posicionado al fondo de la tarjeta */}
-                                <div className="p-6 pt-0 mt-auto"> {/* mt-auto para pegarlo al fondo */}
+                                <div className="p-6 pt-0 mt-auto">
                                     {programa.id === miProgramaId ? (
                                         <button
                                             onClick={() => navigate('/miprograma')}
@@ -210,6 +217,13 @@ const ExplorarProgramas = () => {
                     </div>
                 )}
             </div>
+
+            <EnrolarProgramaModal
+                isOpen={showEnrolarModal}
+                onClose={() => setShowEnrolarModal(false)}
+                onConfirm={confirmarEnrolamiento}
+                programa={programaSeleccionado}
+            />
         </div>
     );
 };
