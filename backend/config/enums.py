@@ -67,10 +67,10 @@ class EstadoPrograma(models.TextChoices):
 
 # Enums de Sesión
 class EtiquetaPractica(models.TextChoices):
-    BREATH = 'breath', 'Atención Focalizada en la Respiración'
-    SOUNDS = 'sounds', 'Atención Focalizada en los Sonidos'
-    VISUAL_OBJECT = 'visual_object', 'Atención Focalizada en un Objeto visual'
-    SENSES = 'senses', 'Atención Focalizada en los Sentidos'
+    BREATH = 'breath', 'Atención a la Respiración'
+    SOUNDS = 'sounds', 'Atención a los Sonidos'
+    VISUAL_OBJECT = 'visual_object', 'Atención Focalizada a Objeto visual'
+    SENSES = 'senses', 'Atención Focalizada a Sentidos'
     OPEN_AWARENESS = 'open_awareness', 'Conciencia Abierta'
     LOVING_KINDNESS = 'loving_kindness', 'Loving Kindness (Bondad Amorosa)'
     BODY_SCAN = 'body_scan', 'Escaneo Corporal'

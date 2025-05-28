@@ -43,6 +43,7 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                             Creado el {formatDate(programa.fecha_creacion)}
                         </p>
                     </div>
+                    {/** 
                     <div className="flex space-x-2">
                         {programa.estado_publicacion === 'borrador' && (
                             <>
@@ -71,7 +72,7 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                                 </button>
                             </>
                         )}
-                    </div>
+                    </div>*/}
                 </div>
 
                 <div className="mb-4">
@@ -119,6 +120,7 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                     >
                         Ver detalles →
                     </Link>
+                    {/** 
                     {programa.participantes?.length > 0 && (
                         <Link
                             to={`/programas/${programa.id}/participantes`}
@@ -128,6 +130,7 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                             Ver participantes ({programa.participantes.length})
                         </Link>
                     )}
+                        */}
                 </div>
             </div>
 

@@ -73,10 +73,10 @@ export const EstadoPrograma = {
 
 // Enums de Sesión
 export const EtiquetaPractica = {
-    BREATH: { value: 'breath', label: 'Atención Focalizada en la Respiración' },
-    SOUNDS: { value: 'sounds', label: 'Atención Focalizada en los Sonidos' },
-    VISUAL_OBJECT: { value: 'visual_object', label: 'Atención Focalizada en un Objeto visual' },
-    SENSES: { value: 'senses', label: 'Atención Focalizada en los Sentidos' },
+    BREATH: { value: 'breath', label: 'Atención a la Respiración' },
+    SOUNDS: { value: 'sounds', label: 'Atención a los Sonidos' },
+    VISUAL_OBJECT: { value: 'visual_object', label: 'Atención a un Objeto visual' },
+    SENSES: { value: 'senses', label: 'Atención a los Sentidos' },
     OPEN_AWARENESS: { value: 'open_awareness', label: 'Conciencia Abierta' },
     LOVING_KINDNESS: { value: 'loving_kindness', label: 'Loving Kindness (Bondad Amorosa)' },
     BODY_SCAN: { value: 'body_scan', label: 'Escaneo Corporal' },
