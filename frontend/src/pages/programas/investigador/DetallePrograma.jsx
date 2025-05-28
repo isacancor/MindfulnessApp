@@ -9,28 +9,34 @@ import { EstadoPublicacion } from '../../../constants/enums';
 const DetallePrograma = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { isInvestigador } = useAuth();
+    const { isInvestigador, user } = useAuth();
     const [programa, setPrograma] = useState(null);
     const [sesiones, setSesiones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const fetchPrograma = async () => {
-        try {
-            const response = await api.get(`/programas/${id}/`);
-            setPrograma(response.data);
-            setSesiones(response.data.sesiones)
-        } catch (err) {
-            setError('Error al cargar los datos');
-            console.error('Error:', err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
+        const fetchPrograma = async () => {
+            try {
+                const response = await api.get(`/programas/${id}/`);
+                setPrograma(response.data);
+                setSesiones(response.data.sesiones);
+
+                // Verificar si el usuario es el creador del programa
+                if (response.data.creado_por.id !== user.perfil_investigador.id) {
+                    navigate('/unauthorized');
+                    return;
+                }
+            } catch (err) {
+                setError('Error al cargar los datos');
+                console.error('Error:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchPrograma();
-    }, [id]);
+    }, [id, navigate, user.perfil_investigador.id]);
 
     const handlePublicar = async () => {
         try {

@@ -34,6 +34,10 @@ const EditarPrograma = () => {
                     navigate('/programas');
                     return;
                 }
+                if (response.data.creado_por.id !== user.perfil_investigador.id) {
+                    navigate('/unauthorized');
+                    return;
+                }
                 setFormData(response.data);
             } catch (err) {
                 setError('Error al cargar el programa');
@@ -44,7 +48,7 @@ const EditarPrograma = () => {
         };
 
         fetchPrograma();
-    }, [id, navigate]);
+    }, [id, navigate, user.perfil_investigador.id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
