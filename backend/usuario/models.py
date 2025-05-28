@@ -3,6 +3,8 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.validators import UnicodeUsernameValidator
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from config.enums import (
     RoleUsuario, Genero, NivelEducativo,
     ExperienciaMindfulness, ExperienciaInvestigacion
@@ -67,6 +69,31 @@ class Usuario(AbstractUser):
 
     def is_admin(self):
         return self.role == RoleUsuario.ADMIN
+
+    def save(self, *args, **kwargs):
+        if self._state.adding:  # Solo para nuevos usuarios
+            try:
+                validate_password(self.password, self)
+            except ValidationError as e:
+                raise ValidationError({'password': list(e.messages)})
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        super().clean()
+        if self._state.adding or self._password_changed:
+            try:
+                validate_password(self.password, self)
+            except ValidationError as e:
+                raise ValidationError({'password': list(e.messages)})
+
+    def set_password(self, raw_password):
+        try:
+            validate_password(raw_password, self)
+        except ValidationError as e:
+            raise ValidationError({'password': list(e.messages)})
+        super().set_password(raw_password)
+        self._password_changed = True
+
 class Investigador(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_investigador')
     experienciaInvestigacion = models.CharField(

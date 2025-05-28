@@ -145,14 +145,46 @@ SIMPLE_JWT = {
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
+# Configuración de hashers de contraseñas
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
+# Configuración de validadores de contraseña
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'user_attributes': ('username', 'email', 'nombre', 'apellidos'),
+            'max_similarity': 0.7,
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+
+    # Validador de contraseña compleja 
+    {
+        'NAME': 'usuario.validators.ComplexityPasswordValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
+    },
 ]
+
+# Configuración de PBKDF2 para hacer el hash más seguro
+PASSWORD_HASHERS_ITERATIONS = 390000  # Número de iteraciones para PBKDF2
 
 
 # Internationalization

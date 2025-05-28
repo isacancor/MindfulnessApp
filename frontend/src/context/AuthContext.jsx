@@ -134,7 +134,18 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (err) {
             console.error('Error en el registro:', err);
-            setError(err.response?.data?.message || 'Error al registrarse');
+            if (err.response?.data?.password) {
+                if (err.response?.data?.password[2]) {
+                    setError(err.response?.data?.password[2]);
+                } else if (err.response?.data?.password[1]) {
+                    setError(err.response?.data?.password[1]);
+                } else {
+                    setError(err.response?.data?.password[0]);
+                }
+
+            } else {
+                setError(err.response?.data?.message || 'Error al registrarse');
+            }
         } finally {
             setLoading(false);
         }
