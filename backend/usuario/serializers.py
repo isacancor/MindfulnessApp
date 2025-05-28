@@ -95,6 +95,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             validate_password(attrs['password'])
         except ValidationError as e:
             raise serializers.ValidationError({"password": list(e.messages)})
+        
 
         return attrs
 

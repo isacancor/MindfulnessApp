@@ -1,12 +1,15 @@
-import { User, Mail, Calendar, Heart, Activity, Phone, MapPin, BookOpen, Clock, ArrowLeft } from 'lucide-react';
+import { User, Mail, Calendar, Heart, Activity, Phone, MapPin, BookOpen, Clock, ArrowLeft, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ErrorAlert from '../ErrorAlert';
 import { Genero, NivelEducativo, ExperienciaMindfulness } from '../../constants/enums';
+import { useState } from 'react';
+import ChangePasswordModal from '../auth/ChangePasswordModal';
 
 const PerfilParticipante = () => {
     const { user, error, resetError } = useAuth();
     const navigate = useNavigate();
+    const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
     // Función para formatear la fecha de registro
     const formatDate = (dateString) => {
@@ -61,6 +64,7 @@ const PerfilParticipante = () => {
                             </span>
                         </div>
                         <div className="mt-4">
+                            {/**
                             <button
                                 onClick={() => navigate('/perfil/editar')}
                                 className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
@@ -70,6 +74,14 @@ const PerfilParticipante = () => {
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                                 </svg>
                                 <span>Editar Perfil</span>
+                            </button>
+                            */}
+                            <button
+                                onClick={() => setIsChangePasswordModalOpen(true)}
+                                className="ml-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
+                            >
+                                <Lock className="h-5 w-5" />
+                                <span>Cambiar Contraseña</span>
                             </button>
                         </div>
                     </div>
@@ -215,6 +227,10 @@ const PerfilParticipante = () => {
                     </div>
                 </div>
             </div>
+            <ChangePasswordModal
+                isOpen={isChangePasswordModalOpen}
+                onClose={() => setIsChangePasswordModalOpen(false)}
+            />
         </div>
     );
 };

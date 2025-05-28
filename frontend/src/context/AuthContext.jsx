@@ -132,19 +132,14 @@ export const AuthProvider = ({ children }) => {
             } else {
                 navigate('/home');
             }
-        } catch (err) {
-            console.error('Error en el registro:', err);
-            if (err.response?.data?.password) {
-                if (err.response?.data?.password[2]) {
-                    setError(err.response?.data?.password[2]);
-                } else if (err.response?.data?.password[1]) {
-                    setError(err.response?.data?.password[1]);
-                } else {
-                    setError(err.response?.data?.password[0]);
-                }
-
+        } catch (error) {
+            console.error('Error en el registro:', error);
+            if (error.response?.data?.error) {
+                setError(error.response?.data?.error);
+            } else if (error.response?.data) {
+                setError(error.response?.data);
             } else {
-                setError(err.response?.data?.message || 'Error al registrarse');
+                setError('Error al registrarse');
             }
         } finally {
             setLoading(false);
@@ -176,16 +171,26 @@ export const AuthProvider = ({ children }) => {
     };
 
     // Función para cambiar la contraseña
-    const changePassword = async (passwordData) => {
+    const changePassword = async (oldPassword, newPassword) => {
         try {
-            setLoading(true);
-            setError(null);
-            await api.put('/auth/password', passwordData);
-        } catch (err) {
-            setError(err.response?.data?.message || 'Error al cambiar contraseña');
-            throw err;
-        } finally {
-            setLoading(false);
+            const response = await api.post('/auth/password', {
+                old_password: oldPassword,
+                new_password: newPassword
+            });
+
+            localStorage.setItem('token', response.data.access);
+            localStorage.setItem('refresh', response.data.refresh);
+
+            return response.data;
+        } catch (error) {
+            console.error('Error al cambiar la contraseña:', error);
+            if (error.response?.data?.error) {
+                throw new Error(error.response?.data?.error);
+            } else if (error.response?.data) {
+                throw new Error(error.response?.data);
+            } else {
+                throw new Error('Error al cambiar la contraseña');
+            }
         }
     };
 
