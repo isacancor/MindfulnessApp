@@ -20,9 +20,9 @@ const CrearSesion = () => {
         descripcion: '',
         semana: '',
         duracion_estimada: '',
-        tipo_practica: EtiquetaPractica.BREATH.value,
-        tipo_contenido: TipoContenido.TEMPORIZADOR.value,
-        tipo_escala: Escala.EMOCIONAL.value,
+        tipo_practica: '',
+        tipo_contenido: '',
+        tipo_escala: '',
         contenido_temporizador: 0,
         contenido_url: '',
         contenido_audio: null,
@@ -77,7 +77,9 @@ const CrearSesion = () => {
             navigate(`/programas/${id}`);
         } catch (error) {
             console.error('Error al crear la sesión:', error);
-            if (error.response?.data?.error) {
+            if (error.response.data.non_field_errors) {
+                setError(`Elige una semana válida. La semana ${formData.semana} ya existe`);
+            } else if (error.response?.data?.error) {
                 setError(error.response.data.error);
             } else {
                 setError('Ha ocurrido un error al crear la sesión');
@@ -212,6 +214,7 @@ const CrearSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona un tipo de práctica</option>
                                     {tiposPractica.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
@@ -231,6 +234,7 @@ const CrearSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona un tipo de contenido</option>
                                     {tiposContenido.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
@@ -250,6 +254,7 @@ const CrearSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona un tipo de escala</option>
                                     {tiposEscala.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}

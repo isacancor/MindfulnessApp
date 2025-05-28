@@ -14,8 +14,8 @@ const CrearPrograma = () => {
     const [formData, setFormData] = useState({
         nombre: '',
         descripcion: '',
-        tipo_contexto: TipoContexto.PERSONAL.value,
-        enfoque_metodologico: EnfoqueMetodologico.MBSR.value,
+        tipo_contexto: '',
+        enfoque_metodologico: '',
         duracion_semanas: '',
         poblacion_objetivo: '',
         creado_por: user.id,

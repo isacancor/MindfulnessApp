@@ -51,6 +51,7 @@ const EditarSesion = () => {
             } catch (error) {
                 console.error('Error al cargar los datos:', error);
                 setError('Error al cargar los datos');
+
             }
         };
         fetchData();
@@ -87,7 +88,10 @@ const EditarSesion = () => {
             navigate(`/programas/${id}`);
         } catch (error) {
             console.error('Error al actualizar la sesión:', error);
-            if (error.response?.data?.error) {
+
+            if (error.response.data.non_field_errors) {
+                setError(`Elige una semana válida. La semana ${formData.semana} ya existe`);
+            } else if (error.response?.data?.error) {
                 setError(error.response.data.error);
             } else {
                 setError('Ha ocurrido un error al actualizar la sesión');

@@ -19,7 +19,7 @@ export const SesionProtectedRoute = ({ children }) => {
             }
 
             try {
-                // Verificar que el usuario tenga acceso a esta sesión - una sola petición para obtener toda la info necesaria
+                // Verificar que el usuario tenga acceso a esta sesión
                 const programaResponse = await api.get('/programas/mi-programa/');
 
                 // Verificar que haya completado el cuestionario pre

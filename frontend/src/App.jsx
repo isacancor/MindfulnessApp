@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ROLES } from '@/config/auth';
 import './main.css';
 import { AuthProvider } from '@/context/AuthContext';
@@ -81,7 +81,7 @@ function App() {
           {/* Proteger ruta de sesiones */}
           <Route path="/miprograma/sesion/:sesionId" element={
             <SesionProtectedRoute>
-              <HacerSesion />
+              <HacerSesion completado={false} />
             </SesionProtectedRoute>
           } />
 
@@ -96,6 +96,7 @@ function App() {
 
           <Route path="/completados" element={<ProgramasCompletados />} />
           <Route path="/completados/:id" element={<ProgramaCompletado />} />
+          <Route path="/completados/:programaId/sesion/:sesionId" element={<HacerSesion completado={true} />} />
         </Route>
 
         {/* Rutas protegidas para admin */}
@@ -106,6 +107,9 @@ function App() {
           <Route path="/admin/programas" element={<div>Gestión de Programas</div>} />
         </Route>
         */}
+
+        {/* Ruta comodín para manejar rutas no existentes */}
+        <Route path="*" element={<Navigate to="/unauthorized" replace />} />
 
       </Routes>
     </AuthProvider>

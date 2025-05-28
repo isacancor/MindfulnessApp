@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../../config/axios';
 import ProgramaDetalle from '../../../../components/ProgramaDetalleParticipante';
 
 const ProgramaCompletado = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [programa, setPrograma] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -17,6 +18,15 @@ const ProgramaCompletado = () => {
     useEffect(() => {
         const fetchPrograma = async () => {
             try {
+                // Primero verificamos si el usuario tiene acceso a este programa completado
+                const completadosResponse = await api.get('/programas/mis-completados/');
+                const tieneAcceso = completadosResponse.data.some(prog => prog.id === parseInt(id));
+
+                if (!tieneAcceso) {
+                    navigate('/forbidden');
+                    return;
+                }
+
                 const response = await api.get(`/programas/${id}/`);
                 setPrograma(response.data);
 
@@ -59,13 +69,14 @@ const ProgramaCompletado = () => {
             } catch (err) {
                 console.error('Error al cargar el programa:', err);
                 setError('Error al cargar el programa. Por favor, intenta nuevamente.');
+                navigate('/forbidden');
             } finally {
                 setLoading(false);
             }
         };
 
         fetchPrograma();
-    }, [id]);
+    }, [id, navigate]);
 
     return (
         <ProgramaDetalle

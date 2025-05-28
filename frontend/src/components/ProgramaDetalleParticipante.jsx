@@ -211,6 +211,7 @@ const ProgramaDetalle = ({
                                 sesiones={programa.sesiones}
                                 cuestionarioPreRespondido={cuestionarioPreRespondido || esCompletado}
                                 permitirAccesoCompletada={true}
+                                programaCompletado={esCompletado}
                             />
                         ))}
                     </div>

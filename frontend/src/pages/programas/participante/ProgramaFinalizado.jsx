@@ -60,7 +60,7 @@ const ProgramaFinalizado = ({ programa }) => {
                             <div>
                                 <h3 className="text-sm font-medium text-red-900">Programa Finalizado</h3>
                                 <p className="mt-1 text-sm text-red-700">
-                                    Este programa ha sido finalizado por el investigador y ya no está disponible para nuevos participantes.
+                                    Este programa ha sido finalizado por el investigador y ya no está disponible.
                                 </p>
                             </div>
                         </div>

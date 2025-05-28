@@ -18,7 +18,7 @@ const EditarCuestionario = () => {
         { id: 'select', nombre: 'Selección Única', icono: <List className="h-5 w-5" /> },
         { id: 'checkbox', nombre: 'Múltiple Opción', icono: <CheckSquare className="h-5 w-5" /> },
         { id: 'calificacion', nombre: 'Calificación', icono: <Star className="h-5 w-5" /> },
-        { id: 'likert', nombre: 'Escala Likert', icono: <BarChart2 className="h-5 w-5" /> },
+        { id: 'likert', nombre: 'Escala Likert Personalizada', icono: <BarChart2 className="h-5 w-5" /> },
         { id: 'likert-5-puntos', nombre: 'Escala Likert 5 Puntos', icono: <BarChart2 className="h-5 w-5" /> },
     ];
 

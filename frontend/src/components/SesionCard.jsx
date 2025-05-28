@@ -3,7 +3,7 @@ import { CheckCircle2, AlertCircle, Timer, Music, Video, Clock, Link, Repeat, Ca
 import { useNavigate } from 'react-router-dom';
 import { EtiquetaPractica, TipoContenido } from '../constants/enums';
 
-const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, programa, isInvestigador }) => {
+const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, programaCompletado = false }) => {
     const navigate = useNavigate();
     const isAvailable = cuestionarioPreRespondido && (index === 0 || sesiones[index - 1]?.completada);
     const isCompleted = sesion.completada;
@@ -122,7 +122,16 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                 </div>
             </div>
             <div className="ml-4">
-                {isCompleted ? (
+
+                {programaCompletado ? (
+                    <button
+                        onClick={() => navigate(`/completados/${sesion.programa}/sesion/${sesion.id}`)}
+                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                        <Repeat className="h-4 w-4 mr-2" />
+                        Repetir
+                    </button>
+                ) : isCompleted ? (
                     <button
                         onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
                         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"

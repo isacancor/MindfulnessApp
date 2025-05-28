@@ -18,7 +18,7 @@ const CrearCuestionario = ({ tipo }) => {
         { id: 'select', nombre: 'Selección Única', icono: <List className="h-5 w-5" /> },
         { id: 'checkbox', nombre: 'Múltiple Opción', icono: <CheckSquare className="h-5 w-5" /> },
         { id: 'calificacion', nombre: 'Calificación', icono: <Star className="h-5 w-5" /> },
-        { id: 'likert', nombre: 'Escala Likert', icono: <BarChart2 className="h-5 w-5" /> },
+        { id: 'likert', nombre: 'Escala Likert Personalizada', icono: <BarChart2 className="h-5 w-5" /> },
         { id: 'likert-5-puntos', nombre: 'Escala Likert 5 Puntos', icono: <BarChart2 className="h-5 w-5" /> },
     ];
 
@@ -419,14 +419,22 @@ const CrearCuestionario = ({ tipo }) => {
                                             <input
                                                 type="number"
                                                 value={pregunta.estrellas.cantidad}
-                                                onChange={(e) => actualizarPregunta(pregunta.id, 'estrellas', {
-                                                    ...pregunta.estrellas,
-                                                    cantidad: parseInt(e.target.value)
-                                                })}
+                                                onChange={(e) => {
+                                                    let valor = parseInt(e.target.value);
+                                                    if (isNaN(valor)) valor = 2;
+                                                    if (valor < 2) valor = 2;
+                                                    if (valor > 10) valor = 10;
+
+                                                    actualizarPregunta(pregunta.id, 'estrellas', {
+                                                        ...pregunta.estrellas,
+                                                        cantidad: valor
+                                                    });
+                                                }}
                                                 min="2"
                                                 max="10"
                                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                                             />
+
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">

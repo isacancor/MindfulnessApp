@@ -15,28 +15,28 @@ const DetallePrograma = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchPrograma = async () => {
-            try {
-                const response = await api.get(`/programas/${id}/`);
-                setPrograma(response.data);
-                setSesiones(response.data.sesiones);
+    const fetchPrograma = async () => {
+        try {
+            const response = await api.get(`/programas/${id}/`);
+            setPrograma(response.data);
+            setSesiones(response.data.sesiones);
 
-                // Verificar si el usuario es el creador del programa
-                if (response.data.creado_por.id !== user.perfil_investigador.id) {
-                    navigate('/unauthorized');
-                    return;
-                }
-            } catch (err) {
-                setError('Error al cargar los datos');
-                console.error('Error:', err);
-            } finally {
-                setLoading(false);
+            // Verificar si el usuario es el creador del programa
+            if (response.data.creado_por.id !== user.perfil_investigador.id) {
+                navigate('/unauthorized');
+                return;
             }
-        };
+        } catch (err) {
+            setError('Error al cargar los datos');
+            console.error('Error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchPrograma();
-    }, [id, navigate, user.perfil_investigador.id]);
+    }, [id]);
 
     const handlePublicar = async () => {
         try {
@@ -105,10 +105,13 @@ const DetallePrograma = () => {
 
     const handleFinalizar = async () => {
         try {
+            setLoading(true);
             await api.post(`/programas/${id}/finalizar/`);
             fetchPrograma();
         } catch (error) {
             setError(error.response?.data?.error || 'Error al finalizar el programa');
+        } finally {
+            setLoading(false);
         }
     };
 

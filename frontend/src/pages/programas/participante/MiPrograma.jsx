@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video, Scale, Lock } from 'lucide-react';
 import api from '../../../config/axios';
-import SesionCard from '../../../components/SesionCard';
 import ErrorAlert from '../../../components/ErrorAlert';
 import ProgramaFinalizado from './ProgramaFinalizado';
-import ProgresoPrograma from '../../../components/ProgresoPrograma';
 import ProgramaDetalle from '../../../components/ProgramaDetalleParticipante';
 
 const MiPrograma = () => {

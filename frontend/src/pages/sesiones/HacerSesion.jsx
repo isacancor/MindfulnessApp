@@ -5,9 +5,9 @@ import api from '../../config/axios';
 import DiarioForm from '../../components/DiarioForm';
 import ErrorAlert from '../../components/ErrorAlert';
 
-const HacerSesion = () => {
+const HacerSesion = ({ completado }) => {
     const navigate = useNavigate();
-    const { sesionId } = useParams();
+    const { sesionId, programaId } = useParams();
     const [sesion, setSesion] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -16,10 +16,22 @@ const HacerSesion = () => {
     const [temporizadorActivo, setTemporizadorActivo] = useState(false);
     const [mostrarDiario, setMostrarDiario] = useState(false);
     const [diarioCompletado, setDiarioCompletado] = useState(false);
+    const [esSesionCompletada, setEsSesionCompletada] = useState(false);
 
     useEffect(() => {
         const fetchSesion = async () => {
             try {
+                if (completado) {
+                    // Verificar si el usuario tiene acceso a este programa completado
+                    const completadosResponse = await api.get('/programas/mis-completados/');
+                    const tieneAcceso = completadosResponse.data.some(prog => prog.id === parseInt(programaId));
+
+                    if (!tieneAcceso) {
+                        navigate('/forbidden');
+                        return;
+                    }
+                }
+
                 const response = await api.get(`/sesiones/${sesionId}/`);
                 setSesion(response.data);
                 if (response.data.tipo_contenido === 'temporizador') {
@@ -31,6 +43,7 @@ const HacerSesion = () => {
                 if (diarioResponse.data) {
                     setDiarioCompletado(true);
                     setCompletada(true);
+                    setEsSesionCompletada(true);
                 }
             } catch (err) {
                 if (err.response?.status === 404) {
@@ -38,6 +51,7 @@ const HacerSesion = () => {
                 } else {
                     console.error('Error al cargar la sesión:', err);
                     setError('Error al cargar la sesión. Por favor, intenta nuevamente.');
+                    navigate('/forbidden');
                 }
             } finally {
                 setLoading(false);
@@ -45,7 +59,7 @@ const HacerSesion = () => {
         };
 
         fetchSesion();
-    }, [sesionId]);
+    }, [sesionId, programaId, navigate, completado]);
 
     useEffect(() => {
         let timer;
@@ -66,7 +80,11 @@ const HacerSesion = () => {
 
     const handleCompletar = () => {
         if (diarioCompletado) {
-            navigate('/miprograma');
+            if (esSesionCompletada) {
+                navigate(`/completados/${programaId}`);
+            } else {
+                navigate('/miprograma');
+            }
         } else {
             setMostrarDiario(true);
         }
@@ -111,7 +129,7 @@ const HacerSesion = () => {
                                 <ArrowLeft className="h-5 w-5 mr-2" />
                                 Volver
                             </button>
-                            {sesion.tipo_contenido === 'temporizador' && (
+                            {sesion.tipo_contenido === 'temporizador' && !esSesionCompletada && (
                                 <div className="flex items-center text-gray-600">
                                     <Clock className="h-5 w-5 mr-2" />
                                     <span className="font-medium">{formatTime(tiempoRestante)}</span>
@@ -184,25 +202,27 @@ const HacerSesion = () => {
                         </div>
 
                         <div className="flex justify-center mt-8">
-                            <button
-                                onClick={handleCompletar}
-                                disabled={sesion.tipo_contenido === 'temporizador' && !completada}
-                                className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white ${sesion.tipo_contenido === 'temporizador' && !completada
-                                    ? 'bg-gray-400 cursor-not-allowed'
-                                    : diarioCompletado
-                                        ? 'bg-green-600 hover:bg-green-700'
-                                        : 'bg-blue-600 hover:bg-blue-700'
-                                    }`}
-                            >
-                                <CheckCircle2 className="h-5 w-5 mr-2" />
-                                {diarioCompletado ? 'Volver al programa' : 'Marcar como completada'}
-                            </button>
+                            {!esSesionCompletada && (
+                                <button
+                                    onClick={handleCompletar}
+                                    disabled={sesion.tipo_contenido === 'temporizador' && !completada}
+                                    className={`inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white ${sesion.tipo_contenido === 'temporizador' && !completada
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : diarioCompletado
+                                            ? 'bg-green-600 hover:bg-green-700'
+                                            : 'bg-blue-600 hover:bg-blue-700'
+                                        }`}
+                                >
+                                    <CheckCircle2 className="h-5 w-5 mr-2" />
+                                    {diarioCompletado ? 'Volver al programa' : 'Marcar como completada'}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {mostrarDiario && !diarioCompletado && (
+            {mostrarDiario && !diarioCompletado && !esSesionCompletada && (
                 <DiarioForm
                     sesion={sesion}
                     onClose={() => setMostrarDiario(false)}
