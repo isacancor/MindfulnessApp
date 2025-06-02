@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -27,72 +26,42 @@ api.interceptors.request.use(
     }
 );
 
-
-// Manejo de renovación de token automática
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, token = null) => {
-    failedQueue.forEach(prom => {
-        if (error) {
-            prom.reject(error);
-        } else {
-            prom.resolve(token);
-        }
-    });
-    failedQueue = [];
-};
-
+// Interceptor para manejar la renovación automática del token
 api.interceptors.response.use(
-    response => response,
+    (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        const navigate = useNavigate();
 
-        if (error.response?.status === 401 && !originalRequest._retry && originalRequest.headers.Authorization) {
+        // Si el error es 401 y no es una solicitud de refresh token
+        if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/token/refresh/') {
             originalRequest._retry = true;
-            const refreshToken = localStorage.getItem('refresh');
-            if (!refreshToken) {
-                localStorage.clear();
-                //window.location.replace('/login');
-                navigate('/login', { replace: true });
-                return Promise.reject(error);
-            }
-
-            if (isRefreshing) {
-                return new Promise((resolve, reject) => {
-                    failedQueue.push({ resolve, reject });
-                }).then((newToken) => {
-                    originalRequest.headers.Authorization = 'Bearer ' + newToken;
-                    return api(originalRequest);
-                }).catch((err) => Promise.reject(err));
-            }
-
-            isRefreshing = true;
 
             try {
-                const res = await axios.post(
+                const refreshToken = localStorage.getItem('refresh');
+                if (!refreshToken) {
+                    throw new Error('No hay token de actualización disponible');
+                }
+
+                // Intentar renovar el token
+                const response = await axios.post(
                     `${import.meta.env.VITE_API_URL}/auth/token/refresh/`,
-                    { refresh: refreshToken },
-                    { headers: { 'Content-Type': 'application/json' } }
+                    { refresh: refreshToken }
                 );
 
-                const newAccess = res.data.access;
-                localStorage.setItem('token', newAccess);
-                api.defaults.headers.common.Authorization = `Bearer ${newAccess}`;
-                processQueue(null, newAccess);
+                const { access } = response.data;
+                localStorage.setItem('token', access);
 
-                originalRequest.headers.Authorization = `Bearer ${newAccess}`;
+                // Actualizar el token en la solicitud original
+                originalRequest.headers.Authorization = `Bearer ${access}`;
+
+                // Reintentar la solicitud original
                 return api(originalRequest);
-
-            } catch (err) {
-                processQueue(err, null);
-                localStorage.clear();
-                //window.location.replace('/login');
-                navigate('/login', { replace: true });
-                return Promise.reject(err);
-            } finally {
-                isRefreshing = false;
+            } catch (refreshError) {
+                // Si falla la renovación, limpiar el almacenamiento y redirigir al login
+                localStorage.removeItem('token');
+                localStorage.removeItem('refresh');
+                window.location.href = '/login';
+                return Promise.reject(refreshError);
             }
         }
 
