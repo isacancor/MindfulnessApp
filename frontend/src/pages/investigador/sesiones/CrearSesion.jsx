@@ -1,29 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 import { ArrowLeft, Clock } from 'lucide-react';
-import api from '../../config/axios';
-import { prepareSessionFormData } from '../../utils/formData';
-import ErrorAlert from '../../components/ErrorAlert';
-import { EtiquetaPractica, TipoContenido, Escala, getEnumArray } from '../../constants/enums';
+import api from '../../../config/axios';
+import { prepareSessionFormData } from '../../../utils/formData';
+import ErrorAlert from '../../../components/ErrorAlert';
+import { EtiquetaPractica, TipoContenido, Escala, getEnumArray } from '../../../constants/enums';
 
-const EditarSesion = () => {
+const CrearSesion = () => {
     const navigate = useNavigate();
-    const { id, sesionId } = useParams();
-    const { error: authError } = useAuth();
+    const { id } = useParams();
+    const { user, loading: authLoading, error: authError } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [programa, setPrograma] = useState(null);
-    const [originalData, setOriginalData] = useState(null);
     const [formData, setFormData] = useState({
         programa: id,
         titulo: '',
         descripcion: '',
         semana: '',
         duracion_estimada: '',
-        tipo_practica: EtiquetaPractica.BREATH.value,
-        tipo_contenido: TipoContenido.TEMPORIZADOR.value,
-        tipo_escala: Escala.EMOCIONAL.value,
+        tipo_practica: '',
+        tipo_contenido: '',
+        tipo_escala: '',
         contenido_temporizador: 0,
         contenido_url: '',
         contenido_audio: null,
@@ -35,27 +34,17 @@ const EditarSesion = () => {
     const tiposEscala = getEnumArray(Escala);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchPrograma = async () => {
             try {
-                const [programaResponse, sesionResponse] = await Promise.all([
-                    api.get(`/programas/${id}/`),
-                    api.get(`/sesiones/${sesionId}/`)
-                ]);
-                setPrograma(programaResponse.data);
-                const sesionData = sesionResponse.data;
-                setOriginalData(sesionData);
-                setFormData({
-                    ...sesionData,
-                    programa: id
-                });
+                const response = await api.get(`/programas/${id}/`);
+                setPrograma(response.data);
             } catch (error) {
-                console.error('Error al cargar los datos:', error);
-                setError('Error al cargar los datos');
-
+                console.error('Error al cargar el programa:', error);
+                setError('Error al cargar el programa');
             }
         };
-        fetchData();
-    }, [id, sesionId]);
+        fetchPrograma();
+    }, [id]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -79,22 +68,21 @@ const EditarSesion = () => {
         setError(null);
 
         try {
-            const formDataToSend = prepareSessionFormData(formData, originalData);
-            await api.put(`/sesiones/${sesionId}/`, formDataToSend, {
+            const formDataToSend = prepareSessionFormData(formData);
+            await api.post('sesiones', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             navigate(`/programas/${id}`);
         } catch (error) {
-            console.error('Error al actualizar la sesión:', error);
-
+            console.error('Error al crear la sesión:', error);
             if (error.response.data.non_field_errors) {
                 setError(`Elige una semana válida. La semana ${formData.semana} ya existe`);
             } else if (error.response?.data?.error) {
                 setError(error.response.data.error);
             } else {
-                setError('Ha ocurrido un error al actualizar la sesión');
+                setError('Ha ocurrido un error al crear la sesión');
             }
         } finally {
             setLoading(false);
@@ -128,7 +116,7 @@ const EditarSesion = () => {
                             </div>
                         </div>
                         <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                            Editar Sesión
+                            Crear Nueva Sesión
                         </h2>
                         <p className="text-gray-500">
                             Programa: {programa.nombre}
@@ -226,6 +214,7 @@ const EditarSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona un tipo de práctica</option>
                                     {tiposPractica.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
@@ -245,6 +234,7 @@ const EditarSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona un tipo de contenido</option>
                                     {tiposContenido.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
@@ -264,6 +254,7 @@ const EditarSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona un tipo de escala</option>
                                     {tiposEscala.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
@@ -315,16 +306,12 @@ const EditarSesion = () => {
                                 <label htmlFor="contenido_audio" className="block text-sm font-medium text-gray-700 mb-1">
                                     Archivo de Audio *
                                 </label>
-                                {formData.contenido_audio && typeof formData.contenido_audio === 'string' && (
-                                    <div className="mb-2 p-2 bg-gray-50 rounded-lg">
-                                        <p className="text-sm text-gray-600">Archivo actual: {formData.contenido_audio.split('/').pop()}</p>
-                                    </div>
-                                )}
                                 <input
                                     id="contenido_audio"
                                     name="contenido_audio"
                                     type="file"
                                     accept="audio/*"
+                                    required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
                                     onChange={handleFileChange}
                                     disabled={loading}
@@ -337,16 +324,12 @@ const EditarSesion = () => {
                                 <label htmlFor="contenido_video" className="block text-sm font-medium text-gray-700 mb-1">
                                     Archivo de Video *
                                 </label>
-                                {formData.contenido_video && typeof formData.contenido_video === 'string' && (
-                                    <div className="mb-2 p-2 bg-gray-50 rounded-lg">
-                                        <p className="text-sm text-gray-600">Archivo actual: {formData.contenido_video.split('/').pop()}</p>
-                                    </div>
-                                )}
                                 <input
                                     id="contenido_video"
                                     name="contenido_video"
                                     type="file"
                                     accept="video/mp4"
+                                    required
                                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
                                     onChange={handleFileChange}
                                     disabled={loading}
@@ -374,9 +357,9 @@ const EditarSesion = () => {
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                         </svg>
-                                        Actualizando...
+                                        Creando...
                                     </span>
-                                ) : 'Actualizar Sesión'}
+                                ) : 'Crear Sesión'}
                             </button>
                         </div>
                     </form>
@@ -386,4 +369,4 @@ const EditarSesion = () => {
     );
 };
 
-export default EditarSesion; 
+export default CrearSesion; 

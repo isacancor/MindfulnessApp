@@ -4,7 +4,7 @@ import { ArrowLeft, Calendar, Users, FileText, Search, CheckCircle2, Star, Lock 
 import SesionCard from './SesionCard';
 import ErrorAlert from './ErrorAlert';
 import ProgresoPrograma from './ProgresoPrograma';
-import ProgramaFinalizado from '../pages/programas/participante/ProgramaFinalizado';
+import ProgramaFinalizado from '../pages/participante/programas/ProgramaFinalizado';
 
 const ProgramaDetalle = ({
     programa,

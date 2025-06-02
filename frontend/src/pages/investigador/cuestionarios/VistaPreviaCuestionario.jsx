@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, Heart, ThumbsUp } from 'lucide-react';
-import api from '../../config/axios';
-import { useAuth } from '../../context/AuthContext';
-import ErrorAlert from '../../components/ErrorAlert';
+import api from '../../../config/axios';
+import { useAuth } from '../../../context/AuthContext';
+import ErrorAlert from '../../../components/ErrorAlert';
 
 const VistaPreviaCuestionario = () => {
     const { id, cuestionarioId } = useParams();

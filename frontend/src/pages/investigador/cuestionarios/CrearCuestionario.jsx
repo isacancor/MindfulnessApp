@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Trash2, Save, Type, List, CheckSquare, ChevronDown, Star, BarChart2, Heart, ThumbsUp } from 'lucide-react';
-import api from '../../config/axios';
+import api from '../../../config/axios';
+import ErrorAlert from '../../../components/ErrorAlert';
 
-const EditarCuestionario = () => {
-    const { id, cuestionarioId } = useParams();
+const CrearCuestionario = ({ tipo }) => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const [titulo, setTitulo] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [preguntas, setPreguntas] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [initialLoading, setInitialLoading] = useState(true);
 
     const tiposPregunta = [
         { id: 'texto', nombre: 'Texto Libre', icono: <Type className="h-5 w-5" /> },
@@ -44,25 +44,6 @@ const EditarCuestionario = () => {
             "Siempre"
         ]
     };
-
-    useEffect(() => {
-        const fetchCuestionario = async () => {
-            try {
-                const response = await api.get(`/cuestionario/${cuestionarioId}/`);
-                const cuestionario = response.data;
-                setTitulo(cuestionario.titulo);
-                setDescripcion(cuestionario.descripcion);
-                setPreguntas(cuestionario.preguntas);
-            } catch (err) {
-                setError('Error al cargar el cuestionario');
-                console.error('Error:', err);
-            } finally {
-                setInitialLoading(false);
-            }
-        };
-
-        fetchCuestionario();
-    }, [cuestionarioId]);
 
     const validarCuestionario = () => {
         if (!titulo.trim()) {
@@ -266,10 +247,11 @@ const EditarCuestionario = () => {
             const cuestionario = {
                 titulo,
                 descripcion,
-                preguntas
+                preguntas,
+                tipo
             };
 
-            await api.put(`/cuestionario/${cuestionarioId}/`, cuestionario);
+            await api.post(`/programas/${id}/cuestionarios/`, cuestionario);
             navigate(`/programas/${id}`);
         } catch (err) {
             console.error('Error al guardar el cuestionario:', err);
@@ -282,14 +264,6 @@ const EditarCuestionario = () => {
     const getIconoPregunta = (tipo) => {
         return tiposPregunta.find(t => t.id === tipo)?.icono;
     };
-
-    if (initialLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -306,7 +280,7 @@ const EditarCuestionario = () => {
                         </button>
                         <div className="flex items-center space-x-4">
                             <span className="text-lg font-semibold text-gray-700">
-                                Editando Cuestionario
+                                Creando Cuestionario {tipo === 'pre' ? 'Pre' : 'Post'}
                             </span>
                             <button
                                 onClick={handleGuardar}
@@ -318,16 +292,15 @@ const EditarCuestionario = () => {
                                 ) : (
                                     <Save className="h-5 w-5 mr-2" />
                                 )}
-                                {loading ? 'Guardando...' : 'Guardar Cambios'}
+                                {loading ? 'Guardando...' : 'Guardar Cuestionario'}
                             </button>
                         </div>
                     </div>
 
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded">
-                            <p className="text-red-700">{error}</p>
-                        </div>
-                    )}
+                    <ErrorAlert
+                        message={error}
+                        onClose={() => setError(null)}
+                    />
 
                     {/* Información básica */}
                     <div className="space-y-6 mb-8">
@@ -446,14 +419,22 @@ const EditarCuestionario = () => {
                                             <input
                                                 type="number"
                                                 value={pregunta.estrellas.cantidad}
-                                                onChange={(e) => actualizarPregunta(pregunta.id, 'estrellas', {
-                                                    ...pregunta.estrellas,
-                                                    cantidad: parseInt(e.target.value)
-                                                })}
+                                                onChange={(e) => {
+                                                    let valor = parseInt(e.target.value);
+                                                    if (isNaN(valor)) valor = 2;
+                                                    if (valor < 2) valor = 2;
+                                                    if (valor > 10) valor = 10;
+
+                                                    actualizarPregunta(pregunta.id, 'estrellas', {
+                                                        ...pregunta.estrellas,
+                                                        cantidad: valor
+                                                    });
+                                                }}
                                                 min="2"
                                                 max="10"
                                                 className="w-full px-4 py-2 border border-gray-300 rounded-lg"
                                             />
+
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -672,4 +653,4 @@ const EditarCuestionario = () => {
     );
 };
 
-export default EditarCuestionario; 
+export default CrearCuestionario; 
