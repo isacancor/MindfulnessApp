@@ -31,7 +31,8 @@ class ExperienciaMindfulness(models.TextChoices):
     MENOS_6_MESES = 'menos_de_6_meses', _('Menos de 6 meses')
     ENTRE_6_12_MESES = '6_meses_1_ano', _('6 meses - 1 año')
     ENTRE_1_2_ANOS = '1_2_anos', _('1 - 2 años')
-    MAS_2_ANOS = 'mas_de_2_anos', _('Más de 2 años')
+    ENTRE_2_10_ANOS = '2_10_anos', _('2 - 10 años')
+    MAS_10_ANOS = 'mas_de_10_anos', _('Más de 10 años')
 
 class ExperienciaInvestigacion(models.TextChoices):
     SI = 'si', _('Sí')

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, Clock, FileText, BookOpen, CheckCircle2, AlertCircle, Timer, Link, Music, Video, Scale, Lock } from 'lucide-react';
+import { Search } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
 import ProgramaFinalizado from './ProgramaFinalizado';
@@ -89,7 +89,7 @@ const MiPrograma = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
                 <div className="bg-white rounded-xl shadow-md overflow-hidden p-8 text-center max-w-2xl">
-                    <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
+                    <Search className="mx-auto h-12 w-12 text-gray-400" />
                     <h3 className="mt-4 text-lg font-medium text-gray-900">No tienes un programa activo</h3>
                     <p className="mt-2 text-gray-500">
                         Explora los programas disponibles y únete a uno para comenzar tu viaje de mindfulness.

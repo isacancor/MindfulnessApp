@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, FileText, BookOpen, Star, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Users, FileText, Star, Loader2, Search } from 'lucide-react';
 import api from '../../../../config/axios';
 import ErrorAlert from '../../../../components/ErrorAlert';
 
@@ -63,7 +63,7 @@ const ProgramasCompletados = () => {
                 {programas.length === 0 ? (
                     <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8 text-center">
                         <div className="bg-gray-50 p-6 rounded-lg">
-                            <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
+                            <Search className="mx-auto h-12 w-12 text-gray-400" />
                             <h3 className="mt-4 text-lg font-medium text-gray-900">No tienes programas completados</h3>
                             <p className="mt-2 text-gray-500">
                                 Completa un programa para verlo aquí.

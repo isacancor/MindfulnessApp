@@ -19,15 +19,18 @@ Usuario = get_user_model()
 def register(request):
     serializer = RegisterSerializer(data=request.data)
 
-    if serializer.is_valid():
-        user = serializer.save()
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'user': UsuarioSerializer(user).data
-        }, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors.get('password')[-1], status=status.HTTP_400_BAD_REQUEST)
+    try:
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': UsuarioSerializer(user).data
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors.get('password')[-1], status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle, Star } from 'lucide-react';
+import { Search, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle, Star } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
 import EnrolarProgramaModal from '../../../components/modals/EnrolarProgramaModal';
@@ -19,7 +19,11 @@ const ExplorarProgramas = () => {
     const fetchProgramas = async () => {
         try {
             const response = await api.get('/programas');
-            setProgramas(response.data);
+
+            // Filtrar los programas que no están completados
+            const programasNoCompletados = response.data.filter(programa => !programa.inscripcion_info?.es_completado);
+            setProgramas(programasNoCompletados);
+
         } catch (err) {
             console.error('Error al cargar programas:', err);
             setError('Error al cargar los programas. Por favor, intenta nuevamente.');
@@ -123,7 +127,7 @@ const ExplorarProgramas = () => {
                 {programas.length === 0 ? (
                     <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8 text-center">
                         <div className="bg-gray-50 p-6 rounded-lg">
-                            <BookOpen className="mx-auto h-12 w-12 text-gray-400" />
+                            <Search className="mx-auto h-12 w-12 text-gray-400" />
                             <h3 className="mt-4 text-lg font-medium text-gray-900">No hay programas disponibles</h3>
                             <p className="mt-2 text-gray-500">
                                 Actualmente no hay programas disponibles. Vuelve a revisar más tarde.

@@ -3,6 +3,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import Usuario, Investigador, Participante
 from config.enums import Genero, NivelEducativo, ExperienciaMindfulness, ExperienciaInvestigacion
+import django.db.utils
 
 class InvestigadorSerializer(serializers.ModelSerializer):
     nombre_completo_investigador = serializers.SerializerMethodField()
@@ -100,32 +101,39 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        perfil_data = {}
-        
-        if validated_data['role'] == 'INVESTIGADOR':
-            perfil_fields = ['experienciaInvestigacion', 'areasInteres']
-        else:
-            perfil_fields = ['experienciaMindfulness', 'condicionesSalud']
-        
-        for field in perfil_fields:
-            if field in validated_data:
-                perfil_data[field] = validated_data.pop(field)
+        try:
+            perfil_data = {}
+            
+            if validated_data['role'] == 'INVESTIGADOR':
+                perfil_fields = ['experienciaInvestigacion', 'areasInteres']
+            else:
+                perfil_fields = ['experienciaMindfulness', 'condicionesSalud']
+            
+            for field in perfil_fields:
+                if field in validated_data:
+                    perfil_data[field] = validated_data.pop(field)
 
-        email = validated_data.pop('email')
+            email = validated_data.pop('email')
 
-        # Crear usuario
-        usuario = Usuario.objects.create_user(
-            email=email,
-            **validated_data
-        )
+            # Crear usuario
+            usuario = Usuario.objects.create_user(
+                email=email,
+                **validated_data
+            )
 
-        # Crear perfil según el role
-        if usuario.role == 'INVESTIGADOR':
-            Investigador.objects.create(usuario=usuario, **perfil_data)
-        else:
-            Participante.objects.create(usuario=usuario, **perfil_data)
+            # Crear perfil según el role
+            if usuario.role == 'INVESTIGADOR':
+                Investigador.objects.create(usuario=usuario, **perfil_data)
+            else:
+                Participante.objects.create(usuario=usuario, **perfil_data)
 
-        return usuario
+            return usuario
+        except django.db.utils.IntegrityError as e:
+            if 'usuario_usuario_username_key' in str(e):
+                raise serializers.ValidationError('Ya existe un usuario con este nombre de usuario')
+            elif 'usuario_usuario_email_key' in str(e):
+                raise serializers.ValidationError('Ya existe un usuario con este correo electrónico')
+            raise serializers.ValidationError('Error al crear el usuario')
 
 class UpdateUsuarioSerializer(serializers.ModelSerializer):
     perfil_investigador = InvestigadorProfileSerializer(required=False)

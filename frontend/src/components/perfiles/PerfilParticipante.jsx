@@ -1,13 +1,14 @@
-import { User, Mail, Calendar, Heart, Activity, Phone, MapPin, BookOpen, Clock, ArrowLeft, Lock } from 'lucide-react';
+import { User, Mail, Calendar, Heart, Activity, Phone, MapPin, BookOpen, Clock, ArrowLeft, Lock, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ErrorAlert from '../ErrorAlert';
 import { Genero, NivelEducativo, ExperienciaMindfulness } from '../../constants/enums';
 import { useState } from 'react';
 import ChangePasswordModal from '../auth/ChangePasswordModal';
+import MobileNavBar from '../MobileNavBar';
 
 const PerfilParticipante = () => {
-    const { user, error, resetError } = useAuth();
+    const { user, error, resetError, logout } = useAuth();
     const navigate = useNavigate();
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
@@ -42,21 +43,21 @@ const PerfilParticipante = () => {
     };
 
     return (
-        <div className="bg-white rounded-2xl overflow-hidden max-w-4xl mx-auto my-8 shadow-xl">
+        <div className="bg-white rounded-2xl overflow-hidden max-w-4xl mx-auto my-4 md:my-8 shadow-xl pb-20 md:pb-8">
             {/* Header del perfil con botón de retroceso */}
-            <div className="bg-gradient-to-br from-emerald-600 to-teal-500 px-6 py-8 relative">
+            <div className="bg-gradient-to-br from-emerald-600 to-teal-500 px-4 md:px-6 py-6 md:py-8 relative">
                 <button
                     onClick={() => navigate(-1)}
-                    className="absolute top-6 left-6 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all duration-300 text-white backdrop-blur-sm"
+                    className="absolute top-4 md:top-6 left-4 md:left-6 bg-white/10 hover:bg-white/20 p-2 rounded-full transition-all duration-300 text-white backdrop-blur-sm"
                 >
                     <ArrowLeft className="h-5 w-5" />
                 </button>
-                <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 ml-0 md:ml-10">
-                    <div className="h-28 w-28 rounded-full bg-white/20 border-4 border-white/30 flex items-center justify-center shadow-lg">
-                        <User className="h-16 w-16 text-white" />
+                <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6 ml-0 md:ml-10 mt-8 md:mt-0">
+                    <div className="h-24 md:h-28 w-24 md:w-28 rounded-full bg-white/20 border-4 border-white/30 flex items-center justify-center shadow-lg">
+                        <User className="h-12 md:h-16 w-12 md:w-16 text-white" />
                     </div>
                     <div className="text-center md:text-left">
-                        <h1 className="text-3xl font-bold text-white">{getDisplayName()}</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-white">{getDisplayName()}</h1>
                         <p className="text-white/90 font-medium">Participante</p>
                         <div className="mt-2 flex justify-center md:justify-start">
                             <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium">
@@ -64,21 +65,9 @@ const PerfilParticipante = () => {
                             </span>
                         </div>
                         <div className="mt-4">
-                            {/**
-                            <button
-                                onClick={() => navigate('/perfil/editar')}
-                                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                                <span>Editar Perfil</span>
-                            </button>
-                            */}
                             <button
                                 onClick={() => setIsChangePasswordModalOpen(true)}
-                                className="ml-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
+                                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 mx-auto md:mx-0"
                             >
                                 <Lock className="h-5 w-5" />
                                 <span>Cambiar Contraseña</span>
@@ -89,16 +78,16 @@ const PerfilParticipante = () => {
             </div>
 
             {/* Contenido principal */}
-            <div className="px-6 py-6">
+            <div className="px-4 md:px-6 py-4 md:py-6">
                 <ErrorAlert
                     message={error}
                     onClose={() => resetError()}
                 />
 
                 {/* Sección de información básica */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div className="bg-gray-50 p-6 rounded-xl shadow-sm">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+                    <div className="bg-gray-50 p-4 md:p-6 rounded-xl shadow-sm">
+                        <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 flex items-center">
                             <Mail className="h-5 w-5 text-teal-600 mr-2" />
                             Información de Contacto
                         </h3>
@@ -118,8 +107,8 @@ const PerfilParticipante = () => {
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 p-6 rounded-xl shadow-sm">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <div className="bg-gray-50 p-4 md:p-6 rounded-xl shadow-sm">
+                        <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 flex items-center">
                             <BookOpen className="h-5 w-5 text-teal-600 mr-2" />
                             Información Académica
                         </h3>
@@ -141,8 +130,8 @@ const PerfilParticipante = () => {
                 </div>
 
                 {/* Información personal */}
-                <div className="bg-gray-50 p-6 rounded-xl shadow-sm mb-8">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <div className="bg-gray-50 p-4 md:p-6 rounded-xl shadow-sm mb-6 md:mb-8">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 flex items-center">
                         <User className="h-5 w-5 text-teal-600 mr-2" />
                         Detalles Personales
                     </h3>
@@ -157,7 +146,7 @@ const PerfilParticipante = () => {
                                 {user.fechaNacimiento ? new Date(user.fechaNacimiento).toLocaleDateString('es-ES') : 'No especificada'}
                             </p>
                         </div>
-                        <div>
+                        <div className="md:col-span-2">
                             <p className="text-sm text-gray-500">Condiciones de Salud</p>
                             <p className="text-gray-800 font-medium">{user.perfil_participante?.condicionesSalud || 'No especificadas'}</p>
                         </div>
@@ -165,15 +154,15 @@ const PerfilParticipante = () => {
                 </div>
 
                 {/* Progreso actual */}
-                <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <div className="mb-6 md:mb-8">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 flex items-center">
                         <Activity className="h-5 w-5 text-teal-600 mr-2" />
                         Progreso Actual
                     </h3>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
                         {user.perfil_participante?.estudiosActivos?.length > 0 ? (
                             user.perfil_participante.estudiosActivos.map((estudio) => (
-                                <div key={estudio.id} className="mb-6 last:mb-0">
+                                <div key={estudio.id} className="mb-4 last:mb-0">
                                     <div className="flex justify-between items-center mb-2">
                                         <h4 className="font-medium text-gray-800">{estudio.nombre}</h4>
                                         <span className="text-sm font-medium text-teal-600">{estudio.progreso}%</span>
@@ -187,7 +176,7 @@ const PerfilParticipante = () => {
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center py-6">
+                            <div className="text-center py-4 md:py-6">
                                 <p className="text-gray-500">No hay programas activos en este momento.</p>
                             </div>
                         )}
@@ -196,11 +185,11 @@ const PerfilParticipante = () => {
 
                 {/* Historial de programas */}
                 <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 flex items-center">
                         <Heart className="h-5 w-5 text-teal-600 mr-2" />
                         Programas Completados
                     </h3>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
                         {user.perfil_participante?.estudiosCompletados?.length > 0 ? (
                             <div className="divide-y divide-gray-100">
                                 {user.perfil_participante.estudiosCompletados.map((estudio) => (
@@ -220,17 +209,31 @@ const PerfilParticipante = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-6">
+                            <div className="text-center py-4 md:py-6">
                                 <p className="text-gray-500">No hay programas completados.</p>
                             </div>
                         )}
                     </div>
                 </div>
             </div>
+
             <ChangePasswordModal
                 isOpen={isChangePasswordModalOpen}
                 onClose={() => setIsChangePasswordModalOpen(false)}
             />
+
+            {/* Botón de cerrar sesión móvil */}
+            <div className="fixed bottom-20 left-4 right-4 md:hidden">
+                <button
+                    onClick={() => logout()}
+                    className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-3 px-4 rounded-xl shadow-md border border-red-100 transition-colors duration-200 flex items-center justify-center space-x-2"
+                >
+                    <LogOut className="w-5 h-5" />
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+
+            <MobileNavBar />
         </div>
     );
 };
