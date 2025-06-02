@@ -2,6 +2,7 @@ from django.urls import path
 from cuestionario.api import cuestionario_list
 from . import api
 
+# /api/programa/
 urlpatterns = [
     path('', api.programa_list_create, name='programa-list-create'),
     path('<int:pk>/', api.programa_detail, name='programa-detail'),

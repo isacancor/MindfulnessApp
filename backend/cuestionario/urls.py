@@ -1,6 +1,7 @@
 from django.urls import path
 from . import api
 
+# /api/cuestionario/
 urlpatterns = [
     # URLs para cuestionarios
     path('<int:cuestionario_id>/', api.cuestionario_detail, name='cuestionario-detail'),

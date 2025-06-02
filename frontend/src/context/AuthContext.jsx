@@ -91,7 +91,6 @@ export const AuthProvider = ({ children }) => {
 
             localStorage.setItem('token', access);
             localStorage.setItem('refresh', refresh);
-            localStorage.setItem('user', JSON.stringify(user));
 
             setUser(user);
             setError(null);
@@ -121,7 +120,6 @@ export const AuthProvider = ({ children }) => {
 
             localStorage.setItem('token', access);
             localStorage.setItem('refresh', refresh);
-            localStorage.setItem('user', JSON.stringify(user));
 
             setUser(user);
             setError(null);
@@ -162,6 +160,7 @@ export const AuthProvider = ({ children }) => {
             setError(null);
             const response = await api.put('/auth/profile', profileData);
             setUser(response.data);
+            // setUser(prev => ({ ...prev, ...response.data }));
         } catch (err) {
             setError(err.response?.data?.message || 'Error al actualizar perfil');
             throw err;

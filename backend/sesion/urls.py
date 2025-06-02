@@ -1,6 +1,7 @@
 from django.urls import path
 from . import api
 
+# /api/sesiones/
 urlpatterns = [
     # Sesiones
     path('', api.sesion_list_create, name='sesion-list-create'),

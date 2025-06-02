@@ -7,6 +7,7 @@ router.register(r'usuarios', UsuarioViewSet)
 router.register(r'investigadores', InvestigadorViewSet)
 router.register(r'participantes', ParticipanteViewSet)
 
+# /api/usuario/
 urlpatterns = [
     path('', include(router.urls)),
 ]
