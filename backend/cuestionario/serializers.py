@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Cuestionario, RespuestaCuestionario
 from usuario.models import Participante
-from config.enums import TipoCuestionario
+from config.enums import TipoCuestionario, TipoPregunta
 
 class CuestionarioSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,27 +22,31 @@ class CuestionarioSerializer(serializers.ModelSerializer):
                 if field not in pregunta:
                     raise serializers.ValidationError(f"Falta el campo requerido: {field}")
             
-            # Validaciones específicas según el tipo de pregunta
+            # Validar que el tipo de pregunta sea válido
             tipo = pregunta['tipo']
-            if tipo in ['select', 'checkbox']:
+            if tipo not in [choice[0] for choice in TipoPregunta.choices]:
+                raise serializers.ValidationError(f"Tipo de pregunta no válido: {tipo}")
+            
+            # Validaciones específicas según el tipo de pregunta
+            if tipo in [TipoPregunta.SELECT, TipoPregunta.CHECKBOX]:
                 if 'opciones' not in pregunta or not isinstance(pregunta['opciones'], list):
                     raise serializers.ValidationError(f"Las preguntas de tipo {tipo} deben tener opciones")
             
-            elif tipo == 'likert':
+            elif tipo == TipoPregunta.LIKERT:
                 if 'escala' not in pregunta:
                     raise serializers.ValidationError("Las preguntas Likert deben tener una escala")
                 escala = pregunta['escala']
                 if not all(k in escala for k in ['inicio', 'fin', 'etiquetas']):
                     raise serializers.ValidationError("La escala Likert debe tener inicio, fin y etiquetas")
             
-            elif tipo == 'likert-5-puntos':
+            elif tipo == TipoPregunta.LIKERT_5_PUNTOS:
                 if 'likert5Puntos' not in pregunta:
                     raise serializers.ValidationError("Las preguntas Likert 5 puntos deben tener configuración")
                 likert5 = pregunta['likert5Puntos']
                 if not all(k in likert5 for k in ['tipo', 'filas']):
                     raise serializers.ValidationError("La configuración Likert 5 puntos debe tener tipo y filas")
             
-            elif tipo == 'calificacion':
+            elif tipo == TipoPregunta.CALIFICACION:
                 if 'estrellas' not in pregunta:
                     raise serializers.ValidationError("Las preguntas de calificación deben tener configuración de estrellas")
                 estrellas = pregunta['estrellas']

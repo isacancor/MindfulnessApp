@@ -94,4 +94,12 @@ class Escala(models.TextChoices):
 # Enums de Cuestionario
 class TipoCuestionario(models.TextChoices):
     PRE = 'pre', 'Pre'
-    POST = 'post', 'Post' 
+    POST = 'post', 'Post'
+
+class TipoPregunta(models.TextChoices):
+    TEXTO = 'texto', 'Texto Libre'
+    SELECT = 'select', 'Selección Única'
+    CHECKBOX = 'checkbox', 'Múltiple Opción'
+    CALIFICACION = 'calificacion', 'Calificación'
+    LIKERT = 'likert', 'Escala Likert'
+    LIKERT_5_PUNTOS = 'likert-5-puntos', 'Escala Likert 5 Puntos' 

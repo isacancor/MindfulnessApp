@@ -28,14 +28,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xy=rv%rr%#*v7imguvx8i^(bg77rq0vb6u1lugp1e5c)@hids+'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -108,9 +100,21 @@ DATABASES = {
     }
 }
 
-
 AUTH_USER_MODEL = 'usuario.Usuario'
 
+
+
+# ALLOWED_HOSTS configuration
+if DEBUG:
+    ALLOWED_HOSTS = ['*']  # En desarrollo, permite todos los hosts
+else:
+    # En producción, especifica los hosts permitidos
+    ALLOWED_HOSTS = [
+        'localhost',
+        '127.0.0.1',
+        '[::1]',
+        # Agrega aquí tu dominio de producción cuando lo tengas
+    ]
 
 # CORS settings
 CORS_ALLOW_ALL_ORIGINS = True  # Solo para desarrollo
@@ -153,35 +157,39 @@ PASSWORD_HASHERS = [
 ]
 
 # Configuración de validadores de contraseña
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-        'OPTIONS': {
-            'user_attributes': ('username', 'email', 'nombre', 'apellidos'),
-            'max_similarity': 0.7,
-        }
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
 
-    # Validador de contraseña compleja 
-    {
-        'NAME': 'usuario.validators.ComplexityPasswordValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
-    },
-]
+if DEBUG:  # En desarrollo, no aplicar validadores
+    AUTH_PASSWORD_VALIDATORS = []
+else: # Solo aplicar validadores en producción
+    AUTH_PASSWORD_VALIDATORS = [
+        {
+            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+            'OPTIONS': {
+                'user_attributes': ('username', 'email', 'nombre', 'apellidos'),
+                'max_similarity': 0.7,
+            }
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+            'OPTIONS': {
+                'min_length': 8,
+            }
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        },
+        {
+            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        },
+        # Validador de contraseña compleja propio
+        {
+            'NAME': 'usuario.validators.ComplexityPasswordValidator',
+            'OPTIONS': {
+                'min_length': 8,
+            }
+        },
+    ]
+
 
 # Configuración de PBKDF2 para hacer el hash más seguro
 PASSWORD_HASHERS_ITERATIONS = 390000  # Número de iteraciones para PBKDF2
@@ -190,7 +198,7 @@ PASSWORD_HASHERS_ITERATIONS = 390000  # Número de iteraciones para PBKDF2
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es'
 
 TIME_ZONE = 'UTC'
 
@@ -208,10 +216,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-
-
 
 
 

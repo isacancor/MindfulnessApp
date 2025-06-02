@@ -17,6 +17,7 @@ const ListaProgramas = () => {
         try {
             const response = await api.get('/programas');
             setProgramas(response.data);
+            console.log(response.data);
         } catch (err) {
             console.error('Error al cargar programas:', err);
             setError('Error al cargar los programas. Por favor, intenta nuevamente.');
@@ -34,7 +35,7 @@ const ListaProgramas = () => {
     };
 
     const programasFiltrados = programas.filter(programa =>
-        programa.titulo?.toLowerCase().includes(busqueda.toLowerCase()) ||
+        programa.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
         programa.descripcion?.toLowerCase().includes(busqueda.toLowerCase())
     );
 
