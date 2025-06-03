@@ -87,6 +87,7 @@ const ProgramaCompletado = () => {
                     <PageHeader
                         title="Programa Completado"
                         subtitle="Revisa el contenido y tus logros en este programa"
+                        backUrl="/completados"
                     />
                 </div>
 

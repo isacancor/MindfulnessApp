@@ -77,7 +77,6 @@ const TerminosPrograma = () => {
                                 La participación en el programa implica entender que:
                             </p>
                             <ul className="list-disc pl-5 mt-2 space-y-2">
-                                <li>Puedes cancelar tu participación en cualquier momento</li>
                                 <li>El programa puede sufrir modificaciones para mejorar su calidad</li>
                                 <li>Se notificarán los cambios importantes con antelación</li>
                             </ul>

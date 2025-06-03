@@ -129,38 +129,38 @@ const ExplorarProgramas = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                         {programas.map((programa) => (
                             <div
                                 key={programa.id}
-                                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-indigo-100"
+                                className="bg-white rounded-xl md:rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-indigo-100"
                             >
-                                <div className="p-6 md:p-8 flex flex-col h-full">
-                                    <div className="flex items-start justify-between mb-6">
+                                <div className="p-4 md:p-6 lg:p-8 flex flex-col h-full">
+                                    <div className="flex items-start justify-between mb-3 md:mb-6">
                                         <div>
-                                            <h3 className="text-xl font-bold text-gray-900 mb-2">{programa.nombre}</h3>
-                                            <p className="text-sm text-gray-500">
+                                            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 md:mb-2">{programa.nombre}</h3>
+                                            <p className="text-xs md:text-sm text-gray-500">
                                                 Por {programa.creado_por.nombre_completo_investigador}
                                             </p>
                                         </div>
-                                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                        <span className="inline-flex items-center px-2 py-1 md:px-3 md:py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                             {programa.tipo_contexto}
                                         </span>
                                     </div>
 
-                                    <p className="text-gray-600 line-clamp-3 mb-6">{programa.descripcion}</p>
+                                    <p className="text-sm md:text-base text-gray-600 line-clamp-2 md:line-clamp-3 mb-4 md:mb-6">{programa.descripcion}</p>
 
-                                    <div className="space-y-4 mb-8">
-                                        <div className="flex items-center text-gray-600 bg-gray-50 p-3 rounded-lg">
-                                            <Calendar className="mr-3 text-indigo-600" size={20} />
+                                    <div className="grid grid-cols-2 gap-2 md:space-y-4 md:grid-cols-1 mb-4 md:mb-8">
+                                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
+                                            <Calendar className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
                                             <span>{programa.duracion_semanas} semanas</span>
                                         </div>
-                                        <div className="flex items-center text-gray-600 bg-gray-50 p-3 rounded-lg">
-                                            <Users className="mr-3 text-indigo-600" size={20} />
+                                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
+                                            <Users className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
                                             <span>{programa.participantes?.length || 0} participantes</span>
                                         </div>
-                                        <div className="flex items-center text-gray-600 bg-gray-50 p-3 rounded-lg">
-                                            <FileText className="mr-3 text-indigo-600" size={20} />
+                                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
+                                            <FileText className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
                                             <span className="capitalize">{programa.enfoque_metodologico}</span>
                                         </div>
                                     </div>
@@ -169,31 +169,31 @@ const ExplorarProgramas = () => {
                                         {programa.id === miProgramaId ? (
                                             <button
                                                 onClick={() => navigate('/miprograma')}
-                                                className="w-full flex items-center justify-center px-6 py-4 text-lg font-medium rounded-xl text-white bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                                                className="w-full flex items-center justify-center px-4 py-2 md:px-6 md:py-4 text-base md:text-lg font-medium rounded-lg md:rounded-xl text-white bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 shadow-md hover:shadow-lg transition-all duration-300"
                                             >
-                                                <CheckCircle className="mr-2 h-5 w-5" />
+                                                <CheckCircle className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                                                 Programa actual
                                             </button>
                                         ) : programa.inscripcion_info?.es_completado ? (
                                             <button
                                                 onClick={() => navigate(`/completados/${programa.id}`)}
-                                                className="w-full flex items-center justify-center px-6 py-4 text-lg font-medium rounded-xl text-white bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                                                className="w-full flex items-center justify-center px-4 py-2 md:px-6 md:py-4 text-base md:text-lg font-medium rounded-lg md:rounded-xl text-white bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 shadow-md hover:shadow-lg transition-all duration-300"
                                             >
-                                                <Star className="mr-2 h-5 w-5" />
+                                                <Star className="mr-2 h-4 w-4 md:h-5 md:w-5" />
                                                 Ver programa completado
                                             </button>
                                         ) : (
                                             <button
                                                 onClick={() => handleEnrolar(programa.id)}
                                                 disabled={enrolando || yaEnrolado}
-                                                className={`w-full flex items-center justify-center px-6 py-4 text-lg font-medium rounded-xl text-white transition-all duration-300 transform hover:scale-105 ${yaEnrolado
+                                                className={`w-full flex items-center justify-center px-4 py-2 md:px-6 md:py-4 text-base md:text-lg font-medium rounded-lg md:rounded-xl text-white transition-all duration-300 ${yaEnrolado
                                                     ? 'bg-gray-400 cursor-not-allowed'
-                                                    : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 shadow-lg hover:shadow-xl'
+                                                    : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 shadow-md hover:shadow-lg'
                                                     }`}
                                             >
                                                 {enrolando ? (
                                                     <>
-                                                        <Loader2 className="animate-spin mr-2 h-5 w-5" />
+                                                        <Loader2 className="animate-spin mr-2 h-4 w-4 md:h-5 md:w-5" />
                                                         Procesando...
                                                     </>
                                                 ) : yaEnrolado ? (
@@ -201,7 +201,7 @@ const ExplorarProgramas = () => {
                                                 ) : (
                                                     <>
                                                         Unirme ahora
-                                                        <ArrowRight className="ml-2 h-5 w-5" />
+                                                        <ArrowRight className="ml-2 h-4 w-4 md:h-5 md:w-5" />
                                                     </>
                                                 )}
                                             </button>

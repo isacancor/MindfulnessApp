@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Mail, Calendar, Phone, CheckCircle, Clock, Users, Loader2 } from 'lucide-react';
+import { User, Mail, Calendar, Phone, CheckCircle, Clock, Users, Loader2 } from 'lucide-react';
 import api from '../../config/axios';
 import ErrorAlert from '../../components/ErrorAlert';
+import PageHeader from '../../components/PageHeader';
 
 const ListadoParticipantes = () => {
     const { id } = useParams();
@@ -100,27 +101,16 @@ const ListadoParticipantes = () => {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-2xl shadow-xl p-8">
-                    {/* Encabezado */}
-                    <div className="flex items-center justify-between mb-8">
-                        <button
-                            onClick={() => navigate(`/programas/${id}`)}
-                            className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
-                        >
-                            <ArrowLeft className="h-5 w-5 mr-2" />
-                            Volver al programa
-                        </button>
-                    </div>
+                    <PageHeader
+                        title={programa.nombre}
+                        subtitle="Listado de participantes"
+                        backUrl={`/programas/${id}`}
+                    />
 
                     <ErrorAlert
                         message={error}
                         onClose={() => setError(null)}
                     />
-
-                    {/* Título y Estado */}
-                    <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">{programa.nombre}</h1>
-                        <p className="text-gray-600">Listado de participantes</p>
-                    </div>
 
                     {/* Lista de Participantes */}
                     <div className="space-y-4">

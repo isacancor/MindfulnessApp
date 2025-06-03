@@ -26,14 +26,20 @@ api.interceptors.request.use(
     }
 );
 
+
 // Interceptor para manejar la renovación automática del token
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
-        // Si el error es 401 y no es una solicitud de refresh token
-        if (error.response?.status === 401 && !originalRequest._retry && originalRequest.url !== '/auth/token/refresh/') {
+        // Si el error es 401 y no es una solicitud de refresh token y no es una solicitud de login
+        if (
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            originalRequest.url !== '/auth/token/refresh/' &&
+            originalRequest.url !== '/auth/login/'
+        ) {
             originalRequest._retry = true;
 
             try {

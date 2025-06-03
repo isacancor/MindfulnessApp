@@ -13,7 +13,7 @@ const Login = () => {
     });
 
     useEffect(() => {
-        if (isAuthenticated()) {
+        if (user && isAuthenticated()) {
             if (user.role === 'INVESTIGADOR') {
                 navigate('/dashboard');
             } else {

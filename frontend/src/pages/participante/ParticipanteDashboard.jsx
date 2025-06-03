@@ -229,7 +229,7 @@ const ParticipanteDashboard = () => {
                 )}
 
                 {/* Acciones rápidas - Solo visible en escritorio */}
-                <div className="hidden md:block">
+                <div className="hidden md:block mt-6">
                     <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center pl-2">
                         <Star className="h-5 w-5 text-amber-500 mr-2" />
                         Acciones rápidas

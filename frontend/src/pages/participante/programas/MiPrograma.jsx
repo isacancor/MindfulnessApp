@@ -94,6 +94,7 @@ const MiPrograma = () => {
                     <PageHeader
                         title="Mi Programa"
                         subtitle="Gestiona y sigue tu progreso en el programa actual"
+                        backUrl="/home"
                     />
 
                     <CTOExplorar
@@ -118,6 +119,7 @@ const MiPrograma = () => {
                 <PageHeader
                     title="Mi Programa"
                     subtitle="Gestiona y sigue tu progreso en el programa actual"
+                    backUrl="/home"
                 />
 
                 <ProgramaDetalle

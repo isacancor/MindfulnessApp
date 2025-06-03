@@ -4,6 +4,7 @@ import { ArrowLeft, Star, Heart, ThumbsUp } from 'lucide-react';
 import api from '../../../config/axios';
 import { useAuth } from '../../../context/AuthContext';
 import ErrorAlert from '../../../components/ErrorAlert';
+import PageHeader from '../../../components/PageHeader';
 
 const VistaPreviaCuestionario = () => {
     const { id, cuestionarioId } = useParams();
@@ -263,16 +264,11 @@ const VistaPreviaCuestionario = () => {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-2xl shadow-xl p-8">
-                    {/* Encabezado */}
-                    <div className="flex items-center justify-between mb-8">
-                        <button
-                            onClick={() => navigate(`/programas/${id}`)}
-                            className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
-                        >
-                            <ArrowLeft className="h-5 w-5 mr-2" />
-                            Volver
-                        </button>
-                    </div>
+                    <PageHeader
+                        title={cuestionario?.titulo}
+                        subtitle={cuestionario?.descripcion}
+                        backUrl={`/programas/${id}`}
+                    />
 
                     <ErrorAlert
                         message={error}
@@ -280,12 +276,6 @@ const VistaPreviaCuestionario = () => {
                     />
 
                     <form onSubmit={handleSubmit}>
-                        {/* Información del cuestionario */}
-                        <div className="mb-8">
-                            <h1 className="text-3xl font-bold text-gray-900 mb-4">{cuestionario?.titulo}</h1>
-                            <p className="text-gray-600 whitespace-pre-line">{cuestionario?.descripcion}</p>
-                        </div>
-
                         {/* Preguntas */}
                         <div className="space-y-8">
                             {cuestionario?.preguntas.map((pregunta, index) => (

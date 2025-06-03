@@ -93,7 +93,6 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('refresh', refresh);
 
             setUser(user);
-            setError(null);
 
             // Redirigir según el rol
             if (user.role === ROLES.INVESTIGADOR) {
