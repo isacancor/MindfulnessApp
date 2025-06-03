@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Users, FileText, Star, Loader2, Search } from 'lucide-react';
 import api from '../../../../config/axios';
 import ErrorAlert from '../../../../components/ErrorAlert';
+import MobileNavBar from '../../../../components/MobileNavBar';
+import CTOExplorar from '../../../../components/CTOExplorar';
 
 const ProgramasCompletados = () => {
     const navigate = useNavigate();
@@ -28,19 +30,20 @@ const ProgramasCompletados = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 pb-16 md:pb-0">
                 <Loader2 className="animate-spin h-12 w-12 text-blue-600" />
                 <p className="mt-4 text-gray-600">Cargando programas completados...</p>
+                <MobileNavBar />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
             <div className="max-w-7xl mx-auto">
                 <button
                     onClick={() => navigate(-1)}
-                    className="absolute top-8 left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
+                    className="mb-6 md:mb-0 md:absolute md:top-8 md:left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
                     aria-label="Volver atrás"
                 >
                     <ArrowLeft className="h-5 w-5" />
@@ -61,21 +64,14 @@ const ProgramasCompletados = () => {
                 />
 
                 {programas.length === 0 ? (
-                    <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8 text-center">
-                        <div className="bg-gray-50 p-6 rounded-lg">
-                            <Search className="mx-auto h-12 w-12 text-gray-400" />
-                            <h3 className="mt-4 text-lg font-medium text-gray-900">No tienes programas completados</h3>
-                            <p className="mt-2 text-gray-500">
-                                Completa un programa para verlo aquí.
-                            </p>
-                            <button
-                                onClick={() => navigate('/explorar')}
-                                className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
-                                Explorar Programas
-                            </button>
-                        </div>
-                    </div>
+                    <CTOExplorar
+                        showBackButton={true}
+                        paginaTitulo="Mis Programas Completados"
+                        titulo="No tienes programas completados"
+                        descripcion="Completa un programa de mindfulness para verlo aquí. ¡Explora nuestra colección y comienza tu viaje!"
+                        buttonText="Explorar Programas"
+                        className="px-4 sm:px-6 lg:px-8"
+                    />
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {programas.map((programa) => (
@@ -129,6 +125,7 @@ const ProgramasCompletados = () => {
                     </div>
                 )}
             </div>
+            <MobileNavBar />
         </div>
     );
 };

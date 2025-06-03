@@ -4,6 +4,7 @@ import { ArrowLeft, Star, Heart, ThumbsUp, AlertCircle } from 'lucide-react';
 import api from '../../config/axios';
 import { useAuth } from '../../context/AuthContext';
 import ErrorAlert from '../../components/ErrorAlert';
+import MobileNavBar from '../../components/MobileNavBar';
 
 const ResponderCuestionario = ({ tipo }) => {
     const navigate = useNavigate();
@@ -295,21 +296,23 @@ const ResponderCuestionario = ({ tipo }) => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex flex-col items-center justify-center pb-16 md:pb-0">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p className="mt-4 text-gray-600">Cargando cuestionario...</p>
+                <MobileNavBar />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
             <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     {/* Encabezado */}
-                    <div className="flex items-center justify-between mb-8">
+                    <div className="mb-8">
                         <button
                             onClick={() => navigate('/miprograma')}
-                            className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
+                            className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors mb-4 md:mb-0"
                         >
                             <ArrowLeft className="h-5 w-5 mr-2" />
                             Volver
@@ -383,6 +386,7 @@ const ResponderCuestionario = ({ tipo }) => {
                     </form>
                 </div>
             </div>
+            <MobileNavBar />
         </div>
     );
 };

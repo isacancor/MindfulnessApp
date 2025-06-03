@@ -4,6 +4,7 @@ import { ArrowLeft, Clock, CheckCircle2, ExternalLink } from 'lucide-react';
 import api from '../../config/axios';
 import DiarioForm from '../../components/DiarioForm';
 import ErrorAlert from '../../components/ErrorAlert';
+import MobileNavBar from '../../components/MobileNavBar';
 
 const HacerSesion = ({ completado }) => {
     const navigate = useNavigate();
@@ -92,8 +93,10 @@ const HacerSesion = ({ completado }) => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 pb-16 md:pb-0">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p className="mt-4 text-gray-600">Cargando sesión...</p>
+                <MobileNavBar />
             </div>
         );
     }
@@ -117,20 +120,20 @@ const HacerSesion = ({ completado }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+            <div className="max-w-4xl mx-auto">
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                     <div className="p-6">
-                        <div className="flex items-center justify-between mb-6">
+                        <div className="mb-6">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="inline-flex items-center text-gray-600 hover:text-gray-900"
+                                className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 md:mb-0"
                             >
                                 <ArrowLeft className="h-5 w-5 mr-2" />
                                 Volver
                             </button>
                             {sesion.tipo_contenido === 'temporizador' && !esSesionCompletada && (
-                                <div className="flex items-center text-gray-600">
+                                <div className="flex items-center text-gray-600 mt-4 md:mt-0">
                                     <Clock className="h-5 w-5 mr-2" />
                                     <span className="font-medium">{formatTime(tiempoRestante)}</span>
                                 </div>
@@ -232,6 +235,7 @@ const HacerSesion = ({ completado }) => {
                     }}
                 />
             )}
+            <MobileNavBar />
         </div>
     );
 };

@@ -3,23 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import ErrorAlert from '@/components/ErrorAlert';
 import MobileNavBar from '@/components/MobileNavBar';
-import {
-    Play,
-    LogOut,
-    Search,
-    User,
-    ChevronRight,
-    CheckCircle2,
-    Star,
-    ArrowRight,
-    ListChecks,
-    FileText,
-    Sparkles,
-    Bell,
-    Loader2
-} from 'lucide-react';
+import { Play, LogOut, Search, User, ChevronRight, CheckCircle2, Star, ArrowRight, ListChecks, FileText, Sparkles, Bell, Loader2 } from 'lucide-react';
 import api from '@/config/axios';
 import ProgresoPrograma from '@/components/ProgresoPrograma';
+import CTOExplorar from '@/components/CTOExplorar';
 
 const ParticipanteDashboard = () => {
     const { user, logout } = useAuth();
@@ -30,10 +17,12 @@ const ParticipanteDashboard = () => {
     const [cuestionarioPreRespondido, setCuestionarioPreRespondido] = useState(false);
     const [cuestionarioPostRespondido, setCuestionarioPostRespondido] = useState(false);
     const [proximaAccion, setProximaAccion] = useState(null);
+    const [programaNoEncontrado, setProgramaNoEncontrado] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                setProgramaNoEncontrado(false)
                 const response = await api.get('programas/mi-programa');
                 const programaData = response.data;
 
@@ -110,13 +99,15 @@ const ParticipanteDashboard = () => {
                     }
                 }
             } catch (err) {
-                console.error('Error al cargar los datos:', err);
                 if (err.response?.status === 403) {
                     setError('No tienes permisos de participante. Por favor, contacta al administrador.');
+                    console.error('Error al cargar los datos:', err);
                 } else if (err.response?.status === 404) {
                     setError('')
+                    setProgramaNoEncontrado(true)
                 } else {
                     setError('Error al cargar los datos. Por favor, intenta nuevamente.');
+                    console.error('Error al cargar los datos:', err);
                 }
             } finally {
                 setLoading(false);
@@ -164,6 +155,14 @@ const ParticipanteDashboard = () => {
                 message={error}
                 onClose={() => setError(null)}
             />
+
+            {programaNoEncontrado && (
+                <CTOExplorar
+                    titulo="No tienes un programa activo"
+                    descripcion="Explora los programas disponibles y únete a uno para comenzar tu viaje de mindfulness."
+                    buttonText="Explorar Programas"
+                />
+            )}
 
             {/* Próxima acción */}
             {proximaAccion && !programaFinalizado && (

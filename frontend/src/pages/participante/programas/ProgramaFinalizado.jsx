@@ -1,16 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar, Users, Clock, FileText, AlertCircle } from 'lucide-react';
+import MobileNavBar from '../../../components/MobileNavBar';
 
 const ProgramaFinalizado = ({ programa }) => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
             <div className="max-w-4xl mx-auto">
                 <button
                     onClick={() => navigate('/home')}
-                    className="absolute top-8 left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
+                    className="mb-6 md:mb-0 md:absolute md:top-8 md:left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
                     aria-label="Volver atrás"
                 >
                     <ArrowLeft className="h-5 w-5" />
@@ -67,6 +68,7 @@ const ProgramaFinalizado = ({ programa }) => {
                     </div>
                 </div>
             </div>
+            <MobileNavBar />
         </div>
     );
 };

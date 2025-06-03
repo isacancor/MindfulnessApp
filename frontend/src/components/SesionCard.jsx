@@ -73,15 +73,15 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
 
     return (
         <div
-            className={`flex items-center justify-between p-4 rounded-lg transition-colors ${isCompleted
+            className={`flex flex-col md:flex-row md:items-center md:justify-between p-4 rounded-lg transition-colors ${isCompleted
                 ? 'bg-green-50 hover:bg-green-100'
                 : isAvailable
                     ? 'bg-blue-50 hover:bg-blue-100'
                     : 'bg-gray-50 hover:bg-gray-100'
                 }`}
         >
-            <div className="flex items-center space-x-4">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${isCompleted
+            <div className="flex items-start space-x-4">
+                <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full font-semibold ${isCompleted
                     ? 'bg-green-100 text-green-600'
                     : isAvailable
                         ? 'bg-blue-100 text-blue-600'
@@ -89,26 +89,28 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                     }`}>
                     {sesion.semana}
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-medium text-gray-900">{sesion.titulo}</h3>
+                        <h3 className="text-lg font-medium text-gray-900 truncate">{sesion.titulo}</h3>
                         {isCompleted ? (
-                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                            <CheckCircle2 className="flex-shrink-0 h-5 w-5 text-green-600" />
                         ) : isAvailable ? (
-                            <AlertCircle className="h-5 w-5 text-blue-600" />
+                            <AlertCircle className="flex-shrink-0 h-5 w-5 text-blue-600" />
                         ) : (
-                            <AlertCircle className="h-5 w-5 text-gray-400" />
+                            <AlertCircle className="flex-shrink-0 h-5 w-5 text-gray-400" />
                         )}
                     </div>
-                    <p className="text-gray-600 mt-1">{sesion.descripcion}</p>
-                    <div className="flex items-center mt-2 text-sm text-gray-500">
-                        <Clock className="h-4 w-4 mr-1" />
-                        <span>{sesion.duracion_estimada} minutos</span>
-                        <span className="mx-2">•</span>
+                    <p className="text-gray-600 mt-1 text-sm md:text-base line-clamp-2 md:line-clamp-1">{sesion.descripcion}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-500">
+                        <div className="flex items-center">
+                            <Clock className="h-4 w-4 mr-1" />
+                            <span>{sesion.duracion_estimada} minutos</span>
+                        </div>
+                        <span className="hidden md:inline mx-2">•</span>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTipoPracticaColor(sesion.tipo_practica)}`}>
                             {sesion.tipo_practica_display}
                         </span>
-                        <span className="mx-2">•</span>
+                        <span className="hidden md:inline mx-2">•</span>
                         <span className="flex items-center">
                             {getTipoContenidoIcon(sesion.tipo_contenido)}
                             {sesion.tipo_contenido_display}
@@ -117,16 +119,15 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                     {/* Fechas de inicio y fin */}
                     <div className="flex items-center mt-2 text-sm text-gray-500">
                         <Calendar className="h-4 w-4 mr-1 text-indigo-500" />
-                        <span>Semana del {fechas.inicio} al {fechas.fin}</span>
+                        <span className="text-xs md:text-sm">Semana del {fechas.inicio} al {fechas.fin}</span>
                     </div>
                 </div>
             </div>
-            <div className="ml-4">
-
+            <div className="mt-4 md:mt-0 md:ml-4 flex justify-end">
                 {programaCompletado ? (
                     <button
                         onClick={() => navigate(`/completados/${sesion.programa}/sesion/${sesion.id}`)}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     >
                         <Repeat className="h-4 w-4 mr-2" />
                         Repetir
@@ -134,7 +135,7 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                 ) : isCompleted ? (
                     <button
                         onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                     >
                         <Repeat className="h-4 w-4 mr-2" />
                         Repetir
@@ -142,12 +143,12 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                 ) : isAvailable ? (
                     <button
                         onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                         Comenzar
                     </button>
                 ) : (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                    <span className="w-full md:w-auto inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 text-center">
                         {!cuestionarioPreRespondido ? 'Completa el cuestionario pre' :
                             (index > 0 && !sesiones[index - 1]?.completada) ? 'Completa la sesión anterior' : 'Bloqueada'}
                     </span>

@@ -5,6 +5,8 @@ import SesionCard from './SesionCard';
 import ErrorAlert from './ErrorAlert';
 import ProgresoPrograma from './ProgresoPrograma';
 import ProgramaFinalizado from '../pages/participante/programas/ProgramaFinalizado';
+import CTOExplorar from './CTOExplorar';
+import MobileNavBar from './MobileNavBar';
 
 const ProgramaDetalle = ({
     programa,
@@ -35,24 +37,36 @@ const ProgramaDetalle = ({
 
     if (!programa?.sesiones?.length) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-                <div className="bg-white rounded-xl shadow-md overflow-hidden p-8 text-center max-w-2xl">
-                    <Search className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-4 text-lg font-medium text-gray-900">
-                        {esCompletado ? "Programa no encontrado" : "No tienes un programa activo"}
-                    </h3>
-                    <p className="mt-2 text-gray-500">
-                        {esCompletado
+            <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+                <div className="max-w-7xl mx-auto">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="mb-6 md:mb-0 md:absolute md:top-8 md:left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
+                        aria-label="Volver atrás"
+                    >
+                        <ArrowLeft className="h-5 w-5" />
+                    </button>
+
+                    <div className="text-center mb-10">
+                        <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                            {esCompletado ? "Programa no encontrado" : "Mi Programa"}
+                        </h1>
+                        <p className="mt-3 text-xl text-gray-500 max-w-2xl mx-auto">
+                            {esCompletado
+                                ? "No se ha encontrado el programa que buscas"
+                                : "Gestiona y sigue tu progreso en el programa actual"}
+                        </p>
+                    </div>
+
+                    <CTOExplorar
+                        titulo={esCompletado ? "Programa no encontrado" : "No tienes un programa activo"}
+                        descripcion={esCompletado
                             ? "El programa que buscas no existe o no tienes acceso a él."
                             : "Explora los programas disponibles y únete a uno para comenzar tu viaje de mindfulness."}
-                    </p>
-                    <button
-                        onClick={() => navigate('/explorar')}
-                        className="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                    >
-                        Explorar Programas
-                    </button>
+                        buttonText="Explorar Programas"
+                    />
                 </div>
+                <MobileNavBar />
             </div>
         );
     }
@@ -67,7 +81,7 @@ const ProgramaDetalle = ({
             <div className="max-w-4xl mx-auto">
                 <button
                     onClick={() => navigate('/home')}
-                    className="absolute top-8 left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
+                    className="mb-6 md:mb-0 md:absolute md:top-8 md:left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
                     aria-label="Volver atrás"
                 >
                     <ArrowLeft className="h-5 w-5" />
