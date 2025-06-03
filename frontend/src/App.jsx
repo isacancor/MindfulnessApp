@@ -75,6 +75,7 @@ function App() {
           <Route path="/programas/:id/cuestionarios/:cuestionarioId" element={<VistaPreviaCuestionario />} />
         </Route>
 
+        {/****************************************************************************/}
         {/* Rutas protegidas para participantes */}
         <Route element={<PrivateRoute roles={[ROLES.PARTICIPANTE]} />}>
           <Route path="/home" element={<ParticipanteDashboard />} />

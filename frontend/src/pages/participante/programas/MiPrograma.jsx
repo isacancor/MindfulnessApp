@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, ArrowLeft } from 'lucide-react';
 import api from '../../../config/axios';
 import ProgramaFinalizado from './ProgramaFinalizado';
 import ProgramaDetalle from '../../../components/ProgramaDetalleParticipante';
 import MobileNavBar from '../../../components/MobileNavBar';
 import CTOExplorar from '../../../components/CTOExplorar';
+import PageHeader from '../../../components/PageHeader';
 
 const MiPrograma = () => {
-    const navigate = useNavigate();
     const [programa, setPrograma] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -79,9 +77,11 @@ const MiPrograma = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 pb-16 md:pb-0">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p className="mt-4 text-gray-600">Cargando tu programa...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-indigo-50 to-white pb-16 md:pb-0">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600"></div>
+                    <p className="mt-4 text-lg text-indigo-600 font-medium">Cargando tu programa...</p>
+                </div>
                 <MobileNavBar />
             </div>
         );
@@ -91,22 +91,10 @@ const MiPrograma = () => {
         return (
             <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
                 <div className="max-w-7xl mx-auto">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="mb-6 md:mb-0 md:absolute md:top-8 md:left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
-                        aria-label="Volver atrás"
-                    >
-                        <ArrowLeft className="h-5 w-5" />
-                    </button>
-
-                    <div className="text-center mb-10">
-                        <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                            Mi Programa
-                        </h1>
-                        <p className="mt-3 text-xl text-gray-500 max-w-2xl mx-auto">
-                            Gestiona y sigue tu progreso en el programa actual
-                        </p>
-                    </div>
+                    <PageHeader
+                        title="Mi Programa"
+                        subtitle="Gestiona y sigue tu progreso en el programa actual"
+                    />
 
                     <CTOExplorar
                         titulo="No tienes un programa activo"
@@ -126,17 +114,24 @@ const MiPrograma = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-20 md:pb-10">
-            <ProgramaDetalle
-                programa={programa}
-                loading={loading}
-                error={error}
-                setError={setError}
-                progreso={progreso}
-                cuestionarioPreRespondido={cuestionarioPreRespondido}
-                cuestionarioPostRespondido={cuestionarioPostRespondido}
-                esCompletado={false}
-                permitirNavegacionCuestionarios={true}
-            />
+            <div className="max-w-7xl mx-auto">
+                <PageHeader
+                    title="Mi Programa"
+                    subtitle="Gestiona y sigue tu progreso en el programa actual"
+                />
+
+                <ProgramaDetalle
+                    programa={programa}
+                    loading={loading}
+                    error={error}
+                    setError={setError}
+                    progreso={progreso}
+                    cuestionarioPreRespondido={cuestionarioPreRespondido}
+                    cuestionarioPostRespondido={cuestionarioPostRespondido}
+                    esCompletado={false}
+                    permitirNavegacionCuestionarios={true}
+                />
+            </div>
             <MobileNavBar />
         </div>
     );

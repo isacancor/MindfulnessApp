@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../../config/axios';
 import ProgramaDetalle from '../../../../components/ProgramaDetalleParticipante';
 import MobileNavBar from '../../../../components/MobileNavBar';
+import PageHeader from '../../../../components/PageHeader';
 
 const ProgramaCompletado = () => {
     const { id } = useParams();
@@ -81,17 +82,26 @@ const ProgramaCompletado = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-20 md:pb-10">
-            <ProgramaDetalle
-                programa={programa}
-                loading={loading}
-                error={error}
-                setError={setError}
-                progreso={progreso}
-                cuestionarioPreRespondido={true}
-                cuestionarioPostRespondido={true}
-                esCompletado={true}
-                permitirNavegacionCuestionarios={false}
-            />
+            <div className="max-w-7xl mx-auto">
+                <div className="relative">
+                    <PageHeader
+                        title="Programa Completado"
+                        subtitle="Revisa el contenido y tus logros en este programa"
+                    />
+                </div>
+
+                <ProgramaDetalle
+                    programa={programa}
+                    loading={loading}
+                    error={error}
+                    setError={setError}
+                    progreso={progreso}
+                    cuestionarioPreRespondido={true}
+                    cuestionarioPostRespondido={true}
+                    esCompletado={true}
+                    permitirNavegacionCuestionarios={false}
+                />
+            </div>
             <MobileNavBar />
         </div>
     );

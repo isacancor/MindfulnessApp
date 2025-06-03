@@ -39,13 +39,6 @@ const ProgramaDetalle = ({
         return (
             <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
                 <div className="max-w-7xl mx-auto">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="mb-6 md:mb-0 md:absolute md:top-8 md:left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
-                        aria-label="Volver atrás"
-                    >
-                        <ArrowLeft className="h-5 w-5" />
-                    </button>
 
                     <div className="text-center mb-10">
                         <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -79,14 +72,6 @@ const ProgramaDetalle = ({
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-                <button
-                    onClick={() => navigate('/home')}
-                    className="mb-6 md:mb-0 md:absolute md:top-8 md:left-8 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
-                    aria-label="Volver atrás"
-                >
-                    <ArrowLeft className="h-5 w-5" />
-                </button>
-
                 <ErrorAlert
                     message={error}
                     onClose={() => setError(null)}

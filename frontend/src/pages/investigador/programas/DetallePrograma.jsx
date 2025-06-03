@@ -129,13 +129,6 @@ const DetallePrograma = () => {
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                     {/* Encabezado */}
                     <div className="flex items-center justify-between mb-8">
-                        <button
-                            onClick={() => navigate('/programas')}
-                            className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors"
-                        >
-                            <ArrowLeft className="h-5 w-5 mr-2" />
-                            Volver
-                        </button>
                         <div className="flex items-center space-x-4">
 
                             <span className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-100 text-blue-800 text-lg font-semibold">

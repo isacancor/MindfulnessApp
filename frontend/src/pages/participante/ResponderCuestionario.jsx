@@ -5,6 +5,7 @@ import api from '../../config/axios';
 import { useAuth } from '../../context/AuthContext';
 import ErrorAlert from '../../components/ErrorAlert';
 import MobileNavBar from '../../components/MobileNavBar';
+import PageHeader from '../../components/PageHeader';
 
 const ResponderCuestionario = ({ tipo }) => {
     const navigate = useNavigate();
@@ -305,19 +306,15 @@ const ResponderCuestionario = ({ tipo }) => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
             <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-xl p-8">
-                    {/* Encabezado */}
-                    <div className="mb-8">
-                        <button
-                            onClick={() => navigate('/miprograma')}
-                            className="flex items-center text-gray-600 hover:text-indigo-600 transition-colors mb-4 md:mb-0"
-                        >
-                            <ArrowLeft className="h-5 w-5 mr-2" />
-                            Volver
-                        </button>
-                    </div>
+                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100">
+                    <PageHeader
+                        title={cuestionario?.titulo}
+                        subtitle={cuestionario?.descripcion}
+                        backUrl="/miprograma"
+                        className="mb-8"
+                    />
 
                     {error && loading && (
                         <ErrorAlert
@@ -327,18 +324,12 @@ const ResponderCuestionario = ({ tipo }) => {
                     )}
 
                     <form onSubmit={handleSubmit}>
-                        {/* Información del cuestionario */}
-                        <div className="mb-8">
-                            <h1 className="text-3xl font-bold text-gray-900 mb-4">{cuestionario?.titulo}</h1>
-                            <p className="text-gray-600 whitespace-pre-line">{cuestionario?.descripcion}</p>
-                        </div>
-
                         {/* Preguntas */}
                         <div className="space-y-8">
                             {cuestionario?.preguntas.map((pregunta, index) => (
-                                <div key={pregunta.id} className="border-2 border-indigo-100 rounded-lg p-6 bg-gradient-to-br from-white to-indigo-50">
-                                    <div className="mb-4">
-                                        <h3 className="text-lg font-medium text-gray-900">
+                                <div key={pregunta.id} className="bg-gradient-to-br from-white to-indigo-50/30 rounded-xl p-6 md:p-8 shadow-sm border border-indigo-100">
+                                    <div className="mb-6">
+                                        <h3 className="text-xl font-semibold text-gray-900">
                                             {index + 1}. {pregunta.texto}
                                         </h3>
                                     </div>
@@ -350,13 +341,13 @@ const ResponderCuestionario = ({ tipo }) => {
                         </div>
 
                         {/* Error más visible */}
-                        <div ref={formEndRef} className="mt-6">
+                        <div ref={formEndRef} className="mt-8">
                             {error && !loading && (
-                                <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4 rounded-md">
+                                <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-xl">
                                     <div className="flex items-start">
-                                        <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2" />
+                                        <AlertCircle className="h-6 w-6 text-red-500 mt-0.5 mr-2" />
                                         <div>
-                                            <h3 className="text-red-800 font-medium">Error</h3>
+                                            <h3 className="text-lg font-semibold text-red-800">Error</h3>
                                             <p className="text-red-700">{error}</p>
                                         </div>
                                     </div>
@@ -366,15 +357,18 @@ const ResponderCuestionario = ({ tipo }) => {
 
                         {/* Botón de envío */}
                         {isParticipante() && (
-                            <div className="mt-8 flex justify-end">
+                            <div className="mt-12 flex justify-end">
                                 <button
                                     type="submit"
                                     disabled={enviando}
-                                    className={`flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg transition-colors ${enviando ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'}`}
+                                    className={`inline-flex items-center px-8 py-4 text-lg font-medium rounded-xl text-white transition-all duration-300 transform hover:scale-105 ${enviando
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 shadow-lg hover:shadow-xl'
+                                        }`}
                                 >
                                     {enviando ? (
                                         <>
-                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
                                             Enviando...
                                         </>
                                     ) : (

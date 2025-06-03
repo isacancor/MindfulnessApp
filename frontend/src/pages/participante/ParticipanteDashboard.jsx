@@ -7,6 +7,7 @@ import { Play, LogOut, Search, User, ChevronRight, CheckCircle2, Star, ArrowRigh
 import api from '@/config/axios';
 import ProgresoPrograma from '@/components/ProgresoPrograma';
 import CTOExplorar from '@/components/CTOExplorar';
+import PageHeader from '@/components/PageHeader';
 
 const ParticipanteDashboard = () => {
     const { user, logout } = useAuth();
@@ -130,195 +131,183 @@ const ParticipanteDashboard = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-6 md:py-10 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
-            {/* Encabezado */}
-            <div className="max-w-4xl mx-auto relative">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 opacity-20 text-indigo-600 hidden md:block">
-                    <Sparkles className="h-32 w-32" />
-                </div>
+        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+            <div className="max-w-7xl mx-auto">
+                <PageHeader
+                    title={`¡Hola, ${user?.nombre || 'Participante'}!`}
+                    subtitle="Bienvenido/a a tu espacio personal de mindfulness"
+                    showBackButton={false}
+                />
 
-                <div className="bg-white rounded-2xl shadow-xl border border-indigo-100 p-4 md:p-8 mb-6 md:mb-10">
-                    <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-                        <div>
-                            <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-500">
-                                ¡Hola, {user?.nombre || 'Participante'}!
-                            </h1>
-                            <p className="text-gray-600 mt-2 text-base md:text-lg">
-                                Bienvenido/a a tu espacio personal de mindfulness
-                            </p>
+                <ErrorAlert
+                    message={error}
+                    onClose={() => setError(null)}
+                />
+
+                {programaNoEncontrado && (
+                    <CTOExplorar
+                        titulo="No tienes un programa activo"
+                        descripcion="Explora los programas disponibles y únete a uno para comenzar tu viaje de mindfulness."
+                        buttonText="Explorar Programas"
+                    />
+                )}
+
+                {/* Próxima acción */}
+                {proximaAccion && !programaFinalizado && (
+                    <div className="mb-8">
+                        <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-[2px] rounded-2xl shadow-xl overflow-hidden">
+                            <div className="bg-white p-6 md:p-8 rounded-2xl relative overflow-hidden">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mt-10 -mr-10 z-0 hidden md:block"></div>
+
+                                <div className="relative z-10">
+                                    <div className="flex items-center mb-4 md:mb-6">
+                                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100 mr-4">
+                                            <Bell className="h-5 w-5 text-indigo-600" />
+                                        </div>
+                                        <h2 className="text-xl md:text-2xl font-bold text-gray-800">Tu próxima acción</h2>
+                                    </div>
+
+                                    <div className="mb-6">
+                                        <div className="flex items-start">
+                                            <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-indigo-600 mr-4">
+                                                {proximaAccion.icono}
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold text-gray-900">{proximaAccion.titulo}</h3>
+                                                <p className="text-gray-600 mt-1">{proximaAccion.descripcion}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <Link
+                                        to={proximaAccion.url}
+                                        className="group inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 w-full md:w-auto"
+                                    >
+                                        <span className="absolute right-full w-12 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-96 ease"></span>
+                                        <span className="relative flex items-center justify-center">
+                                            {proximaAccion.tipo === 'sesion' ? 'Comenzar sesión' : 'Completar cuestionario'}
+                                            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                                        </span>
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                )}
 
-            <ErrorAlert
-                message={error}
-                onClose={() => setError(null)}
-            />
+                {/* Progreso */}
+                {progreso && !programaFinalizado && (
+                    <div className="mb-8">
+                        <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100">
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                <CheckCircle2 className="h-6 w-6 text-indigo-600 mr-3" />
+                                Tu progreso
+                            </h2>
 
-            {programaNoEncontrado && (
-                <CTOExplorar
-                    titulo="No tienes un programa activo"
-                    descripcion="Explora los programas disponibles y únete a uno para comenzar tu viaje de mindfulness."
-                    buttonText="Explorar Programas"
-                />
-            )}
+                            <ProgresoPrograma
+                                progreso={progreso}
+                                cuestionarioPreRespondido={cuestionarioPreRespondido}
+                                cuestionarioPostRespondido={cuestionarioPostRespondido}
+                                mostrarDetalles={false}
+                            />
 
-            {/* Próxima acción */}
-            {proximaAccion && !programaFinalizado && (
-                <div className="max-w-4xl mx-auto mb-6 md:mb-10">
-                    <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-[2px] rounded-2xl shadow-xl overflow-hidden">
-                        <div className="bg-white p-4 md:p-8 rounded-2xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full -mt-10 -mr-10 z-0 hidden md:block"></div>
-
-                            <div className="relative z-10">
-                                <div className="flex items-center mb-4 md:mb-6">
-                                    <div className="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-full bg-indigo-100 mr-3 md:mr-4">
-                                        <Bell className="h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
-                                    </div>
-                                    <h2 className="text-lg md:text-xl font-bold text-gray-800">Tu próxima acción</h2>
-                                </div>
-
-                                <div className="mb-4 md:mb-6">
-                                    <div className="flex items-start">
-                                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-600 mr-3 md:mr-4">
-                                            {proximaAccion.icono}
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg md:text-xl font-bold text-gray-900">{proximaAccion.titulo}</h3>
-                                            <p className="text-sm md:text-base text-gray-600 mt-1">{proximaAccion.descripcion}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
+                            <div className="flex justify-center mt-8">
                                 <Link
-                                    to={proximaAccion.url}
-                                    className="group relative inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden w-full md:w-auto text-center"
+                                    to="/miprograma"
+                                    className="group relative inline-flex items-center justify-center px-8 py-3.5 overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
                                 >
-                                    <span className="absolute right-full w-12 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-96 ease"></span>
-                                    <span className="relative flex items-center justify-center">
-                                        {proximaAccion.tipo === 'sesion' ? 'Comenzar sesión' : 'Completar cuestionario'}
-                                        <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                                    <span className="absolute left-0 w-8 h-32 -mt-12 transition-all duration-1000 transform -translate-x-12 bg-white opacity-10 rotate-12 group-hover:translate-x-96 ease"></span>
+                                    <span className="relative flex items-center justify-center text-white font-semibold">
+                                        <ListChecks className="h-5 w-5 mr-3" />
+                                        Ver detalles de mi programa
+                                        <ChevronRight className="h-5 w-5 ml-3 group-hover:translate-x-1 transition-transform" />
                                     </span>
                                 </Link>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Progreso */}
-            {progreso && !programaFinalizado && (
-                <div className="max-w-4xl mx-auto mb-6 md:mb-10">
-                    <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6 border border-indigo-100">
-                        <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 flex items-center">
-                            <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6 text-indigo-600 mr-2" />
-                            Tu progreso
-                        </h2>
+                {/* Acciones rápidas - Solo visible en escritorio */}
+                <div className="hidden md:block">
+                    <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center pl-2">
+                        <Star className="h-5 w-5 text-amber-500 mr-2" />
+                        Acciones rápidas
+                    </h2>
 
-                        <ProgresoPrograma
-                            progreso={progreso}
-                            cuestionarioPreRespondido={cuestionarioPreRespondido}
-                            cuestionarioPostRespondido={cuestionarioPostRespondido}
-                            mostrarDetalles={false}
-                        />
+                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
+                        <Link
+                            to="/explorar"
+                            className="group bg-white rounded-xl shadow-md border border-gray-100 hover:border-indigo-300 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <div className="p-5">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 mr-4 group-hover:bg-blue-100 transition-colors">
+                                        <Search className="h-6 w-6 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">Explorar Programas</h3>
+                                        <p className="text-sm text-gray-500">Descubre nuevos caminos de mindfulness</p>
+                                    </div>
+                                    <ChevronRight className="h-5 w-5 text-gray-400 ml-auto group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                                </div>
+                            </div>
+                        </Link>
 
-                        <div className="flex justify-center mt-6 md:mt-8">
-                            <Link
-                                to="/miprograma"
-                                className="group relative inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-3.5 overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 w-full md:w-auto text-center"
-                            >
-                                <span className="absolute left-0 w-8 h-32 -mt-12 transition-all duration-1000 transform -translate-x-12 bg-white opacity-10 rotate-12 group-hover:translate-x-96 ease"></span>
-                                <span className="relative flex items-center justify-center text-white font-semibold">
-                                    <ListChecks className="h-5 w-5 mr-3" />
-                                    Ver detalles de mi programa
-                                    <ChevronRight className="h-5 w-5 ml-3 group-hover:translate-x-1 transition-transform" />
-                                </span>
-                            </Link>
-                        </div>
+                        <Link
+                            to="/perfil"
+                            className="group bg-white rounded-xl shadow-md border border-gray-100 hover:border-indigo-300 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <div className="p-5">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-indigo-50 mr-4 group-hover:bg-indigo-100 transition-colors">
+                                        <User className="h-6 w-6 text-indigo-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors">Mi Perfil</h3>
+                                        <p className="text-sm text-gray-500">Gestiona tu información personal</p>
+                                    </div>
+                                    <ChevronRight className="h-5 w-5 text-gray-400 ml-auto group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+                                </div>
+                            </div>
+                        </Link>
+
+                        <Link
+                            to="/completados"
+                            className="group bg-white rounded-xl shadow-md border border-gray-100 hover:border-indigo-300 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                            <div className="p-5">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-amber-50 mr-4 group-hover:bg-amber-100 transition-colors">
+                                        <Star className="h-6 w-6 text-amber-500" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition-colors">Programas Completados</h3>
+                                        <p className="text-sm text-gray-500">Revisa tus logros de mindfulness</p>
+                                    </div>
+                                    <ChevronRight className="h-5 w-5 text-gray-400 ml-auto group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
+                                </div>
+                            </div>
+                        </Link>
+
+                        <button
+                            onClick={logout}
+                            className="group bg-white rounded-xl shadow-md border border-gray-100 hover:border-red-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 text-left w-full"
+                        >
+                            <div className="p-5">
+                                <div className="flex items-center">
+                                    <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-red-50 mr-4 group-hover:bg-red-100 transition-colors">
+                                        <LogOut className="h-6 w-6 text-red-500" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-semibold text-gray-900 group-hover:text-red-600 transition-colors">Cerrar Sesión</h3>
+                                        <p className="text-sm text-gray-500">Hasta pronto</p>
+                                    </div>
+                                    <ChevronRight className="h-5 w-5 text-gray-400 ml-auto group-hover:text-red-500 group-hover:translate-x-1 transition-all" />
+                                </div>
+                            </div>
+                        </button>
                     </div>
-                </div>
-            )}
-
-            {/* Acciones rápidas - Solo visible en escritorio */}
-            <div className="hidden md:block max-w-4xl mx-auto">
-                <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4 md:mb-6 flex items-center pl-2">
-                    <Star className="h-4 w-4 md:h-5 md:w-5 text-amber-500 mr-2" />
-                    Acciones rápidas
-                </h2>
-
-                <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2">
-                    <Link
-                        to="/explorar"
-                        className="group bg-white rounded-xl shadow-md border border-gray-100 hover:border-indigo-300 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
-                    >
-                        <div className="p-4 md:p-5">
-                            <div className="flex items-center">
-                                <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-blue-50 mr-3 md:mr-4 group-hover:bg-blue-100 transition-colors">
-                                    <Search className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">Explorar Programas</h3>
-                                    <p className="text-sm text-gray-500">Descubre nuevos caminos de mindfulness</p>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-gray-400 ml-auto group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    <Link
-                        to="/perfil"
-                        className="group bg-white rounded-xl shadow-md border border-gray-100 hover:border-indigo-300 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
-                    >
-                        <div className="p-4 md:p-5">
-                            <div className="flex items-center">
-                                <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-indigo-50 mr-3 md:mr-4 group-hover:bg-indigo-100 transition-colors">
-                                    <User className="h-5 w-5 md:h-6 md:w-6 text-indigo-600" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 group-hover:text-indigo-700 transition-colors">Mi Perfil</h3>
-                                    <p className="text-sm text-gray-500">Gestiona tu información personal</p>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-gray-400 ml-auto group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    <Link
-                        to="/completados"
-                        className="group bg-white rounded-xl shadow-md border border-gray-100 hover:border-indigo-300 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
-                    >
-                        <div className="p-4 md:p-5">
-                            <div className="flex items-center">
-                                <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-amber-50 mr-3 md:mr-4 group-hover:bg-amber-100 transition-colors">
-                                    <Star className="h-5 w-5 md:h-6 md:w-6 text-amber-500" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition-colors">Programas Completados</h3>
-                                    <p className="text-sm text-gray-500">Revisa tus logros de mindfulness</p>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-gray-400 ml-auto group-hover:text-amber-500 group-hover:translate-x-1 transition-all" />
-                            </div>
-                        </div>
-                    </Link>
-
-                    <button
-                        onClick={logout}
-                        className="group bg-white rounded-xl shadow-md border border-gray-100 hover:border-red-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
-                    >
-                        <div className="p-5">
-                            <div className="flex items-center">
-                                <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-red-50 mr-4 group-hover:bg-red-100 transition-colors">
-                                    <LogOut className="h-6 w-6 text-red-500" />
-                                </div>
-                                <div>
-                                    <h3 className="font-semibold text-gray-900 group-hover:text-red-600 transition-colors">Cerrar Sesión</h3>
-                                    <p className="text-sm text-gray-500">Hasta pronto</p>
-                                </div>
-                                <ChevronRight className="h-5 w-5 text-gray-400 ml-auto group-hover:text-red-500 group-hover:translate-x-1 transition-all" />
-                            </div>
-                        </div>
-                    </button>
                 </div>
             </div>
 
