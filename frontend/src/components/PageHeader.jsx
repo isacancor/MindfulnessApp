@@ -9,7 +9,8 @@ const PageHeader = ({
     backUrl,
     className = '',
     titleClassName = '',
-    subtitleClassName = ''
+    subtitleClassName = '',
+    isInvestigador = false
 }) => {
     const navigate = useNavigate();
 
@@ -33,8 +34,8 @@ const PageHeader = ({
                 </button>
             )}
 
-            <div className="text-center pt-16 pb-8 px-4 md:pt-10 md:pb-10">
-                <h1 className={`text-2xl md:text-3xl lg:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-500 mb-2 ${titleClassName}`}>
+            <div className={`text-center pt-16 px-4 md:pt-10 ${!isInvestigador ? 'pb-8 md:pb-10' : ''}`}>
+                <h1 className={`text-2xl md:text-3xl lg:text-4xl font-extrabold bg-clip-text text-transparent mb-2 ${isInvestigador ? 'bg-gradient-to-r from-blue-600 to-teal-500' : 'bg-gradient-to-r from-indigo-600 to-purple-500'} ${titleClassName}`}>
                     {title}
                 </h1>
                 {subtitle && (
