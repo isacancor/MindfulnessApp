@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, BarChart, BarChartHorizontal, LineChart, AlertTriangle, BookOpen } from 'lucide-react';
 import api from '../../config/axios';
-import InvestigadorLayout from '../../components/InvestigadorLayout';
+import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
 
 const Analisis = () => {

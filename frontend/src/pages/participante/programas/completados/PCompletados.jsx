@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, FileText, Star, Loader2, Search } from 'lucide-react';
+import { Calendar, Users, FileText, Star, Loader2, Search } from 'lucide-react';
 import api from '../../../../config/axios';
 import ErrorAlert from '../../../../components/ErrorAlert';
-import MobileNavBar from '../../../../components/MobileNavBar';
+import MobileNavBar from '../../../../components/layout/MobileNavBar';
 import CTOExplorar from '../../../../components/CTOExplorar';
-import PageHeader from '../../../../components/PageHeader';
+import PageHeader from '../../../../components/layout/PageHeader';
 
 const ProgramasCompletados = () => {
     const navigate = useNavigate();

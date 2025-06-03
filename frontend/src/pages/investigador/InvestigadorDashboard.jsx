@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { PlusCircle, Eye, Users, Clock, CalendarCheck, Award, FileText, ArrowRight, MenuSquare, BarChart, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import api from '../../config/axios';
-import InvestigadorLayout from '../../components/InvestigadorLayout';
+import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
 
 const InvestigadorDashboard = () => {

@@ -4,7 +4,7 @@ import { ArrowLeft, Star, Heart, ThumbsUp } from 'lucide-react';
 import api from '../../../config/axios';
 import { useAuth } from '../../../context/AuthContext';
 import ErrorAlert from '../../../components/ErrorAlert';
-import PageHeader from '../../../components/PageHeader';
+import PageHeader from '../../../components/layout/PageHeader';
 
 const VistaPreviaCuestionario = () => {
     const { id, cuestionarioId } = useParams();

@@ -4,8 +4,8 @@ import { ArrowLeft, Star, Heart, ThumbsUp, AlertCircle } from 'lucide-react';
 import api from '../../config/axios';
 import { useAuth } from '../../context/AuthContext';
 import ErrorAlert from '../../components/ErrorAlert';
-import MobileNavBar from '../../components/MobileNavBar';
-import PageHeader from '../../components/PageHeader';
+import MobileNavBar from '../../components/layout/MobileNavBar';
+import PageHeader from '../../components/layout/PageHeader';
 
 const ResponderCuestionario = ({ tipo }) => {
     const navigate = useNavigate();

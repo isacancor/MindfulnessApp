@@ -5,7 +5,7 @@ import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, 
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
 import { EstadoPublicacion } from '../../../constants/enums';
-import PageHeader from '../../../components/PageHeader';
+import PageHeader from '../../../components/layout/PageHeader';
 
 const DetallePrograma = () => {
     const { id } = useParams();

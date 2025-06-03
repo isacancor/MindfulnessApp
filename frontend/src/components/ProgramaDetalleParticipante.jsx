@@ -6,7 +6,7 @@ import ErrorAlert from './ErrorAlert';
 import ProgresoPrograma from './ProgresoPrograma';
 import ProgramaFinalizado from '../pages/participante/programas/ProgramaFinalizado';
 import CTOExplorar from './CTOExplorar';
-import MobileNavBar from './MobileNavBar';
+import MobileNavBar from './layout/MobileNavBar';
 
 const ProgramaDetalle = ({
     programa,

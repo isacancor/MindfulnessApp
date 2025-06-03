@@ -5,7 +5,7 @@ import ErrorAlert from '../ErrorAlert';
 import { Genero, NivelEducativo, ExperienciaMindfulness } from '../../constants/enums';
 import { useState } from 'react';
 import ChangePasswordModal from '../auth/ChangePasswordModal';
-import MobileNavBar from '../MobileNavBar';
+import MobileNavBar from '../layout/MobileNavBar';
 
 const PerfilParticipante = () => {
     const { user, error, resetError, logout } = useAuth();

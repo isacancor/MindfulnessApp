@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import ErrorAlert from '@/components/ErrorAlert';
-import MobileNavBar from '@/components/MobileNavBar';
+import MobileNavBar from '@/components/layout/MobileNavBar';
 import { Play, LogOut, Search, User, ChevronRight, CheckCircle2, Star, ArrowRight, ListChecks, FileText, Sparkles, Bell, Loader2 } from 'lucide-react';
 import api from '@/config/axios';
 import ProgresoPrograma from '@/components/ProgresoPrograma';
 import CTOExplorar from '@/components/CTOExplorar';
-import PageHeader from '@/components/PageHeader';
+import PageHeader from '@/components/layout/PageHeader';
 
 const ParticipanteDashboard = () => {
     const { user, logout } = useAuth();

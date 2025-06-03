@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { LogOut, FileText, BarChart2, Calendar, ClipboardList, Settings, PieChart, Download } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = () => {
     const { logout } = useAuth();

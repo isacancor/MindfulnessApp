@@ -4,8 +4,8 @@ import { Search, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, Chec
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
 import EnrolarProgramaModal from '../../../components/modals/EnrolarProgramaModal';
-import MobileNavBar from '../../../components/MobileNavBar';
-import PageHeader from '../../../components/PageHeader';
+import MobileNavBar from '../../../components/layout/MobileNavBar';
+import PageHeader from '../../../components/layout/PageHeader';
 
 const ExplorarProgramas = () => {
     const navigate = useNavigate();

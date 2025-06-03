@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import api from '../../../config/axios';
 import ProgramaFinalizado from './ProgramaFinalizado';
 import ProgramaDetalle from '../../../components/ProgramaDetalleParticipante';
-import MobileNavBar from '../../../components/MobileNavBar';
+import MobileNavBar from '../../../components/layout/MobileNavBar';
 import CTOExplorar from '../../../components/CTOExplorar';
-import PageHeader from '../../../components/PageHeader';
+import PageHeader from '../../../components/layout/PageHeader';
 
 const MiPrograma = () => {
     const [programa, setPrograma] = useState(null);

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { User, Mail, Calendar, Phone, CheckCircle, Clock, Users, Loader2 } from 'lucide-react';
 import api from '../../config/axios';
 import ErrorAlert from '../../components/ErrorAlert';
-import PageHeader from '../../components/PageHeader';
+import PageHeader from '../../components/layout/PageHeader';
 
 const ListadoParticipantes = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
     const [programa, setPrograma] = useState(null);
     const [participantes, setParticipantes] = useState([]);
     const [inscripciones, setInscripciones] = useState({});

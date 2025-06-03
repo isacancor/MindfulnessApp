@@ -4,8 +4,8 @@ import { ArrowLeft, Clock, CheckCircle2, ExternalLink } from 'lucide-react';
 import api from '../../config/axios';
 import DiarioForm from '../../components/DiarioForm';
 import ErrorAlert from '../../components/ErrorAlert';
-import MobileNavBar from '../../components/MobileNavBar';
-import PageHeader from '../../components/PageHeader';
+import MobileNavBar from '../../components/layout/MobileNavBar';
+import PageHeader from '../../components/layout/PageHeader';
 
 const HacerSesion = ({ completado }) => {
     const navigate = useNavigate();

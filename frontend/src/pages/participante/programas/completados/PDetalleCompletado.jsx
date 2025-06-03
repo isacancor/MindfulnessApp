@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../../config/axios';
 import ProgramaDetalle from '../../../../components/ProgramaDetalleParticipante';
-import MobileNavBar from '../../../../components/MobileNavBar';
-import PageHeader from '../../../../components/PageHeader';
+import MobileNavBar from '../../../../components/layout/MobileNavBar';
+import PageHeader from '../../../../components/layout/PageHeader';
 
 const ProgramaCompletado = () => {
     const { id } = useParams();

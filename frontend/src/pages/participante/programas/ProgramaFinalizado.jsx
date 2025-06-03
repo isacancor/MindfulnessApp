@@ -1,8 +1,8 @@
 import React from 'react';
 import { Calendar, Users, Clock, FileText, AlertCircle } from 'lucide-react';
-import MobileNavBar from '../../../components/MobileNavBar';
+import MobileNavBar from '../../../components/layout/MobileNavBar';
 import CTOExplorar from '../../../components/CTOExplorar';
-import PageHeader from '../../../components/PageHeader';
+import PageHeader from '../../../components/layout/PageHeader';
 
 const ProgramaFinalizado = ({ programa }) => {
     return (
