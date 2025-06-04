@@ -1094,4 +1094,64 @@ def programa_estadisticas(request, pk):
         return Response(
             {"error": f"Error al obtener estadísticas: {str(e)}"}, 
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_duplicar(request, pk):
+    try:
+        programa_original = Programa.objects.get(pk=pk)
+    except Programa.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # Verificar que el usuario es el investigador del programa
+    if programa_original.creado_por != request.user.perfil_investigador:
+        return Response(
+            {"error": "No tienes permiso para duplicar este programa"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        # Crear una copia del programa
+        programa_duplicado = Programa.objects.create(
+            nombre=f"Copia de {programa_original.nombre}",
+            descripcion=programa_original.descripcion,
+            tipo_contexto=programa_original.tipo_contexto,
+            enfoque_metodologico=programa_original.enfoque_metodologico,
+            poblacion_objetivo=programa_original.poblacion_objetivo,
+            duracion_semanas=programa_original.duracion_semanas,
+            creado_por=request.user.perfil_investigador,
+            estado_publicacion=EstadoPublicacion.BORRADOR
+        )
+
+        # Copiar las sesiones
+        for sesion in programa_original.sesiones.all():
+            sesion.pk = None
+            sesion.programa = programa_duplicado
+            sesion.save()
+
+        # Copiar los cuestionarios si existen
+        if programa_original.cuestionario_pre:
+            cuestionario_pre = programa_original.cuestionario_pre
+            cuestionario_pre.pk = None
+            cuestionario_pre.programa = programa_duplicado
+            cuestionario_pre.save()
+            programa_duplicado.cuestionario_pre = cuestionario_pre
+
+        if programa_original.cuestionario_post:
+            cuestionario_post = programa_original.cuestionario_post
+            cuestionario_post.pk = None
+            cuestionario_post.programa = programa_duplicado
+            cuestionario_post.save()
+            programa_duplicado.cuestionario_post = cuestionario_post
+
+        programa_duplicado.save()
+
+        serializer = ProgramaSerializer(programa_duplicado)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response(
+            {"error": f"Error al duplicar el programa: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) 

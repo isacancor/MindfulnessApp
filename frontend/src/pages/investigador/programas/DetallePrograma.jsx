@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion, CheckCircle, UserCheck } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion, CheckCircle, UserCheck, Copy } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
 import { EstadoPublicacion } from '../../../constants/enums';
@@ -111,6 +111,19 @@ const DetallePrograma = () => {
             fetchPrograma();
         } catch (error) {
             setError(error.response?.data?.error || 'Error al finalizar el programa');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDuplicar = async () => {
+        try {
+            setLoading(true);
+            await api.post(`/programas/${id}/duplicar/`);
+            navigate('/programas');
+            // navigate(`/programas/${response.data.id}`);
+        } catch (error) {
+            setError(error.response?.data?.error || 'Error al duplicar el programa');
         } finally {
             setLoading(false);
         }
@@ -235,14 +248,24 @@ const DetallePrograma = () => {
                             )}
 
                             {isInvestigador() && programa?.estado_publicacion === 'publicado' && (
-                                <button
-                                    onClick={handleFinalizar}
-                                    className="flex items-center px-6 py-3 bg-red-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-red-600"
-                                >
-                                    <CheckCircle className="h-5 w-5 mr-2" />
-                                    Finalizar Programa
-                                </button>
+                                <>
+                                    <button
+                                        onClick={handleFinalizar}
+                                        className="flex items-center px-6 py-3 bg-red-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-red-600"
+                                    >
+                                        <CheckCircle className="h-5 w-5 mr-2" />
+                                        Finalizar Programa
+                                    </button>
+                                </>
                             )}
+
+                            <button
+                                onClick={handleDuplicar}
+                                className="flex items-center px-6 py-3 bg-indigo-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-indigo-600"
+                            >
+                                <Copy className="h-5 w-5 mr-2" />
+                                Duplicar Programa
+                            </button>
                         </div>
                     </div>
 

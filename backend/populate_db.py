@@ -67,7 +67,7 @@ def run():
     inv, _ = Investigador.objects.get_or_create(
         usuario=user_inv,
         defaults={
-            "experienciaInvestigacion": "Sí",
+            "experienciaInvestigacion": "si",
             "areasInteres": ["Mindfulness", "Psicología", "Educación"],
         }
     )
@@ -94,7 +94,7 @@ def run():
     inv2, _ = Investigador.objects.get_or_create(
         usuario=user_inv2,
         defaults={
-            "experienciaInvestigacion": "Sí",
+            "experienciaInvestigacion": "si",
             "areasInteres": ["Mindfulness", "Educación", "Bienestar"],
         }
     )
@@ -121,7 +121,7 @@ def run():
     inv3, _ = Investigador.objects.get_or_create(
         usuario=user_inv3,
         defaults={
-            "experienciaInvestigacion": "Sí",
+            "experienciaInvestigacion": "si",
             "areasInteres": ["Mindfulness", "Neurociencia", "Psicología", "Educación", "Meditación", "Bienestar"],
         }
     )
@@ -152,7 +152,7 @@ def run():
             "ubicacion": "Barcelona, España",
             "ocupacion": "Médica",
             "nivelEducativo": "doctorado",
-            "experienciaMindfulness": "menos_de_6_meses",
+            "experienciaMindfulness": "menos_6_meses",
             "condicionesSalud": "Estrés laboral",
         },
         {
@@ -165,7 +165,7 @@ def run():
             "ubicacion": "Valencia, España",
             "ocupacion": "Profesor",
             "nivelEducativo": "master",
-            "experienciaMindfulness": "mas_de_2_anos",
+            "experienciaMindfulness": "mas_10_anos",
             "condicionesSalud": "Ansiedad",
         }
     ]
@@ -217,7 +217,7 @@ def run():
     yo.save()
     yopart, _ = Participante.objects.get_or_create(usuario=yo,
         defaults={
-            "experienciaMindfulness": "mas_de_2_anos",
+            "experienciaMindfulness": "mas_10_anos",
             "condicionesSalud": "Nada",
         }
     )
@@ -248,7 +248,7 @@ def run():
             "ubicacion": "Barcelona, España",
             "ocupacion": "Médica",
             "nivelEducativo": "doctorado",
-            "experienciaMindfulness": "menos_de_6_meses",
+            "experienciaMindfulness": "menos_6_meses",
             "condicionesSalud": "Estrés laboral",
         },
         {
@@ -261,7 +261,7 @@ def run():
             "ubicacion": "Valencia, España",
             "ocupacion": "Profesor",
             "nivelEducativo": "master",
-            "experienciaMindfulness": "mas_de_2_anos",
+            "experienciaMindfulness": "mas_10_anos",
             "condicionesSalud": "Ansiedad",
         }
     ]

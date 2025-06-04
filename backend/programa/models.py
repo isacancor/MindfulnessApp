@@ -15,7 +15,7 @@ class Programa(models.Model):
     tipo_contexto = models.CharField(
         max_length=50,
         choices=TipoContexto.choices,
-        default=TipoContexto.PERSONAL
+        default=TipoContexto.CRECIMIENTO_PERSONAL
     )
     enfoque_metodologico = models.CharField(
         max_length=50,

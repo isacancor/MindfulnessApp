@@ -37,6 +37,7 @@ const ExplorarProgramas = () => {
     const verificarEnrolamiento = async () => {
         try {
             const response = await api.get('/programas/mi-programa/');
+            console.log(response.data);
             if (response.data && response.data.id) {
                 setMiProgramaId(response.data.id);
                 setYaEnrolado(true);

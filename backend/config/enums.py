@@ -20,7 +20,7 @@ class NivelEducativo(models.TextChoices):
     PRIMARIA = 'primaria', _('Primaria')
     SECUNDARIA = 'secundaria', _('Secundaria')
     BACHILLERATO = 'bachillerato', _('Bachillerato')
-    FP = 'formacion_profesional', _('Formación Profesional')
+    FP = 'fp', _('Formación Profesional')
     UNIVERSIDAD = 'universidad', _('Universidad')
     MASTER = 'master', _('Master')
     DOCTORADO = 'doctorado', _('Doctorado')
@@ -28,11 +28,11 @@ class NivelEducativo(models.TextChoices):
 
 class ExperienciaMindfulness(models.TextChoices):
     NINGUNA = 'ninguna', _('Ninguna')
-    MENOS_6_MESES = 'menos_de_6_meses', _('Menos de 6 meses')
-    ENTRE_6_12_MESES = '6_meses_1_ano', _('6 meses - 1 año')
-    ENTRE_1_2_ANOS = '1_2_anos', _('1 - 2 años')
-    ENTRE_2_10_ANOS = '2_10_anos', _('2 - 10 años')
-    MAS_10_ANOS = 'mas_de_10_anos', _('Más de 10 años')
+    MENOS_6_MESES = 'menos_6_meses', _('Menos de 6 meses')
+    ENTRE_6_12_MESES = 'entre_6_12_meses', _('6 meses - 1 año')
+    ENTRE_1_2_ANOS = 'entre_1_2_anos', _('1 - 2 años')
+    ENTRE_2_10_ANOS = 'entre_2_10_anos', _('2 - 10 años')
+    MAS_10_ANOS = 'mas_10_anos', _('Más de 10 años')
 
 class ExperienciaInvestigacion(models.TextChoices):
     SI = 'si', _('Sí')
@@ -43,9 +43,9 @@ class ExperienciaInvestigacion(models.TextChoices):
 class TipoContexto(models.TextChoices):
     ACADEMICO = 'académico', 'Académico'
     LABORAL = 'laboral', 'Laboral'
-    CLINICO = 'clínico/terapéutico', 'Clínico/Terapéutico'
+    CLINICO = 'clínico', 'Clínico/Terapéutico'
     DEPORTIVO = 'deportivo', 'Deportivo'
-    PERSONAL = 'personal/desarrollo individual', 'Personal/Desarrollo Individual'
+    CRECIMIENTO_PERSONAL = 'crecimiento_personal', 'Crecimiento Personal'
     OTRO = 'otro', 'Otro'
 
 class EnfoqueMetodologico(models.TextChoices):
@@ -63,15 +63,15 @@ class EstadoPublicacion(models.TextChoices):
     FINALIZADO = 'finalizado', 'Finalizado'
 
 class EstadoPrograma(models.TextChoices):
-    EN_PROGRESO = 'en progreso', 'En progreso'
+    EN_PROGRESO = 'en_progreso', 'En progreso'
     COMPLETADO = 'completado', 'Completado'
 
 # Enums de Sesión
 class EtiquetaPractica(models.TextChoices):
     BREATH = 'breath', 'Atención a la Respiración'
     SOUNDS = 'sounds', 'Atención a los Sonidos'
-    VISUAL_OBJECT = 'visual_object', 'Atención Focalizada a Objeto visual'
-    SENSES = 'senses', 'Atención Focalizada a Sentidos'
+    VISUAL_OBJECT = 'visual_object', 'Atención a un Objeto visual'
+    SENSES = 'senses', 'Atención a los Sentidos'
     OPEN_AWARENESS = 'open_awareness', 'Conciencia Abierta'
     LOVING_KINDNESS = 'loving_kindness', 'Loving Kindness (Bondad Amorosa)'
     BODY_SCAN = 'body_scan', 'Escaneo Corporal'
@@ -102,4 +102,4 @@ class TipoPregunta(models.TextChoices):
     CHECKBOX = 'checkbox', 'Múltiple Opción'
     CALIFICACION = 'calificacion', 'Calificación'
     LIKERT = 'likert', 'Escala Likert'
-    LIKERT_5_PUNTOS = 'likert-5-puntos', 'Escala Likert 5 Puntos' 
+    LIKERT_5_PUNTOS = 'likert_5_puntos', 'Escala Likert 5 Puntos' 

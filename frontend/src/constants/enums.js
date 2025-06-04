@@ -19,7 +19,7 @@ export const NivelEducativo = {
     PRIMARIA: { value: 'primaria', label: 'Primaria' },
     SECUNDARIA: { value: 'secundaria', label: 'Secundaria' },
     BACHILLERATO: { value: 'bachillerato', label: 'Bachillerato' },
-    FP: { value: 'formacion_profesional', label: 'Formación Profesional' },
+    FP: { value: 'fp', label: 'Formación Profesional' },
     UNIVERSIDAD: { value: 'universidad', label: 'Universidad' },
     MASTER: { value: 'master', label: 'Master' },
     DOCTORADO: { value: 'doctorado', label: 'Doctorado' },
@@ -28,11 +28,11 @@ export const NivelEducativo = {
 
 export const ExperienciaMindfulness = {
     NINGUNA: { value: 'ninguna', label: 'Ninguna' },
-    MENOS_6_MESES: { value: 'menos_de_6_meses', label: 'Menos de 6 meses' },
-    ENTRE_6_12_MESES: { value: '6_meses_1_ano', label: '6 meses - 1 año' },
-    ENTRE_1_2_ANOS: { value: '1_2_anos', label: '1 - 2 años' },
-    ENTRE_2_10_ANOS: { value: '2_10_anos', label: '2 - 10 años' },
-    MAS_10_ANOS: { value: 'mas_de_10_anos', label: 'Más de 10 años' }
+    MENOS_6_MESES: { value: 'menos_6_meses', label: 'Menos de 6 meses' },
+    ENTRE_6_12_MESES: { value: 'entre_6_12_meses', label: '6 meses - 1 año' },
+    ENTRE_1_2_ANOS: { value: 'entre_1_2_anos', label: '1 - 2 años' },
+    ENTRE_2_10_ANOS: { value: 'entre_2_10_anos', label: '2 - 10 años' },
+    MAS_10_ANOS: { value: 'mas_10_anos', label: 'Más de 10 años' }
 };
 
 export const ExperienciaInvestigacion = {
@@ -45,9 +45,9 @@ export const ExperienciaInvestigacion = {
 export const TipoContexto = {
     ACADEMICO: { value: 'académico', label: 'Académico' },
     LABORAL: { value: 'laboral', label: 'Laboral' },
-    CLINICO: { value: 'clínico/terapéutico', label: 'Clínico/Terapéutico' },
+    CLINICO: { value: 'clínico', label: 'Clínico/Terapéutico' },
     DEPORTIVO: { value: 'deportivo', label: 'Deportivo' },
-    PERSONAL: { value: 'personal/desarrollo individual', label: 'Personal/Desarrollo Individual' },
+    CRECIMIENTO_PERSONAL: { value: 'crecimiento_personal', label: 'Crecimiento Personal' },
     OTRO: { value: 'otro', label: 'Otro' }
 };
 
@@ -68,7 +68,7 @@ export const EstadoPublicacion = {
 };
 
 export const EstadoPrograma = {
-    EN_PROGRESO: { value: 'en progreso', label: 'En progreso' },
+    EN_PROGRESO: { value: 'en_progreso', label: 'En progreso' },
     COMPLETADO: { value: 'completado', label: 'Completado' }
 };
 
@@ -112,7 +112,7 @@ export const TipoPregunta = {
     CHECKBOX: { value: 'checkbox', label: 'Múltiple Opción' },
     CALIFICACION: { value: 'calificacion', label: 'Calificación' },
     LIKERT: { value: 'likert', label: 'Escala Likert' },
-    LIKERT_5_PUNTOS: { value: 'likert-5-puntos', label: 'Escala Likert 5 Puntos' }
+    LIKERT_5_PUNTOS: { value: 'likert_5_puntos', label: 'Escala Likert 5 Puntos' }
 };
 
 export const TipoEscala = {

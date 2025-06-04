@@ -39,9 +39,9 @@ const PageHeader = ({
                     {title}
                 </h1>
                 {subtitle && (
-                    <p className={`text-base md:text-xl text-gray-500 max-w-2xl mx-auto ${subtitleClassName}`}>
+                    <div className={`text-base md:text-xl text-gray-500 max-w-2xl mx-auto ${subtitleClassName}`}>
                         {subtitle}
-                    </p>
+                    </div>
                 )}
             </div>
         </div>

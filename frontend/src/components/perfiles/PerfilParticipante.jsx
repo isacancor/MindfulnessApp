@@ -12,6 +12,8 @@ const PerfilParticipante = () => {
     const navigate = useNavigate();
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
 
+    console.log(user);
+
     // Función para formatear la fecha de registro
     const formatDate = (dateString) => {
         if (!dateString) return 'No disponible';

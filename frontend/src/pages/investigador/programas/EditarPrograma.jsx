@@ -15,7 +15,7 @@ const EditarPrograma = () => {
     const [formData, setFormData] = useState({
         nombre: '',
         descripcion: '',
-        tipo_contexto: TipoContexto.PERSONAL.value,
+        tipo_contexto: TipoContexto.CRECIMIENTO_PERSONAL.value,
         enfoque_metodologico: EnfoqueMetodologico.MBSR.value,
         duracion_semanas: '',
         poblacion_objetivo: '',
