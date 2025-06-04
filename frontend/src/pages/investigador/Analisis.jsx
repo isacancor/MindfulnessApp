@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, BarChart, BarChartHorizontal, LineChart, AlertTriangle, BookOpen } from 'lucide-react';
+import { PieChart, BarChart, BarChartHorizontal, LineChart, BookOpen } from 'lucide-react';
 import api from '../../config/axios';
 import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
@@ -7,9 +7,10 @@ import ErrorAlert from '../../components/ErrorAlert';
 const Analisis = () => {
     const [programasFinalizados, setProgramasFinalizados] = useState([]);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
+    const [estadisticas, setEstadisticas] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [tipoGrafico, setTipoGrafico] = useState('barras');
+    //const [tipoGrafico, setTipoGrafico] = useState('barras');
 
     useEffect(() => {
         const fetchProgramasFinalizados = async () => {
@@ -35,8 +36,9 @@ const Analisis = () => {
             const response = await api.get(`/programas/${programaId}/estadisticas`);
             setProgramaSeleccionado({
                 ...programasFinalizados.find(p => p.id === programaId),
-                estadisticas: response.data
             });
+            setEstadisticas(response.data);
+            console.log(response.data);
         } catch (err) {
             console.error('Error al cargar estadísticas del programa:', err);
             setError('Error al cargar las estadísticas del programa. Por favor, intenta nuevamente.');
@@ -117,7 +119,7 @@ const Analisis = () => {
                                         >
                                             <h3 className={`font-medium ${programaSeleccionado?.id === programa.id ? 'text-indigo-700' : 'text-gray-800'
                                                 }`}>
-                                                {programa.titulo}
+                                                {programa.nombre}
                                             </h3>
                                             <p className="text-xs text-gray-500 mt-1">
                                                 {programa.participantes?.length || 0} participantes
@@ -131,7 +133,6 @@ const Analisis = () => {
                         <div className="lg:col-span-3">
                             {!programaSeleccionado ? (
                                 <div className="bg-white rounded-xl shadow-md p-12 text-center h-full flex flex-col items-center justify-center">
-                                    <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
                                     <h3 className="text-xl font-medium text-gray-800 mb-2">
                                         Selecciona un programa
                                     </h3>
@@ -141,6 +142,7 @@ const Analisis = () => {
                                 </div>
                             ) : (
                                 <div className="space-y-6">
+                                    {/*
                                     <div className="bg-white rounded-xl shadow-md p-6">
                                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                                             <div>
@@ -182,6 +184,7 @@ const Analisis = () => {
                                             </div>
                                         </div>
 
+                                        
                                         <div className="h-80 bg-gray-50 rounded-lg flex items-center justify-center">
                                             {tipoGrafico === 'barras' && (
                                                 <div className="text-center text-gray-500">
@@ -212,31 +215,33 @@ const Analisis = () => {
                                             )}
                                         </div>
                                     </div>
+                                     */}
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <TarjetaMetrica
                                             titulo="Total participantes"
-                                            valor={programaSeleccionado.participantes?.length || 0}
+                                            valor={estadisticas?.total_participantes || 0}
                                             icono={<BarChart className="h-6 w-6 text-blue-600" />}
                                             color="blue"
                                             descripcion="Número total de personas que participaron"
                                         />
                                         <TarjetaMetrica
                                             titulo="Sesiones completadas"
-                                            valor="85%"
+                                            valor={estadisticas?.sesiones_completadas || 0}
                                             icono={<PieChart className="h-6 w-6 text-purple-600" />}
                                             color="purple"
-                                            descripcion="Promedio de sesiones completadas por participante"
+                                            descripcion="Número total de sesiones completadas por todos los participantes"
                                         />
                                         <TarjetaMetrica
                                             titulo="Minutos de práctica"
-                                            valor="3,260"
+                                            valor={estadisticas?.minutos_totales_practica || 0}
                                             icono={<BarChartHorizontal className="h-6 w-6 text-green-600" />}
                                             color="green"
                                             descripcion="Minutos totales dedicados a mindfulness"
                                         />
                                     </div>
 
+                                    {/** 
                                     <div className="bg-white rounded-xl shadow-md p-6">
                                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Datos del cuestionario</h3>
                                         <div className="overflow-x-auto">
@@ -307,7 +312,9 @@ const Analisis = () => {
                                             Nota: Los datos mostrados son ejemplos y pueden no reflejar los resultados reales del programa.
                                         </p>
                                     </div>
+                                    */}
                                 </div>
+
                             )}
                         </div>
                     </div>

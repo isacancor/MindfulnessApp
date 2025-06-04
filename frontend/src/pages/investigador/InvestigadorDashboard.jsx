@@ -25,6 +25,8 @@ const InvestigadorDashboard = () => {
                 // Obtener estadísticas desde el endpoint del backend
                 const estadisticasResponse = await api.get('/programas/estadisticas/');
 
+                console.log(estadisticasResponse.data);
+
                 setEstadisticas({
                     totalProgramas: estadisticasResponse.data.total_programas,
                     participantesActivos: estadisticasResponse.data.participantes_activos,
@@ -134,7 +136,7 @@ const InvestigadorDashboard = () => {
                     </div>
                     <div className="mt-2 text-sm text-gray-500">
                         <span className="font-medium">
-                            {estadisticas.totalProgramas > 0 ? 'Programas activos disponibles' : 'Crea tu primer programa'}
+                            {estadisticas.totalProgramas > 0 ? 'Programas disponibles' : 'Crea tu primer programa'}
                         </span>
                     </div>
                 </div>

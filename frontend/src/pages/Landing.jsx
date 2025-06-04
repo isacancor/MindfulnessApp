@@ -53,12 +53,14 @@ export default function Landing() {
                         >
                             Acceder ya <ArrowRight size={18} />
                         </Link>
+                        {/** 
                         <Link
                             to="/about"
                             className="flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white/10 transition-all"
                         >
                             Conoce más
                         </Link>
+                        */}
                     </div>
                 </div>
             </section>

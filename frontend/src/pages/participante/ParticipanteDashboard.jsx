@@ -146,7 +146,7 @@ const ParticipanteDashboard = () => {
 
                 {programaNoEncontrado && (
                     <CTOExplorar
-                        titulo="No tienes un programa activo"
+                        titulo="No tienes ningún programa activo"
                         descripcion="Explora los programas disponibles y únete a uno para comenzar tu viaje de mindfulness."
                         buttonText="Explorar Programas"
                     />

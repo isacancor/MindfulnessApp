@@ -52,7 +52,7 @@ const ProgramaDetalle = ({
                     </div>
 
                     <CTOExplorar
-                        titulo={esCompletado ? "Programa no encontrado" : "No tienes un programa activo"}
+                        titulo={esCompletado ? "Programa no encontrado" : "No tienes ningún programa activo"}
                         descripcion={esCompletado
                             ? "El programa que buscas no existe o no tienes acceso a él."
                             : "Explora los programas disponibles y únete a uno para comenzar tu viaje de mindfulness."}

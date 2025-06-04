@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DownloadCloud, FileText, Filter, AlertTriangle, Check, File, BookOpen, Database } from 'lucide-react';
+import { DownloadCloud, Check, BookOpen, Database } from 'lucide-react';
 import api from '../../config/axios';
 import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
@@ -151,7 +151,6 @@ const ExportarDatos = () => {
                         <div className="lg:col-span-2">
                             {!programaSeleccionado ? (
                                 <div className="bg-white rounded-xl shadow-md p-12 text-center h-full flex flex-col items-center justify-center">
-                                    <AlertTriangle className="h-12 w-12 text-amber-500 mb-4" />
                                     <h3 className="text-xl font-medium text-gray-800 mb-2">
                                         Selecciona un programa
                                     </h3>

@@ -373,7 +373,6 @@ def investigador_estadisticas(request):
         # Participantes activos en todos los programas
         participantes_activos = InscripcionPrograma.objects.filter(
             programa__creado_por=request.user.perfil_investigador,
-            estado_programa=EstadoPrograma.EN_PROGRESO
         ).count()
         
         # Total de sesiones completadas (diarios registrados)
@@ -967,4 +966,132 @@ def listar_participantes_programa(request, pk):
     
     # Serializar y devolver los datos
     serializer = ParticipantesProgramaSerializer(programa)
-    return Response(serializer.data) 
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsInvestigador])
+def programa_estadisticas(request, pk):
+    """
+    Obtiene estadísticas detalladas de un programa específico.
+    Incluye:
+    - Número total de participantes
+    - Porcentaje de sesiones completadas
+    - Minutos totales de práctica
+    - Datos de cuestionarios pre/post
+    """
+    try:
+        programa = get_object_or_404(Programa, pk=pk)
+        
+        # Verificar que el programa pertenece al investigador actual
+        if programa.creado_por != request.user.perfil_investigador:
+            return Response(
+                {"error": "No tienes permiso para ver las estadísticas de este programa"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Obtener inscripciones del programa
+        inscripciones = InscripcionPrograma.objects.filter(programa=programa)
+        total_participantes = inscripciones.count()
+        
+        # Calcular sesiones completadas
+        sesiones_totales = programa.sesiones.count()
+        sesiones_completadas = DiarioSesion.objects.filter(
+            sesion__programa=programa
+        ).count()
+        
+        # Calcular minutos totales de práctica (solo sesiones completadas)
+        minutos_totales = 0
+        diarios = DiarioSesion.objects.filter(
+            sesion__programa=programa
+        ).select_related('sesion')
+        
+        for diario in diarios:
+            if diario.sesion.duracion_estimada:
+                minutos_totales += diario.sesion.duracion_estimada
+        
+       
+        # Obtener datos de cuestionarios
+        cuestionario_pre = programa.cuestionario_pre
+        cuestionario_post = programa.cuestionario_post
+        
+        # TODO: quitar
+        datos_cuestionarios = []
+        
+        # Calcular porcentaje de sesiones completadas
+        porcentaje_completado = round((sesiones_completadas / (sesiones_totales * total_participantes) * 100) if total_participantes > 0 else 0, 2)
+        
+        # Obtener datos detallados de diarios
+        diarios_detalle = []
+        for diario in diarios:
+            diarios_detalle.append({
+                'id': diario.id,
+                'participante_id': diario.participante.id,
+                'sesion_id': diario.sesion.id,
+                'sesion_titulo': diario.sesion.titulo,
+                'semana': diario.sesion.semana,
+                'fecha_creacion': diario.fecha_creacion,
+                'valoracion': diario.valoracion,
+                'comentario': diario.comentario
+            })
+        
+        # Obtener datos detallados de cuestionarios
+        cuestionarios_detalle = {
+            'pre': None,
+            'post': None
+        }
+        
+        if cuestionario_pre:
+            cuestionarios_detalle['pre'] = {
+                'id': cuestionario_pre.id,
+                'titulo': cuestionario_pre.titulo,
+                'preguntas': cuestionario_pre.preguntas,
+                'respuestas': []
+            }
+            
+            respuestas_pre = RespuestaCuestionario.objects.filter(
+                cuestionario=cuestionario_pre
+            ).select_related('participante')
+            
+            for respuesta in respuestas_pre:
+                cuestionarios_detalle['pre']['respuestas'].append({
+                    'id': respuesta.id,
+                    'participante_id': respuesta.participante.id,
+                    'fecha_respuesta': respuesta.fecha_respuesta,
+                    'respuestas': respuesta.respuestas
+                })
+        
+        if cuestionario_post:
+            cuestionarios_detalle['post'] = {
+                'id': cuestionario_post.id,
+                'titulo': cuestionario_post.titulo,
+                'preguntas': cuestionario_post.preguntas,
+                'respuestas': []
+            }
+            
+            respuestas_post = RespuestaCuestionario.objects.filter(
+                cuestionario=cuestionario_post
+            ).select_related('participante')
+            
+            for respuesta in respuestas_post:
+                cuestionarios_detalle['post']['respuestas'].append({
+                    'id': respuesta.id,
+                    'participante_id': respuesta.participante.id,
+                    'fecha_respuesta': respuesta.fecha_respuesta,
+                    'respuestas': respuesta.respuestas
+                })
+        
+        return Response({
+            'total_participantes': total_participantes,
+            'sesiones_completadas': sesiones_completadas,
+            'porcentaje_completado': porcentaje_completado,
+            'minutos_totales_practica': minutos_totales,
+            'datos_cuestionarios': datos_cuestionarios,
+            'diarios_detalle': diarios_detalle,
+            'cuestionarios_detalle': cuestionarios_detalle
+        })
+        
+    except Exception as e:
+        return Response(
+            {"error": f"Error al obtener estadísticas: {str(e)}"}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        ) 
