@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { PieChart, BarChart, BarChartHorizontal, LineChart, BookOpen } from 'lucide-react';
+import { PieChart, BarChart, BarChartHorizontal, LineChart, BookOpen, Table, List, Users } from 'lucide-react';
 import api from '../../config/axios';
 import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
 import TablaCuestionario from '../../components/TablaCuestionario';
+import { renderDiariosPorSesion, renderTodosLosDiarios, renderDiariosPorParticipante } from '../../utils/diariosUtils';
 
 const Analisis = () => {
     const [programas, setProgramas] = useState([]);
@@ -14,6 +15,7 @@ const Analisis = () => {
     const [pre, setPre] = useState(null);
     const [post, setPost] = useState(null);
     const [diarios, setDiarios] = useState(null);
+    const [vistaDiarios, setVistaDiarios] = useState('por_sesion'); // 'por_sesion', 'todos', o 'por_participante'
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     //const [tipoGrafico, setTipoGrafico] = useState('barras');
@@ -375,11 +377,11 @@ const Analisis = () => {
                                                                     {participante.id_anonimo}
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${progreso.estado === 'Completado'
+                                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${progreso.estado === 'completado'
                                                                         ? 'bg-green-100 text-green-800'
-                                                                        : progreso.estado === 'En progreso'
-                                                                            ? 'bg-blue-100 text-blue-800'
-                                                                            : 'bg-yellow-100 text-yellow-800'
+                                                                        : progreso.estado === 'en_progreso'
+                                                                            ? 'bg-yellow-100 text-yellow-800'
+                                                                            : 'bg-red-100 text-red-800'
                                                                         }`}>
                                                                         {progreso.estado}
                                                                     </span>
@@ -505,59 +507,47 @@ const Analisis = () => {
             {/* Tabla de Diarios de Sesión */}
             {programaSeleccionado?.tiene_diarios && diarios && (
                 <div className="mt-8">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">Diarios de Sesión</h2>
-                    {diarios.map((sesion) => (
-                        <div key={sesion.id} className="bg-white rounded-xl shadow-md p-6 mb-6">
-                            <div className="mb-4">
-                                <h3 className="text-lg font-semibold text-gray-800">
-                                    Semana {sesion.semana}: {sesion.titulo}
-                                </h3>
-                                <p className="text-sm text-gray-600">
-                                    Tipo de práctica: {sesion.tipo_practica} • Duración estimada: {sesion.duracion_estimada} minutos
-                                </p>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                    <thead className="bg-gray-50">
-                                        <tr>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Participante
-                                            </th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Valoración
-                                            </th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Comentario
-                                            </th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                Fecha
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-gray-200">
-                                        {Object.entries(sesion.diarios).map(([participanteId, diariosParticipante]) => (
-                                            diariosParticipante.map((diario, index) => (
-                                                <tr key={`${participanteId}-${index}`}>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                                        {participanteId}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {diario.valoracion}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-sm text-gray-500">
-                                                        {diario.comentario || 'Sin comentario'}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                        {new Date(diario.fecha).toLocaleDateString()}
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold text-gray-800">Diarios de Sesión</h2>
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={() => setVistaDiarios('por_sesion')}
+                                className={`p-2 rounded-lg flex items-center space-x-2 ${vistaDiarios === 'por_sesion'
+                                    ? 'bg-indigo-100 text-indigo-700'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                <List className="h-5 w-5" />
+                                <span>Agrupar por Semana</span>
+                            </button>
+                            <button
+                                onClick={() => setVistaDiarios('todos')}
+                                className={`p-2 rounded-lg flex items-center space-x-2 ${vistaDiarios === 'todos'
+                                    ? 'bg-indigo-100 text-indigo-700'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                <Table className="h-5 w-5" />
+                                <span>Todos</span>
+                            </button>
+                            <button
+                                onClick={() => setVistaDiarios('por_participante')}
+                                className={`p-2 rounded-lg flex items-center space-x-2 ${vistaDiarios === 'por_participante'
+                                    ? 'bg-indigo-100 text-indigo-700'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                <Users className="h-5 w-5" />
+                                <span>Por Participante</span>
+                            </button>
                         </div>
-                    ))}
+                    </div>
+                    {vistaDiarios === 'por_sesion'
+                        ? renderDiariosPorSesion(diarios)
+                        : vistaDiarios === 'todos'
+                            ? renderTodosLosDiarios(diarios)
+                            : renderDiariosPorParticipante(diarios)
+                    }
                 </div>
             )}
         </InvestigadorLayout>

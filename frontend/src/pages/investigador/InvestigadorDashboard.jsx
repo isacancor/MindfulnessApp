@@ -108,7 +108,7 @@ const InvestigadorDashboard = () => {
 
                     <Link
                         to="/programas/crear"
-                        className="flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-all shadow-md hover:shadow-lg"
+                        className="flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-full hover:bg-blue-50 transition-all shadow-md hover:shadow-lg"
                     >
                         <PlusCircle size={20} />
                         <span className="font-medium">Nuevo Programa</span>
