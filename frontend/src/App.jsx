@@ -28,7 +28,6 @@ import VistaPreviaCuestionario from './pages/investigador/cuestionarios/VistaPre
 import ResponderCuestionario from './pages/participante/ResponderCuestionario';
 import ProgramasCompletados from './pages/participante/programas/completados/PCompletados';
 import ProgramaCompletado from './pages/participante/programas/completados/PDetalleCompletado';
-import ListadoParticipantes from './pages/investigador/ListadoParticipantes';
 
 import Analisis from './pages/investigador/Analisis';
 import Exportar from './pages/investigador/Exportar';
@@ -57,7 +56,6 @@ function App() {
           <Route path="/programas" element={<ListaProgramas />} />
           <Route path="/programas/crear" element={<CrearPrograma />} />
           <Route path="/programas/:id" element={<DetallePrograma />} />
-          <Route path="/programas/:id/participantes" element={<ListadoParticipantes />} />
           <Route path="/programas/:id/editar" element={<EditarPrograma />} />
 
           {/* Análisis y Exportación */}

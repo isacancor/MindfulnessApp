@@ -51,7 +51,7 @@ const ListaProgramas = () => {
 
     return (
         <InvestigadorLayout>
-            <div className="max-w-7xl mx-auto space-y-8">
+            <div className="mx-auto space-y-8">
                 {/* Header con fondo de gradiente */}
                 <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-500 rounded-xl p-8 shadow-xl text-white mb-8">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">

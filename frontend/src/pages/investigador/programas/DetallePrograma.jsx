@@ -194,7 +194,7 @@ const DetallePrograma = () => {
                         />
 
                         <div className="flex flex-wrap justify-center gap-4 mt-6">
-                            {programa.estado_publicacion !== 'borrador' && (
+                            {/*programa.estado_publicacion !== 'borrador' && (
                                 <button
                                     onClick={() => navigate(`/programas/${id}/participantes`)}
                                     className="flex items-center px-6 py-3 bg-white text-indigo-700 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
@@ -202,7 +202,7 @@ const DetallePrograma = () => {
                                     <UserCheck className="h-5 w-5 mr-2" />
                                     Ver Participantes ({programa.participantes?.length || 0})
                                 </button>
-                            )}
+                            )*/}
 
                             {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
                                 <>

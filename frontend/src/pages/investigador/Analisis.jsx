@@ -7,7 +7,8 @@ import ErrorAlert from '../../components/ErrorAlert';
 const Analisis = () => {
     const [programas, setProgramas] = useState([]);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
-    const [estadisticas, setEstadisticas] = useState(null);
+    const [estadisticasGenerales, setEstadisticasGenerales] = useState(null);
+    const [estadisticasProgreso, setEstadisticasProgreso] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     //const [tipoGrafico, setTipoGrafico] = useState('barras');
@@ -31,12 +32,16 @@ const Analisis = () => {
     const handleSeleccionarPrograma = async (programaId) => {
         setLoading(true);
         try {
-            const response = await api.get(`/programas/${programaId}/estadisticas`);
+            const responseGenerales = await api.get(`/programas/${programaId}/estadisticas`);
+            setEstadisticasGenerales(responseGenerales.data);
+
+            const responseProgreso = await api.get(`/programas/${programaId}/estadisticas-progreso`);
             setProgramaSeleccionado({
                 ...programas.find(p => p.id === programaId),
             });
-            setEstadisticas(response.data);
-            console.log(response.data);
+            setEstadisticasProgreso(responseProgreso.data);
+            console.log(responseProgreso.data);
+
         } catch (err) {
             console.error('Error al cargar estadísticas del programa:', err);
             setError('Error al cargar las estadísticas del programa. Por favor, intenta nuevamente.');
@@ -73,7 +78,7 @@ const Analisis = () => {
 
     return (
         <InvestigadorLayout>
-            <div className="max-w-7xl mx-auto space-y-8 pb-10">
+            <div className="mx-auto space-y-8 pb-10">
                 <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 rounded-xl p-8 shadow-xl text-white">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="space-y-2">
@@ -218,25 +223,167 @@ const Analisis = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         <TarjetaMetrica
                                             titulo="Total participantes"
-                                            valor={estadisticas?.total_participantes || 0}
+                                            valor={estadisticasGenerales?.total_participantes || 0}
                                             icono={<BarChart className="h-6 w-6 text-blue-600" />}
                                             color="blue"
                                             descripcion="Número total de personas que participaron"
                                         />
                                         <TarjetaMetrica
                                             titulo="Sesiones completadas"
-                                            valor={estadisticas?.sesiones_completadas || 0}
+                                            valor={estadisticasGenerales?.sesiones_completadas || 0}
                                             icono={<PieChart className="h-6 w-6 text-purple-600" />}
                                             color="purple"
                                             descripcion="Número total de sesiones completadas por todos los participantes"
                                         />
                                         <TarjetaMetrica
                                             titulo="Minutos de práctica"
-                                            valor={estadisticas?.minutos_totales_practica || 0}
+                                            valor={estadisticasGenerales?.minutos_totales_practica || 0}
                                             icono={<BarChartHorizontal className="h-6 w-6 text-green-600" />}
                                             color="green"
                                             descripcion="Minutos totales dedicados a mindfulness"
                                         />
+                                    </div>
+
+                                    {/* Lista de Participantes */}
+                                    <div className="bg-white rounded-xl shadow-md p-6 mt-6">
+                                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Participantes</h3>
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            ID
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Género
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Edad
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Ocupación
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Nivel Educativo
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Ubicación
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Exp. Mindfulness
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Condiciones de Salud
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {programaSeleccionado?.participantes?.map((participante) => {
+                                                        const edad = new Date().getFullYear() - new Date(participante.fecha_nacimiento).getFullYear();
+                                                        return (
+                                                            <tr key={participante.id_anonimo}>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                                    {participante.id_anonimo}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {participante.genero}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {edad} años
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {participante.ocupacion}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {participante.nivel_educativo}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {participante.ubicacion}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {participante.experiencia_mindfulness}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {participante.condiciones_salud}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    {/* Progreso de Participantes */}
+                                    <div className="bg-white rounded-xl shadow-md p-6 mt-6">
+                                        <h3 className="text-lg font-semibold text-gray-800 mb-4">Progreso de Participantes</h3>
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-gray-200">
+                                                <thead className="bg-gray-50">
+                                                    <tr>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            ID
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Estado del Programa
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Sesiones Completadas
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Cuestionarios Completados
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Minutos de Práctica
+                                                        </th>
+                                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            Última Actividad
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="bg-white divide-y divide-gray-200">
+                                                    {programaSeleccionado?.participantes?.map((participante) => {
+                                                        const progreso = estadisticasProgreso?.progreso_participantes?.[participante.id_anonimo] || {
+                                                            estado: 'En progreso',
+                                                            sesiones_completadas: 0,
+                                                            cuestionarios_completados: 0,
+                                                            minutos_practica: 0,
+                                                            ultima_actividad: 'N/A'
+                                                        };
+
+                                                        return (
+                                                            <tr key={participante.id_anonimo}>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                                    {participante.id_anonimo}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${progreso.estado === 'Completado'
+                                                                        ? 'bg-green-100 text-green-800'
+                                                                        : progreso.estado === 'En progreso'
+                                                                            ? 'bg-blue-100 text-blue-800'
+                                                                            : 'bg-yellow-100 text-yellow-800'
+                                                                        }`}>
+                                                                        {progreso.estado}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {progreso.sesiones_completadas} / {estadisticasProgreso?.total_sesiones || 0}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {progreso.cuestionarios_completados} / {estadisticasProgreso?.total_cuestionarios || 0}
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {progreso.minutos_practica} min
+                                                                </td>
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                                    {progreso.ultima_actividad}
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
 
                                     {/** 

@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from usuario.permissions import IsInvestigador, IsParticipante
 from .models import Programa, EstadoPublicacion, InscripcionPrograma, EstadoInscripcion
-from .serializers import ProgramaSerializer, ParticipantesProgramaSerializer
+from .serializers import ProgramaSerializer, ParticipantesProgramaSerializer, ParticipanteSerializer
 from sesion.models import Sesion, EtiquetaPractica, TipoContenido, DiarioSesion
 from django.shortcuts import get_object_or_404
 from cuestionario.models import Cuestionario, RespuestaCuestionario
@@ -904,28 +904,26 @@ def exportar_json(datos, nombre_programa, tipo_exportacion):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def listar_participantes_programa(request, pk):
-    # Verificar que el usuario es investigador
-    if not request.user.is_investigador():
+@permission_classes([IsAuthenticated, IsInvestigador])
+def obtener_participantes_programa(request, programa_id):
+    programa = get_object_or_404(Programa, id=programa_id)
+    
+    # Verificar que el investigador tiene permiso para ver este programa
+    if programa.creado_por.usuario != request.user:
         return Response(
-            {"error": "No tienes permisos para ver los participantes del programa"},
+            {"error": "No tienes permiso para ver los participantes de este programa"},
             status=status.HTTP_403_FORBIDDEN
         )
     
-    # Obtener el programa
-    programa = get_object_or_404(Programa, id=pk)
+    # Obtener participantes con datos anonimizados
+    participantes = programa.participantes.all()
+    serializer = ParticipanteSerializer(participantes, many=True)
     
-    # Verificar que el investigador es el creador del programa
-    if programa.creado_por != request.user.perfil_investigador:
-        return Response(
-            {"error": "Solo el investigador creador puede ver los participantes del programa"},
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
-    # Serializar y devolver los datos
-    serializer = ParticipantesProgramaSerializer(programa)
-    return Response(serializer.data)
+    return Response({
+        "id": programa.id,
+        "nombre": programa.nombre,
+        "participantes": serializer.data
+    })
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsInvestigador])
@@ -1156,4 +1154,130 @@ def programa_abandonar(request, pk):
         return Response(
             {'error': str(e)},
             status=status.HTTP_400_BAD_REQUEST
+        )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsInvestigador])
+def programa_estadisticas_progreso(request, pk):
+    """
+    Obtiene estadísticas detalladas del progreso de cada participante en un programa.
+    Incluye:
+    - Estado del programa para cada participante
+    - Sesiones completadas
+    - Cuestionarios completados
+    - Minutos de práctica
+    - Última actividad
+    """
+    try:
+        programa = get_object_or_404(Programa, pk=pk)
+        
+        # Verificar que el programa pertenece al investigador actual
+        if programa.creado_por != request.user.perfil_investigador:
+            return Response(
+                {"error": "No tienes permiso para ver las estadísticas de este programa"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Obtener todas las inscripciones del programa
+        inscripciones = InscripcionPrograma.objects.filter(programa=programa).select_related('participante')
+        
+        # Obtener el total de sesiones y cuestionarios del programa
+        total_sesiones = programa.sesiones.count()
+        total_cuestionarios = 2 if programa.tiene_cuestionarios else 0  # pre y post
+        
+        # Preparar datos de progreso por participante
+        progreso_participantes = {}
+        
+        for inscripcion in inscripciones:
+            try:
+                participante = inscripcion.participante
+                id_anonimo = f"P{participante.id}"  # Crear ID anónimo usando el ID del participante
+                
+                # Obtener sesiones completadas por este participante
+                sesiones_completadas = DiarioSesion.objects.filter(
+                    sesion__programa=programa,
+                    participante=participante
+                ).count()
+                
+                # Obtener minutos de práctica
+                minutos_practica = 0
+                diarios = DiarioSesion.objects.filter(
+                    sesion__programa=programa,
+                    participante=participante
+                ).select_related('sesion')
+                
+                for diario in diarios:
+                    if diario.sesion.duracion_estimada:
+                        minutos_practica += diario.sesion.duracion_estimada
+                
+                # Obtener cuestionarios completados
+                cuestionarios_completados = 0
+                if programa.cuestionario_pre:
+                    if RespuestaCuestionario.objects.filter(
+                        cuestionario=programa.cuestionario_pre,
+                        participante=participante
+                    ).exists():
+                        cuestionarios_completados += 1
+                
+                if programa.cuestionario_post:
+                    if RespuestaCuestionario.objects.filter(
+                        cuestionario=programa.cuestionario_post,
+                        participante=participante
+                    ).exists():
+                        cuestionarios_completados += 1
+                
+                # Determinar el estado del programa
+                estado = inscripcion.estado_inscripcion
+                
+                # Obtener la última actividad
+                ultima_actividad = None
+                ultimo_diario = DiarioSesion.objects.filter(
+                    sesion__programa=programa,
+                    participante=participante
+                ).order_by('-fecha_creacion').first()
+                
+                ultima_respuesta = RespuestaCuestionario.objects.filter(
+                    cuestionario__programa=programa,
+                    participante=participante
+                ).order_by('-fecha_respuesta').first()
+                
+                if ultimo_diario and ultima_respuesta:
+                    ultima_actividad = max(ultimo_diario.fecha_creacion, ultima_respuesta.fecha_respuesta)
+                elif ultimo_diario:
+                    ultima_actividad = ultimo_diario.fecha_creacion
+                elif ultima_respuesta:
+                    ultima_actividad = ultima_respuesta.fecha_respuesta
+                
+                # Guardar el progreso del participante
+                progreso_participantes[id_anonimo] = {
+                    'estado': estado,
+                    'sesiones_completadas': sesiones_completadas,
+                    'total_sesiones': total_sesiones,
+                    'cuestionarios_completados': cuestionarios_completados,
+                    'total_cuestionarios': total_cuestionarios,
+                    'minutos_practica': minutos_practica,
+                    'ultima_actividad': ultima_actividad.strftime('%Y-%m-%d %H:%M') if ultima_actividad else 'N/A'
+                }
+            except Exception as e:
+                print(f"Error procesando participante {participante.id}: {str(e)}")
+                continue
+        
+        return Response({
+            'programa_id': programa.id,
+            'programa_nombre': programa.nombre,
+            'total_sesiones': total_sesiones,
+            'total_cuestionarios': total_cuestionarios,
+            'progreso_participantes': progreso_participantes
+        })
+        
+    except Programa.DoesNotExist:
+        return Response(
+            {"error": "El programa no existe"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        print(f"Error en programa_estadisticas_progreso: {str(e)}")
+        return Response(
+            {"error": f"Error al obtener estadísticas de progreso: {str(e)}"}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) 

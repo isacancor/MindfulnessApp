@@ -18,9 +18,30 @@ class InvestigadorSerializer(serializers.ModelSerializer):
         return None
 
 class ParticipanteSerializer(serializers.ModelSerializer):
+    id_anonimo = serializers.SerializerMethodField()
+    genero = serializers.CharField(source='usuario.genero')
+    fecha_nacimiento = serializers.DateField(source='usuario.fechaNacimiento')
+    ocupacion = serializers.CharField(source='usuario.ocupacion')
+    nivel_educativo = serializers.CharField(source='usuario.nivelEducativo')
+    ubicacion = serializers.CharField(source='usuario.ubicacion')
+    experiencia_mindfulness = serializers.CharField(source='experienciaMindfulness')
+    condiciones_salud = serializers.CharField(source='condicionesSalud')
+
     class Meta:
         model = Participante
-        fields = '__all__'
+        fields = [
+            'id_anonimo',
+            'genero',
+            'fecha_nacimiento',
+            'ocupacion',
+            'nivel_educativo',
+            'ubicacion',
+            'experiencia_mindfulness',
+            'condiciones_salud'
+        ]
+
+    def get_id_anonimo(self, obj):
+        return f"P{obj.id}"
 
 class InvestigadorProfileSerializer(serializers.ModelSerializer):
     class Meta:

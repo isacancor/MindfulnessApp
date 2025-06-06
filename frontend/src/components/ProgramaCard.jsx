@@ -116,17 +116,6 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                     >
                         Ver detalles →
                     </Link>
-                    {/** 
-                    {programa.participantes?.length > 0 && (
-                        <Link
-                            to={`/programas/${programa.id}/participantes`}
-                            className="flex items-center text-indigo-600 hover:text-indigo-700 text-sm font-medium"
-                        >
-                            <UserCheck className="h-4 w-4 mr-1" />
-                            Ver participantes ({programa.participantes.length})
-                        </Link>
-                    )}
-                        */}
                 </div>
             </div>
 

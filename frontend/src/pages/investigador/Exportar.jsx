@@ -91,7 +91,7 @@ const Exportar = () => {
 
     return (
         <InvestigadorLayout>
-            <div className="max-w-7xl mx-auto space-y-8 pb-10">
+            <div className="mx-auto space-y-8 pb-10">
                 <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 rounded-xl p-8 shadow-xl text-white">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="space-y-2">
