@@ -3,12 +3,16 @@ import { PieChart, BarChart, BarChartHorizontal, LineChart, BookOpen } from 'luc
 import api from '../../config/axios';
 import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
+import TablaCuestionario from '../../components/TablaCuestionario';
 
 const Analisis = () => {
     const [programas, setProgramas] = useState([]);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [estadisticasGenerales, setEstadisticasGenerales] = useState(null);
     const [estadisticasProgreso, setEstadisticasProgreso] = useState(null);
+    //const [cuestionariosDetalle, setCuestionariosDetalle] = useState(null);
+    const [pre, setPre] = useState(null);
+    const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     //const [tipoGrafico, setTipoGrafico] = useState('barras');
@@ -31,16 +35,23 @@ const Analisis = () => {
 
     const handleSeleccionarPrograma = async (programaId) => {
         setLoading(true);
+        const programa = programas.find(p => p.id === programaId);
+        setProgramaSeleccionado(programa);
+
         try {
             const responseGenerales = await api.get(`/programas/${programaId}/estadisticas`);
             setEstadisticasGenerales(responseGenerales.data);
 
             const responseProgreso = await api.get(`/programas/${programaId}/estadisticas-progreso`);
-            setProgramaSeleccionado({
-                ...programas.find(p => p.id === programaId),
-            });
             setEstadisticasProgreso(responseProgreso.data);
-            console.log(responseProgreso.data);
+
+            // Solo si el programa tiene cuestionarios
+            if (programa.tiene_cuestionarios) {
+                const responseCuestionarios = await api.get(`/programas/${programaId}/cuestionarios-y-respuestas`);
+                console.log(responseCuestionarios.data);
+                setPre(responseCuestionarios.data.pre);
+                setPost(responseCuestionarios.data.post);
+            }
 
         } catch (err) {
             console.error('Error al cargar estadísticas del programa:', err);
@@ -465,6 +476,24 @@ const Analisis = () => {
                     </div>
                 )}
             </div>
+
+            {/* Después de la tabla de progreso de participantes */}
+            {programaSeleccionado?.tiene_cuestionarios && (
+                <>
+                    {pre && (
+                        <TablaCuestionario
+                            titulo={`Cuestionario Pre: ${pre.nombre}`}
+                            cuestionario={pre}
+                        />
+                    )}
+                    {post && (
+                        <TablaCuestionario
+                            titulo={`Cuestionario Post: ${post.nombre}`}
+                            cuestionario={post}
+                        />
+                    )}
+                </>
+            )}
         </InvestigadorLayout>
     );
 };
