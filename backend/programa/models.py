@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from django.core.exceptions import ValidationError
 from config.enums import (
     TipoContexto, EnfoqueMetodologico,
-    EstadoPublicacion, EstadoPrograma
+    EstadoPublicacion, EstadoInscripcion
 )
 
 class Programa(models.Model):
@@ -155,7 +155,7 @@ class InscripcionPrograma(models.Model):
     participante = models.ForeignKey(Participante, on_delete=models.CASCADE, related_name='inscripciones')
     fecha_inicio = models.DateTimeField(auto_now_add=True)
     fecha_fin = models.DateTimeField(null=True, blank=True)
-    estado_programa = models.CharField(max_length=20, choices=EstadoPrograma.choices, default=EstadoPrograma.EN_PROGRESO)
+    estado_inscripcion = models.CharField(max_length=20, choices=EstadoInscripcion.choices, default=EstadoInscripcion.EN_PROGRESO)
 
     class Meta:
         unique_together = ('programa', 'participante')
@@ -171,15 +171,15 @@ class InscripcionPrograma(models.Model):
         return self.fecha_fin
 
     def completar_programa(self):
-        if self.estado_programa == EstadoPrograma.EN_PROGRESO:
+        if self.estado_inscripcion == EstadoInscripcion.EN_PROGRESO:
             fecha_fin = self.calcular_fecha_fin()
             if fecha_fin > timezone.now():
-                self.estado_programa = EstadoPrograma.COMPLETADO
+                self.estado_inscripcion = EstadoInscripcion.COMPLETADO
 
             # o si todas las sesiones están completadas
             usuario = self.participante
             sesiones_completadas = self.programa.sesiones.filter(completadas__participante=usuario).count()
             if sesiones_completadas == self.programa.sesiones.count():
-                self.estado_programa = EstadoPrograma.COMPLETADO
+                self.estado_inscripcion = EstadoInscripcion.COMPLETADO
 
             self.save()

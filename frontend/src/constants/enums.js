@@ -66,9 +66,10 @@ export const EstadoPublicacion = {
     PUBLICADO: { value: 'publicado', label: 'Publicado' },
 };
 
-export const EstadoPrograma = {
+export const EstadoInscripcion = {
     EN_PROGRESO: { value: 'en_progreso', label: 'En progreso' },
-    COMPLETADO: { value: 'completado', label: 'Completado' }
+    COMPLETADO: { value: 'completado', label: 'Completado' },
+    ABANDONADO: { value: 'abandonado', label: 'Abandonado' }
 };
 
 // Enums de Sesión

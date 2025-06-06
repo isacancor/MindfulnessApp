@@ -31,7 +31,7 @@ import ProgramaCompletado from './pages/participante/programas/completados/PDeta
 import ListadoParticipantes from './pages/investigador/ListadoParticipantes';
 
 import Analisis from './pages/investigador/Analisis';
-import ExportarDatos from './pages/investigador/ExportarDatos';
+import Exportar from './pages/investigador/Exportar';
 import TerminosPrograma from './pages/TerminosPrograma';
 
 function App() {
@@ -62,7 +62,7 @@ function App() {
 
           {/* Análisis y Exportación */}
           <Route path="/analisis" element={<Analisis />} />
-          <Route path="/exportar" element={<ExportarDatos />} />
+          <Route path="/exportar" element={<Exportar />} />
 
           {/* Sesiones */}
           <Route path="/programas/:id/sesiones/nueva" element={<CrearSesion />} />

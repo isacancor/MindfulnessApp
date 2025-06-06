@@ -23,9 +23,8 @@ const ExplorarProgramas = () => {
             const response = await api.get('/programas');
 
             // Filtrar los programas que no están completados
-            const programasNoCompletados = response.data.filter(programa => !programa.inscripcion_info?.es_completado);
-            setProgramas(programasNoCompletados);
-
+            const programasDisponibles = response.data.filter(programa => programa.inscripcion_info == null);
+            setProgramas(programasDisponibles);
         } catch (err) {
             console.error('Error al cargar programas:', err);
             setError('Error al cargar los programas. Por favor, intenta nuevamente.');
@@ -37,7 +36,6 @@ const ExplorarProgramas = () => {
     const verificarEnrolamiento = async () => {
         try {
             const response = await api.get('/programas/mi-programa/');
-            console.log(response.data);
             if (response.data && response.data.id) {
                 setMiProgramaId(response.data.id);
                 setYaEnrolado(true);

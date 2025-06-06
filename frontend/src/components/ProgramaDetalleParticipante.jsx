@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, Users, FileText, Search, CheckCircle2, Star, Lock } from 'lucide-react';
+import { Calendar, Users, FileText, CheckCircle2, Star, Lock, AlertTriangle, Clock } from 'lucide-react';
 import SesionCard from './SesionCard';
 import ErrorAlert from './ErrorAlert';
 import ProgresoPrograma from './ProgresoPrograma';
 import CTOExplorar from './CTOExplorar';
 import MobileNavBar from './layout/MobileNavBar';
+import api from '../config/axios';
 
 const ProgramaDetalle = ({
     programa,
@@ -19,10 +20,20 @@ const ProgramaDetalle = ({
     permitirNavegacionCuestionarios = true
 }) => {
     const navigate = useNavigate();
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('es-ES', options);
+    };
+
+    const handleAbandonar = async () => {
+        try {
+            await api.post(`/programas/${programa.id}/abandonar/`);
+            navigate('/home');
+        } catch (error) {
+            setError(error.response?.data?.error || 'Error al abandonar el programa');
+        }
     };
 
     if (loading) {
@@ -81,18 +92,14 @@ const ProgramaDetalle = ({
                         </div>
                         <div className="flex flex-col items-end space-y-2">
                             {esCompletado ? (
-                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    <Star className="h-4 w-4 mr-1" />
+                                <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-sm">
+                                    <Star className="h-4 w-4 mr-2" />
                                     Programa Completado
                                 </span>
                             ) : (
-                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${programa.inscripciones?.[0]?.estado_programa === 'completado' || cuestionarioPostRespondido
-                                    ? 'bg-green-100 text-green-800'
-                                    : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
-                                    {programa.inscripciones?.[0]?.estado_programa === 'completado' || cuestionarioPostRespondido
-                                        ? 'Completado'
-                                        : 'En progreso'}
+                                <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-sm">
+                                    <Clock className="h-4 w-4 mr-2" />
+                                    En progreso
                                 </span>
                             )}
                         </div>
@@ -208,6 +215,51 @@ const ProgramaDetalle = ({
                         ))}
                     </div>
                 </div>
+
+                {/* Botón de Abandonar Programa - Solo para programa activo */}
+                {!esCompletado && (
+                    <div className="mt-8 flex justify-center">
+                        <button
+                            onClick={() => setShowConfirmDialog(true)}
+                            className="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-semibold text-white transition-all duration-200 ease-in-out bg-gradient-to-r from-red-500 to-rose-500 rounded-xl shadow-lg hover:shadow-xl hover:from-red-700 hover:to-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        >
+                            <AlertTriangle className="h-6 w-6 mr-3 text-white group-hover:text-red-100" />
+                            <span className="group-hover:text-red-100">Abandonar Programa</span>
+                        </button>
+                    </div>
+                )}
+
+                {/* Modal de confirmación */}
+                {showConfirmDialog && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full mx-4 border border-gray-100">
+                            <div className="flex items-center mb-6">
+                                <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mr-4">
+                                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                                </div>
+                                <h3 className="text-xl font-bold text-gray-900">¿Estás seguro?</h3>
+                            </div>
+                            <p className="text-gray-600 mb-8">
+                                Si abandonas el programa, perderás todo tu progreso y no podrás volver a retomarlo.
+                                Esta acción no se puede deshacer.
+                            </p>
+                            <div className="flex justify-end space-x-4">
+                                <button
+                                    onClick={() => setShowConfirmDialog(false)}
+                                    className="px-6 py-2.5 text-gray-600 hover:text-gray-800 font-medium transition-colors duration-200"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={handleAbandonar}
+                                    className="px-6 py-2.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-full font-medium shadow-sm hover:shadow-md hover:from-red-600 hover:to-rose-600 transform hover:-translate-y-0.5 transition-all duration-200"
+                                >
+                                    Sí, abandonar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

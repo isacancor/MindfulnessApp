@@ -9,6 +9,7 @@ urlpatterns = [
     path('<int:pk>/duplicar/', api.programa_duplicar, name='programa-duplicar'),
     path('<int:pk>/publicar/', api.programa_publicar, name='programa-publicar'),
     path('<int:pk>/enrolar/', api.programa_enrolar, name='programa-enrolar'),
+    path('<int:pk>/abandonar/', api.programa_abandonar, name='programa-abandonar'),
     path('mi-programa/', api.mi_programa, name='mi-programa'),
     path('mis-completados/', api.mis_programas_completados, name='mis_programas-completados'),
     path('<int:pk>/cuestionarios/', cuestionario_list, name='cuestionario-list'),

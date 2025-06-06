@@ -7,7 +7,7 @@ from .models import Cuestionario, RespuestaCuestionario
 from .serializers import CuestionarioSerializer, RespuestaCuestionarioSerializer
 from programa.models import Programa
 from usuario.models import Participante
-from programa.models import InscripcionPrograma, EstadoPrograma
+from programa.models import InscripcionPrograma, EstadoInscripcion
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -136,7 +136,7 @@ def obtener_cuestionario_pre(request):
         # Obtener la inscripción activa del participante
         inscripcion = InscripcionPrograma.objects.filter(
             participante=request.user.perfil_participante,
-            estado_programa=EstadoPrograma.EN_PROGRESO
+            estado_inscripcion=EstadoInscripcion.EN_PROGRESO
         ).select_related('programa').first()
         
         if not inscripcion:
@@ -191,7 +191,7 @@ def obtener_cuestionario_post(request):
         # Obtener la inscripción activa del participante
         inscripcion = InscripcionPrograma.objects.filter(
             participante=request.user.perfil_participante,
-            estado_programa=EstadoPrograma.EN_PROGRESO
+            estado_inscripcion=EstadoInscripcion.EN_PROGRESO
         ).select_related('programa').first()
         
         if not inscripcion:
@@ -246,7 +246,7 @@ def responder_cuestionario_pre(request):
         # Obtener la inscripción activa del participante
         inscripcion = InscripcionPrograma.objects.filter(
             participante=request.user.perfil_participante,
-            estado_programa=EstadoPrograma.EN_PROGRESO
+            estado_inscripcion=EstadoInscripcion.EN_PROGRESO
         ).select_related('programa').first()
         
         if not inscripcion:
@@ -311,7 +311,7 @@ def responder_cuestionario_post(request):
         # Obtener la inscripción activa del participante
         inscripcion = InscripcionPrograma.objects.filter(
             participante=request.user.perfil_participante,
-            estado_programa=EstadoPrograma.EN_PROGRESO
+            estado_inscripcion=EstadoInscripcion.EN_PROGRESO
         ).select_related('programa').first()
         
         if not inscripcion:
@@ -353,7 +353,7 @@ def responder_cuestionario_post(request):
             serializer.save()
             
             # Marcar el programa como completado
-            inscripcion.estado_programa = EstadoPrograma.COMPLETADO
+            inscripcion.estado_inscripcion = EstadoInscripcion.COMPLETADO
             inscripcion.save()
             
             return Response({

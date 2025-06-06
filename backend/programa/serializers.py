@@ -5,16 +5,16 @@ from sesion.serializers import SesionSerializer
 from django.utils import timezone
 from cuestionario.serializers import CuestionarioSerializer
 from rest_framework.exceptions import ValidationError
-from config.enums import TipoContexto, EnfoqueMetodologico, EstadoPublicacion, EstadoPrograma
+from config.enums import TipoContexto, EnfoqueMetodologico, EstadoPublicacion, EstadoInscripcion
 
 class InscripcionProgramaSerializer(serializers.ModelSerializer):
     participante = ParticipanteSerializer(read_only=True)
     fecha_fin = serializers.DateTimeField(read_only=True)
-    estado_programa = serializers.ChoiceField(choices=EstadoPrograma.choices, read_only=True)
+    estado_inscripcion = serializers.ChoiceField(choices=EstadoInscripcion.choices, read_only=True)
 
     class Meta:
         model = InscripcionPrograma
-        fields = ['participante', 'fecha_inicio', 'fecha_fin', 'estado_programa']
+        fields = ['participante', 'fecha_inicio', 'fecha_fin', 'estado_inscripcion']
 
 class ProgramaSerializer(serializers.ModelSerializer):
     creado_por = InvestigadorSerializer(read_only=True)
@@ -62,8 +62,8 @@ class ProgramaSerializer(serializers.ModelSerializer):
                 return {
                     'fecha_inicio': fecha_inicio,
                     'fecha_fin': fecha_fin,
-                    'estado_programa': inscripcion.estado_programa,
-                    'es_completado': inscripcion.estado_programa == EstadoPrograma.COMPLETADO
+                    'estado_inscripcion': inscripcion.estado_inscripcion,
+                    'es_completado': inscripcion.estado_inscripcion == EstadoInscripcion.COMPLETADO
                 }
         return None
 

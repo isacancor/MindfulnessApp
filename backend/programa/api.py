@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from usuario.permissions import IsInvestigador, IsParticipante
-from .models import Programa, EstadoPublicacion, InscripcionPrograma, EstadoPrograma
+from .models import Programa, EstadoPublicacion, InscripcionPrograma, EstadoInscripcion
 from .serializers import ProgramaSerializer, ParticipantesProgramaSerializer
 from sesion.models import Sesion, EtiquetaPractica, TipoContenido, DiarioSesion
 from django.shortcuts import get_object_or_404
@@ -156,7 +156,7 @@ def mi_programa(request):
         try:
             inscripcion = InscripcionPrograma.objects.get(
                 participante=participante,
-                estado_programa=EstadoPrograma.EN_PROGRESO
+                estado_inscripcion=EstadoInscripcion.EN_PROGRESO
             )
             programa = inscripcion.programa
 
@@ -218,7 +218,7 @@ def programa_enrolar(request, pk):
     # Verificar si el participante ya está enrolado en algún programa en progreso
     if InscripcionPrograma.objects.filter(
         participante=request.user.perfil_participante,
-        estado_programa=EstadoPrograma.EN_PROGRESO
+        estado_inscripcion=EstadoInscripcion.EN_PROGRESO
     ).exists():
         return Response(
             {'error': 'Ya estás enrolado en un programa en progreso'},
@@ -230,7 +230,7 @@ def programa_enrolar(request, pk):
         inscripcion = InscripcionPrograma.objects.create(
             programa=programa,
             participante=request.user.perfil_participante,
-            estado_programa=EstadoPrograma.EN_PROGRESO
+            estado_inscripcion=EstadoInscripcion.EN_PROGRESO
         )
         inscripcion.calcular_fecha_fin()
         
@@ -260,7 +260,7 @@ def mis_programas_completados(request):
         # Obtener todos los programas en los que el usuario está inscrito y están completados
         programas_completados = InscripcionPrograma.objects.filter(
             participante=request.user.perfil_participante,
-            estado_programa=EstadoPrograma.COMPLETADO
+            estado_inscripcion=EstadoInscripcion.COMPLETADO
         ).select_related('programa')
 
         # Serializar los programas
@@ -303,7 +303,7 @@ def programa_inscripciones(request, pk):
                 'participante': inscripcion.participante.id,
                 'fecha_inicio': inscripcion.fecha_inicio,
                 'fecha_fin': inscripcion.fecha_fin,
-                'estado_programa': inscripcion.estado_programa
+                'estado_inscripcion': inscripcion.estado_inscripcion
             })
         
         return Response(inscripciones_data)
@@ -512,7 +512,7 @@ def recopilar_datos(programa, tipo_exportacion):
                         'genero': getattr(participante.usuario, 'genero', 'No especificado'),
                         'fecha_inicio': inscripcion.fecha_inicio,
                         'fecha_fin': inscripcion.fecha_fin,
-                        'estado_programa': inscripcion.estado_programa
+                        'estado_inscripcion': inscripcion.estado_inscripcion
                     }
                     
                     # Añadir estadísticas de participación
@@ -643,7 +643,7 @@ def exportar_csv(datos, nombre_programa, tipo_exportacion):
                             p.get('genero', 'No especificado'),
                             p.get('fecha_inicio', 'N/A'),
                             p.get('fecha_fin', 'N/A') if p.get('fecha_fin') else 'N/A',
-                            p.get('estado_programa', 'N/A'),
+                            p.get('estado_inscripcion', 'N/A'),
                             p.get('sesiones_completadas', 0),
                             f"{p.get('porcentaje_completado', 0):.2f}%",
                             'Sí' if p.get('cuestionario_pre_completado', False) else 'No',
@@ -774,7 +774,7 @@ def exportar_excel(datos, nombre_programa, tipo_exportacion):
                 'genero': 'Género',
                 'fecha_inicio': 'Fecha Inicio',
                 'fecha_fin': 'Fecha Fin',
-                'estado_programa': 'Estado',
+                'estado_inscripcion': 'Estado',
                 'sesiones_completadas': 'Sesiones Completadas',
                 'porcentaje_completado': 'Porcentaje Completado (%)',
                 'cuestionario_pre_completado': 'Cuestionario Pre Completado',
@@ -1113,4 +1113,44 @@ def programa_duplicar(request, pk):
         return Response(
             {"error": f"Error al duplicar el programa: {str(e)}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_abandonar(request, pk):
+    """
+    Permite a un participante abandonar un programa en curso.
+    """
+    try:
+        programa = Programa.objects.get(pk=pk)
+    except Programa.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if not request.user.is_participante():
+        return Response(
+            {'error': 'Solo los participantes pueden abandonar programas'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        inscripcion = InscripcionPrograma.objects.get(
+            programa=programa,
+            participante=request.user.perfil_participante,
+            estado_inscripcion=EstadoInscripcion.EN_PROGRESO
+        )
+        
+        inscripcion.estado_inscripcion = EstadoInscripcion.ABANDONADO
+        inscripcion.fecha_fin = timezone.now()
+        inscripcion.save()
+        
+        return Response({'status': 'Programa abandonado exitosamente'})
+    except InscripcionPrograma.DoesNotExist:
+        return Response(
+            {'error': 'No estás inscrito en este programa o no está en progreso'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
         ) 

@@ -10,7 +10,7 @@ from .serializers import (
     TipoContenidoSerializer,
     EscalaSerializer
 )
-from programa.models import Programa, InscripcionPrograma, EstadoPublicacion, EstadoPrograma
+from programa.models import Programa, InscripcionPrograma, EstadoPublicacion, EstadoInscripcion
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -54,7 +54,7 @@ def sesion_list_create(request):
                 if request.user.is_participante():
                     inscripciones = InscripcionPrograma.objects.filter(
                         participante=request.user.perfil_participante,
-                        estado_programa=EstadoPrograma.EN_PROGRESO,
+                        estado_inscripcion=EstadoInscripcion.EN_PROGRESO,
                         programa=programa
                     )
                     

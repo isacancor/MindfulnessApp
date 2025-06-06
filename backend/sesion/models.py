@@ -1,5 +1,5 @@
 from django.db import models
-from programa.models import Programa, InscripcionPrograma, EstadoPrograma
+from programa.models import Programa, InscripcionPrograma, EstadoInscripcion
 from usuario.models import Participante
 from django.utils import timezone
 from config.enums import EtiquetaPractica, TipoContenido, Escala
@@ -49,7 +49,7 @@ class Sesion(models.Model):
         inscripcion = InscripcionPrograma.objects.filter(
             participante=usuario,
             programa=self.programa,
-            estado_programa=EstadoPrograma.EN_PROGRESO
+            estado_inscripcion=EstadoInscripcion.EN_PROGRESO
         ).first()
         
         if not inscripcion:

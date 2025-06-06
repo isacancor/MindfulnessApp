@@ -4,7 +4,7 @@ import api from '../../config/axios';
 import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
 
-const ExportarDatos = () => {
+const Exportar = () => {
     const [programas, setProgramas] = useState([]);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -135,7 +135,7 @@ const ExportarDatos = () => {
                                         >
                                             <h3 className={`font-medium ${programaSeleccionado?.id === programa.id ? 'text-emerald-700' : 'text-gray-800'
                                                 }`}>
-                                                {programa.titulo}
+                                                {programa.nombre}
                                             </h3>
                                             <p className="text-xs text-gray-500 mt-1">
                                                 {programa.participantes?.length || 0} participantes
@@ -330,4 +330,4 @@ const ExportarDatos = () => {
     );
 };
 
-export default ExportarDatos; 
+export default Exportar; 

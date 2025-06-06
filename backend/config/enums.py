@@ -61,9 +61,10 @@ class EstadoPublicacion(models.TextChoices):
     BORRADOR = 'borrador', 'Borrador'
     PUBLICADO = 'publicado', 'Publicado'
 
-class EstadoPrograma(models.TextChoices):
+class EstadoInscripcion(models.TextChoices):
     EN_PROGRESO = 'en_progreso', 'En progreso'
     COMPLETADO = 'completado', 'Completado'
+    ABANDONADO = 'abandonado', 'Abandonado'
 
 # Enums de Sesión
 class EtiquetaPractica(models.TextChoices):
