@@ -72,12 +72,6 @@ export const EstadoInscripcion = {
     ABANDONADO: { value: 'abandonado', label: 'Abandonado' }
 };
 
-export const TipoEvaluacion = {
-    CUESTIONARIOS: { value: 'cuestionarios', label: 'Cuestionarios Pre/Post' },
-    DIARIOS: { value: 'diarios', label: 'Diarios de Autoevaluación Post-Sesión' },
-    AMBOS: { value: 'ambos', label: 'Cuestionarios y Diarios' },
-};
-
 // Enums de Sesión
 export const EtiquetaPractica = {
     BREATH: { value: 'breath', label: 'Atención a la Respiración' },

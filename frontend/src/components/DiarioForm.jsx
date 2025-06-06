@@ -4,7 +4,7 @@ import api from '../config/axios';
 import { useNavigate } from 'react-router-dom';
 import { Escala } from '../constants/enums';
 
-const DiarioForm = ({ sesion, onClose }) => {
+const DiarioForm = ({ programa, sesion, onClose, isLastSession }) => {
     const navigate = useNavigate();
     const [valoracion, setValoracion] = useState('');
     const [comentario, setComentario] = useState('');
@@ -42,7 +42,13 @@ const DiarioForm = ({ sesion, onClose }) => {
                 valoracion: parseInt(valoracion),
                 comentario
             });
-            navigate('/miprograma');
+
+            // Si es la última sesión y no hay cuestionarios post, redirigir a completados
+            if (isLastSession && !programa.tiene_cuestionarios) {
+                navigate(`/completados/${sesion.programa}`);
+            } else {
+                navigate('/miprograma');
+            }
         } catch (err) {
             console.error('Error al guardar el diario:', err);
             setError('Error al guardar el diario. Por favor, intenta nuevamente.');

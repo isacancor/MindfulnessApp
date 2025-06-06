@@ -301,7 +301,28 @@ def diario_sesion_list_create(request):
         
         serializer = DiarioSesionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save(participante=request.user.perfil_participante)
+            diario = serializer.save(participante=request.user.perfil_participante)
+            
+            # Verificar si es la última sesión y el programa no tiene cuestionarios
+            sesion = diario.sesion
+            programa = sesion.programa
+            
+            if not programa.tiene_cuestionarios:
+                # Obtener todas las sesiones del programa ordenadas por semana
+                todas_sesiones = Sesion.objects.filter(programa=programa).order_by('semana')
+                ultima_sesion = todas_sesiones.last()
+                
+                # Si esta es la última sesión, marcar el programa como completado
+                if sesion.id == ultima_sesion.id:
+                    # Obtener la inscripción del participante
+                    inscripcion = InscripcionPrograma.objects.get(
+                        participante=request.user.perfil_participante,
+                        programa=programa
+                    )
+                    inscripcion.estado_inscripcion = EstadoInscripcion.COMPLETADO
+                    inscripcion.fecha_fin = timezone.now()
+                    inscripcion.save()
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

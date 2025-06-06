@@ -51,7 +51,6 @@ const EditarSesion = () => {
             } catch (error) {
                 console.error('Error al cargar los datos:', error);
                 setError('Error al cargar los datos');
-
             }
         };
         fetchData();
@@ -80,6 +79,9 @@ const EditarSesion = () => {
 
         try {
             const formDataToSend = prepareSessionFormData(formData, originalData);
+            if (!programa.tiene_diarios) {
+                delete formDataToSend.tipo_escala;
+            }
             await api.put(`/sesiones/${sesionId}/`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -212,7 +214,9 @@ const EditarSesion = () => {
                                     disabled={loading}
                                 />
                             </div>
+                        </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label htmlFor="tipo_practica" className="block text-sm font-medium text-gray-700 mb-1">
                                     Tipo de Práctica *
@@ -226,6 +230,7 @@ const EditarSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona un tipo de práctica</option>
                                     {tiposPractica.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
@@ -245,15 +250,18 @@ const EditarSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona un tipo de contenido</option>
                                     {tiposContenido.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
                                 </select>
                             </div>
+                        </div>
 
+                        {programa.tiene_diarios && (
                             <div>
                                 <label htmlFor="tipo_escala" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Tipo de Escala de Evaluación *
+                                    Escala de Evaluación *
                                 </label>
                                 <select
                                     id="tipo_escala"
@@ -264,12 +272,16 @@ const EditarSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
+                                    <option value="">Selecciona una escala de evaluación</option>
                                     {tiposEscala.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
                                 </select>
+                                <p className="mt-1 text-sm text-gray-500">
+                                    Esta escala se utilizará para evaluar la experiencia de los participantes después de la sesión
+                                </p>
                             </div>
-                        </div>
+                        )}
 
                         {formData.tipo_contenido === 'temporizador' && (
                             <div>

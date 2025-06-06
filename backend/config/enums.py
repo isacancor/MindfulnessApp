@@ -103,8 +103,3 @@ class TipoPregunta(models.TextChoices):
     CALIFICACION = 'calificacion', 'Calificación'
     LIKERT = 'likert', 'Escala Likert'
     LIKERT_5_PUNTOS = 'likert_5_puntos', 'Escala Likert 5 Puntos'
-
-class TipoEvaluacion(models.TextChoices):
-    CUESTIONARIOS = 'cuestionarios', 'Cuestionarios Pre/Post'
-    DIARIOS = 'diarios', 'Diarios de Autoevaluación Post-Sesión'
-    AMBOS = 'ambos', 'Cuestionarios y Diarios'

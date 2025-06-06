@@ -18,6 +18,7 @@ const ParticipanteDashboard = () => {
     const [cuestionarioPostRespondido, setCuestionarioPostRespondido] = useState(false);
     const [proximaAccion, setProximaAccion] = useState(null);
     const [programaNoEncontrado, setProgramaNoEncontrado] = useState(false);
+    const [programa, setPrograma] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -25,6 +26,7 @@ const ParticipanteDashboard = () => {
                 setProgramaNoEncontrado(false)
                 const response = await api.get('programas/mi-programa');
                 const programaData = response.data;
+                setPrograma(programaData);
 
                 if (programaData) {
                     // Obtener el estado de los cuestionarios
@@ -73,7 +75,7 @@ const ParticipanteDashboard = () => {
                     });
 
                     // Determinar próxima acción
-                    if (!programaData.cuestionario_pre_respondido) {
+                    if (programaData.tiene_cuestionarios && !programaData.cuestionario_pre_respondido) {
                         setProximaAccion({
                             tipo: 'cuestionarioPre',
                             titulo: 'Completar cuestionario inicial',
@@ -81,7 +83,7 @@ const ParticipanteDashboard = () => {
                             url: '/miprograma/cuestionario-pre',
                             icono: <FileText className="h-6 w-6 text-blue-600" />
                         });
-                    } else if (sesionesCompletadas === sesionesConEstado.length && !programaData.cuestionario_post_respondido) {
+                    } else if (sesionesCompletadas === sesionesConEstado.length && programaData.tiene_cuestionarios && !programaData.cuestionario_post_respondido) {
                         setProximaAccion({
                             tipo: 'cuestionarioPost',
                             titulo: 'Completar cuestionario final',
@@ -201,6 +203,7 @@ const ParticipanteDashboard = () => {
                                 cuestionarioPreRespondido={cuestionarioPreRespondido}
                                 cuestionarioPostRespondido={cuestionarioPostRespondido}
                                 mostrarDetalles={false}
+                                tieneCuestionarios={programa?.tiene_cuestionarios}
                             />
 
                             <div className="flex justify-center mt-8">

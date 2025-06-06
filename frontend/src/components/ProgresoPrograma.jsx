@@ -5,14 +5,15 @@ const ProgresoPrograma = ({
     progreso,
     cuestionarioPreRespondido = false,
     cuestionarioPostRespondido = false,
-    mostrarDetalles = true
+    mostrarDetalles = true,
+    tieneCuestionarios = true
 }) => {
     // Calcular el total de elementos y completados
-    const totalElementos = (progreso?.totalSesiones || 0) + 2; // +2 por los cuestionarios pre y post
+    const totalElementos = (progreso?.totalSesiones || 0) + (tieneCuestionarios ? 2 : 0); // +2 por los cuestionarios pre y post si existen
     const elementosCompletados =
-        (cuestionarioPreRespondido ? 1 : 0) +
+        (tieneCuestionarios ? (cuestionarioPreRespondido ? 1 : 0) : 0) +
         (progreso?.sesionesCompletadas || 0) +
-        (cuestionarioPostRespondido ? 1 : 0);
+        (tieneCuestionarios ? (cuestionarioPostRespondido ? 1 : 0) : 0);
 
     // Porcentaje de progreso
     const porcentajeProgreso = Math.round((elementosCompletados / totalElementos) * 100);
@@ -44,13 +45,15 @@ const ProgresoPrograma = ({
                 {/* Barra de progreso simplificada */}
                 <div className="flex h-10 rounded-lg overflow-hidden border border-gray-200">
                     {/* Cuestionario Pre */}
-                    <div
-                        className={`flex items-center justify-center ${cuestionarioPreRespondido ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
-                            } text-xs font-medium`}
-                        style={{ width: `${100 / totalElementos}%` }}
-                    >
-                        Pre
-                    </div>
+                    {tieneCuestionarios && (
+                        <div
+                            className={`flex items-center justify-center border-r border-gray-200 ${cuestionarioPreRespondido ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
+                                } text-xs font-medium`}
+                            style={{ width: `${100 / totalElementos}%` }}
+                        >
+                            Pre
+                        </div>
+                    )}
 
                     {/* Sesiones */}
                     <div
@@ -60,7 +63,7 @@ const ProgresoPrograma = ({
                         {Array.from({ length: progreso?.totalSesiones || 0 }).map((_, index) => (
                             <div
                                 key={index}
-                                className={`flex items-center justify-center ${index < (progreso?.sesionesCompletadas || 0)
+                                className={`flex items-center justify-center ${index < (progreso?.totalSesiones || 0) - 1 ? 'border-r border-gray-200' : ''} ${index < (progreso?.sesionesCompletadas || 0)
                                     ? 'bg-emerald-500 text-white'
                                     : 'bg-gray-100 text-gray-600'
                                     } text-xs font-medium`}
@@ -72,30 +75,36 @@ const ProgresoPrograma = ({
                     </div>
 
                     {/* Cuestionario Post */}
-                    <div
-                        className={`flex items-center justify-center ${cuestionarioPostRespondido ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-600'
-                            } text-xs font-medium`}
-                        style={{ width: `${100 / totalElementos}%` }}
-                    >
-                        Post
-                    </div>
+                    {tieneCuestionarios && (
+                        <div
+                            className={`flex items-center justify-center border-l border-gray-200 ${cuestionarioPostRespondido ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-600'
+                                } text-xs font-medium`}
+                            style={{ width: `${100 / totalElementos}%` }}
+                        >
+                            Post
+                        </div>
+                    )}
                 </div>
 
                 {/* Leyenda simple */}
                 <div className="flex flex-wrap gap-3 justify-center mt-2">
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${cuestionarioPreRespondido ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
-                        }`}>
-                        {cuestionarioPreRespondido ? '✓' : '○'} Cuestionario Pre
-                    </div>
+                    {tieneCuestionarios && (
+                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${cuestionarioPreRespondido ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
+                            }`}>
+                            {cuestionarioPreRespondido ? '✓' : '○'} Cuestionario Pre
+                        </div>
+                    )}
 
                     <div className="bg-emerald-100 px-3 py-1 rounded-full text-sm font-medium text-emerald-800">
                         {progreso?.sesionesCompletadas || 0}/{progreso?.totalSesiones || 0} sesiones
                     </div>
 
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${cuestionarioPostRespondido ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-500'
-                        }`}>
-                        {cuestionarioPostRespondido ? '✓' : '○'} Cuestionario Post
-                    </div>
+                    {tieneCuestionarios && (
+                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${cuestionarioPostRespondido ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-500'
+                            }`}>
+                            {cuestionarioPostRespondido ? '✓' : '○'} Cuestionario Post
+                        </div>
+                    )}
                 </div>
 
                 {/* Detalles opcionales simplificados */}
@@ -106,7 +115,7 @@ const ProgresoPrograma = ({
                                 ? '¡Has completado todo el programa! Felicidades.'
                                 : `Te faltan ${totalElementos - elementosCompletados} elementos para completar el programa.`}
                         </p>
-                        {(progreso?.sesionesCompletadas || 0) === (progreso?.totalSesiones || 0) && !cuestionarioPostRespondido && (
+                        {tieneCuestionarios && (progreso?.sesionesCompletadas || 0) === (progreso?.totalSesiones || 0) && !cuestionarioPostRespondido && (
                             <p className="text-purple-600 text-sm mt-1 font-medium">
                                 ¡Has completado todas las sesiones! Ya puedes responder el cuestionario final.
                             </p>

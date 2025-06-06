@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { ArrowLeft, BookOpen } from 'lucide-react';
+import { ArrowLeft, BookOpen, HelpCircle, AlertTriangle, FileText, BookMarked } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
-import { TipoContexto, EnfoqueMetodologico, EstadoPublicacion, TipoEvaluacion, getEnumArray } from '../../../constants/enums';
+import { TipoContexto, EnfoqueMetodologico, EstadoPublicacion, getEnumArray } from '../../../constants/enums';
 
 const EditarPrograma = () => {
     const navigate = useNavigate();
@@ -19,14 +19,14 @@ const EditarPrograma = () => {
         enfoque_metodologico: EnfoqueMetodologico.MBSR.value,
         duracion_semanas: '',
         poblacion_objetivo: '',
-        tipo_evaluacion: TipoEvaluacion.AMBOS.value,
+        tiene_cuestionarios: true,
+        tiene_diarios: true,
         creado_por: user.id,
         estado_publicacion: EstadoPublicacion.BORRADOR.value
     });
 
     const tiposContexto = getEnumArray(TipoContexto);
     const enfoquesMetodologicos = getEnumArray(EnfoqueMetodologico);
-    const tiposEvaluacion = getEnumArray(TipoEvaluacion);
 
     useEffect(() => {
         const fetchPrograma = async () => {
@@ -53,10 +53,10 @@ const EditarPrograma = () => {
     }, [id, navigate, user.perfil_investigador.id]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
 
@@ -227,39 +227,29 @@ const EditarPrograma = () => {
                                 <label htmlFor="duracion_semanas" className="block text-sm font-medium text-gray-700 mb-1">
                                     Duración en Semanas *
                                 </label>
-                                <input
-                                    id="duracion_semanas"
-                                    name="duracion_semanas"
-                                    type="number"
-                                    min="1"
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    placeholder="Ej. 8"
-                                    value={formData.duracion_semanas}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor="tipo_evaluacion" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Tipo de Evaluación *
-                                </label>
-                                <select
-                                    id="tipo_evaluacion"
-                                    name="tipo_evaluacion"
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    value={formData.tipo_evaluacion}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                >
-                                    {tiposEvaluacion.map((tipo) => (
-                                        <option key={tipo.value} value={tipo.value}>
-                                            {tipo.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="relative">
+                                    <input
+                                        id="duracion_semanas"
+                                        name="duracion_semanas"
+                                        type="number"
+                                        min="1"
+                                        required
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                        placeholder="Ej. 8"
+                                        value={formData.duracion_semanas}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    />
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <div className="group relative">
+                                            <HelpCircle className="h-5 w-5 text-gray-400 cursor-help hover:text-indigo-500 transition-colors duration-200" />
+                                            <div className="absolute bottom-full right-0 mb-2 w-72 p-3 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-lg">
+                                                <div className="font-medium mb-1">Duración del Programa</div>
+                                                <p className="text-gray-200">Este número determinará la cantidad de sesiones que deberás crear para el programa. Cada semana corresponde a una sesión.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 

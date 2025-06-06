@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, FileText, CheckCircle2, Star, Lock, AlertTriangle, Clock } from 'lucide-react';
+import { Calendar, Users, FileText, CheckCircle, CheckCircle2, Star, Lock, AlertTriangle, Clock, FileQuestion } from 'lucide-react';
 import SesionCard from './SesionCard';
 import ErrorAlert from './ErrorAlert';
 import ProgresoPrograma from './ProgresoPrograma';
@@ -47,7 +47,7 @@ const ProgramaDetalle = ({
 
     if (!programa?.sesiones?.length) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+            <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-10">
                         <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
@@ -97,7 +97,7 @@ const ProgramaDetalle = ({
                                     Programa Completado
                                 </span>
                             ) : (
-                                <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-amber-500 to-yellow-500 text-white shadow-sm">
+                                <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-amber-200 to-amber-300 text-amber-800 shadow-sm">
                                     <Clock className="h-4 w-4 mr-2" />
                                     En progreso
                                 </span>
@@ -125,7 +125,7 @@ const ProgramaDetalle = ({
                         </div>
                     )}
 
-                    <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="mt-6 grid grid-cols-2 md:grid-cols-2 gap-4">
                         <div className="flex items-center text-gray-600">
                             <Calendar className="mr-2 text-gray-400" size={16} />
                             <span>{programa.duracion_semanas} semanas</span>
@@ -138,6 +138,26 @@ const ProgramaDetalle = ({
                             <Users className="mr-2 text-gray-400" size={16} />
                             <span className="capitalize">{programa.tipo_contexto}</span>
                         </div>
+                        <div className="flex items-center text-gray-600">
+                            <FileQuestion className="mr-2 text-gray-400" size={16} />
+                            <div className="flex flex-wrap gap-2">
+                                {programa.tiene_cuestionarios && (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-s font-medium bg-indigo-100 text-indigo-800">
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                        Cuestionarios
+                                    </span>
+                                )}
+                                {programa.tiene_diarios && (
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-s font-medium bg-emerald-100 text-emerald-800">
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                        Diarios
+                                    </span>
+                                )}
+                                {!programa.tiene_cuestionarios && !programa.tiene_diarios && (
+                                    <span className="text-gray-500">Sin evaluación</span>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -147,10 +167,11 @@ const ProgramaDetalle = ({
                     cuestionarioPreRespondido={cuestionarioPreRespondido}
                     cuestionarioPostRespondido={cuestionarioPostRespondido}
                     mostrarDetalles={!esCompletado}
+                    tieneCuestionarios={programa?.tiene_cuestionarios}
                 />
 
                 {/* Cuestionarios - Solo para programa activo */}
-                {!esCompletado && permitirNavegacionCuestionarios && (
+                {!esCompletado && permitirNavegacionCuestionarios && (programa.tiene_cuestionarios) && (
                     <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
                         <h2 className="text-xl font-bold text-gray-900 mb-4">Cuestionarios</h2>
                         <p className="text-gray-600 mb-4">
@@ -211,6 +232,7 @@ const ProgramaDetalle = ({
                                 cuestionarioPreRespondido={cuestionarioPreRespondido || esCompletado}
                                 permitirAccesoCompletada={true}
                                 programaCompletado={esCompletado}
+                                tieneCuestionarios={programa?.tiene_cuestionarios}
                             />
                         ))}
                     </div>

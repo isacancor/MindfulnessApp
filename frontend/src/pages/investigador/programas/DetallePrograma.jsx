@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion, CheckCircle, UserCheck, Copy } from 'lucide-react';
+import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion, CheckCircle, UserCheck, Copy, Info, ClipboardList } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
 import { EstadoPublicacion } from '../../../constants/enums';
@@ -41,6 +41,12 @@ const DetallePrograma = () => {
 
     const handlePublicar = async () => {
         try {
+            // Validar que si tiene_cuestionarios es true, ambos cuestionarios deben estar creados
+            if (programa.tiene_cuestionarios && (!programa.cuestionario_pre || !programa.cuestionario_post)) {
+                setError('Para publicar el programa, debes crear tanto el cuestionario pre como el post');
+                return;
+            }
+
             await api.post(`/programas/${id}/publicar/`);
             navigate('/programas');
         } catch (error) {
@@ -126,8 +132,8 @@ const DetallePrograma = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto">
+        <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto">
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                     {/* Encabezado con gradiente */}
                     <div className="bg-gradient-to-r from-indigo-200 via-blue-100 to-teal-200 p-8 text-white">
@@ -244,42 +250,163 @@ const DetallePrograma = () => {
                             onClose={() => setError(null)}
                         />
 
-                        {/* Información del Programa */}
-                        <div className="space-y-8">
-                            {/* Descripción y Objetivos */}
-                            <div>
-                                <h2 className="text-xl font-semibold text-gray-900 mb-4">Descripción y Objetivos</h2>
-                                <p className="text-gray-600 whitespace-pre-line">{programa.descripcion}</p>
+                        {/* Contenido Principal */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Columna Principal */}
+                            <div className="lg:col-span-2 space-y-6">
+                                {/* Descripción y Objetivos */}
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div className="p-4 border-b border-gray-100 bg-gray-50">
+                                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                                            <Info className="h-5 w-5 text-indigo-600 mr-2" />
+                                            Descripción y Objetivos
+                                        </h2>
+                                    </div>
+                                    <div className="p-4">
+                                        <p className="text-gray-600 whitespace-pre-line text-base leading-relaxed">{programa.descripcion}</p>
+                                    </div>
+                                </div>
+
+                                {/* Sesiones */}
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                                        <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                                            <Calendar className="h-5 w-5 text-indigo-600 mr-2" />
+                                            Sesiones del Programa ({sesiones.length}/{programa.duracion_semanas})
+                                        </h2>
+                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && sesiones.length < programa.duracion_semanas && (
+                                            <button
+                                                onClick={handleNuevaSesion}
+                                                className="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                                            >
+                                                <Plus className="h-4 w-4 mr-1" />
+                                                Nueva Sesión
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="divide-y divide-gray-100">
+                                        {sesiones.length === 0 ? (
+                                            <div className="p-4 text-center text-gray-500 text-sm">
+                                                No hay sesiones creadas todavía.
+                                            </div>
+                                        ) : (
+                                            sesiones.map((sesion) => (
+                                                <div key={sesion.id} className="p-4 hover:bg-gray-50 transition-colors">
+                                                    <div className="flex items-start justify-between">
+                                                        <div className="flex items-start space-x-4">
+                                                            <div className="flex-shrink-0 w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-semibold">
+                                                                {sesion.semana}
+                                                            </div>
+                                                            <div>
+                                                                <h3 className="text-base font-medium text-gray-900">{sesion.titulo}</h3>
+                                                                <p className="text-gray-600 text-base mt-1">{sesion.descripcion}</p>
+                                                                <div className="flex items-center mt-2 space-x-4 text-sm text-gray-500">
+                                                                    <div className="flex items-center">
+                                                                        <Clock className="h-4 w-4 mr-1" />
+                                                                        <span>{sesion.duracion_estimada} min</span>
+                                                                    </div>
+                                                                    <div className="flex items-center">
+                                                                        {sesion.tipo_contenido === 'temporizador' && <Timer className="h-4 w-4 mr-1 text-blue-500" />}
+                                                                        {sesion.tipo_contenido === 'enlace' && <Link className="h-4 w-4 mr-1 text-green-500" />}
+                                                                        {sesion.tipo_contenido === 'audio' && <Music className="h-4 w-4 mr-1 text-purple-500" />}
+                                                                        {sesion.tipo_contenido === 'video' && <Video className="h-4 w-4 mr-1 text-red-500" />}
+                                                                        <span>{sesion.tipo_contenido}</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className={`px-2.5 py-1 rounded-full text-base font-medium ${(sesion.tipo_practica === 'breath' || sesion.tipo_practica === 'sounds' ||
+                                                                sesion.tipo_practica === 'visual_object' || sesion.tipo_practica === 'senses' ||
+                                                                sesion.tipo_practica === 'open_awareness') ? 'bg-blue-100 text-blue-800' :
+                                                                sesion.tipo_practica === 'open_monitoring' ? 'bg-green-100 text-green-800' :
+                                                                    sesion.tipo_practica === 'loving_kindness' ? 'bg-purple-100 text-purple-800' :
+                                                                        sesion.tipo_practica === 'body_scan' ? 'bg-yellow-100 text-yellow-800' :
+                                                                            sesion.tipo_practica === 'mindful_movement' ? 'bg-red-100 text-red-800' :
+                                                                                sesion.tipo_practica === 'self_compassion' ? 'bg-pink-100 text-pink-800' :
+                                                                                    'bg-gray-100 text-gray-800'
+                                                                }`}>
+                                                                {sesion.tipo_practica_display}
+                                                            </span>
+                                                            {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                                                <div className="flex space-x-1">
+                                                                    <button
+                                                                        onClick={() => navigate(`/programas/${id}/sesiones/${sesion.id}/editar`)}
+                                                                        className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                                        title="Editar sesión"
+                                                                    >
+                                                                        <Edit className="h-4 w-4" />
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleEliminarSesion(sesion.id)}
+                                                                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                        title="Eliminar sesión"
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Detalles del Programa */}
+                            {/* Columna Lateral */}
                             <div className="space-y-6">
                                 {/* Información General */}
-                                <div className="bg-gray-50 p-6 rounded-lg">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Información General</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div className="space-y-4">
-                                            <div className="flex items-start">
-                                                <Users className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                                <div>
-                                                    <p className="text-sm text-gray-500">Población Objetivo</p>
-                                                    <p className="text-gray-900">{programa.poblacion_objetivo}</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-start">
-                                                <Calendar className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                                <div>
-                                                    <p className="text-sm text-gray-500">Tipo de Contexto</p>
-                                                    <p className="text-gray-900">{programa.tipo_contexto}</p>
-                                                </div>
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div className="p-4 border-b border-gray-100 bg-gray-50">
+                                        <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                                            <ClipboardList className="h-5 w-5 text-indigo-600 mr-2" />
+                                            Información General
+                                        </h3>
+                                    </div>
+                                    <div className="p-4 space-y-4">
+                                        <div className="flex items-start">
+                                            <Users className="h-5 w-5 text-indigo-600 mt-0.5 mr-3 flex-shrink-0" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Población Objetivo</p>
+                                                <p className="text-gray-900 text-base font-medium mt-0.5">{programa.poblacion_objetivo}</p>
                                             </div>
                                         </div>
-                                        <div className="space-y-4">
-                                            <div className="flex items-start">
-                                                <BookOpen className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
-                                                <div>
-                                                    <p className="text-sm text-gray-500">Enfoque Metodológico</p>
-                                                    <p className="text-gray-900">{programa.enfoque_metodologico}</p>
+                                        <div className="flex items-start">
+                                            <Calendar className="h-5 w-5 text-indigo-600 mt-0.5 mr-3 flex-shrink-0" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Tipo de Contexto</p>
+                                                <p className="text-gray-900 text-base font-medium mt-0.5">{programa.tipo_contexto}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <BookOpen className="h-5 w-5 text-indigo-600 mt-0.5 mr-3 flex-shrink-0" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Enfoque Metodológico</p>
+                                                <p className="text-gray-900 text-base font-medium mt-0.5">{programa.enfoque_metodologico}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start">
+                                            <FileQuestion className="h-5 w-5 text-indigo-600 mt-0.5 mr-3 flex-shrink-0" />
+                                            <div>
+                                                <p className="text-sm text-gray-500">Métodos de Evaluación</p>
+                                                <div className="flex flex-wrap gap-2 mt-1.5">
+                                                    {programa.tiene_cuestionarios && (
+                                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-base font-medium bg-indigo-100 text-indigo-800">
+                                                            <CheckCircle className="h-4 w-4 mr-1.5" />
+                                                            Cuestionarios
+                                                        </span>
+                                                    )}
+                                                    {programa.tiene_diarios && (
+                                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-base font-medium bg-emerald-100 text-emerald-800">
+                                                            <CheckCircle className="h-4 w-4 mr-1.5" />
+                                                            Diarios
+                                                        </span>
+                                                    )}
+                                                    {!programa.tiene_cuestionarios && !programa.tiene_diarios && (
+                                                        <span className="text-gray-500 text-base">No hay métodos de evaluación</span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -287,203 +414,115 @@ const DetallePrograma = () => {
                                 </div>
 
                                 {/* Evaluación */}
-                                <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Evaluación</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Cuestionario Pre */}
-                                        <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-                                            <div className="flex justify-between items-center mb-3">
-                                                <h4 className="font-medium text-gray-800 flex items-center">
-                                                    <FileQuestion className="h-5 w-5 text-indigo-600 mr-2" />
-                                                    Cuestionario Pre
-                                                </h4>
-                                                {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_pre && (
-                                                    <button
-                                                        onClick={handleNuevoCuestionarioPre}
-                                                        className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                                    >
-                                                        <Plus className="h-5 w-5 mr-1" />
-                                                        Crear
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {programa.cuestionario_pre ? (
-                                                <div className="flex justify-between items-center">
-                                                    <a
-                                                        href={`/programas/${id}/cuestionarios/${programa.cuestionario_pre.id}`}
-                                                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-                                                    >
-                                                        Ver vista previa del cuestionario
-                                                    </a>
-                                                    {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
-                                                        <div className="flex space-x-2">
-                                                            <button
-                                                                onClick={() => handleEditarCuestionario(programa.cuestionario_pre.id)}
-                                                                className="text-gray-500 hover:text-indigo-600 focus:outline-none"
-                                                                title="Editar"
-                                                            >
-                                                                <Edit className="h-5 w-5" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleEliminarCuestionario(programa.cuestionario_pre.id)}
-                                                                className="text-gray-500 hover:text-red-600 focus:outline-none"
-                                                                title="Eliminar"
-                                                            >
-                                                                <Trash2 className="h-5 w-5" />
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <p className="text-gray-500 text-sm">No se ha creado cuestionario pre</p>
-                                            )}
+                                {programa.tiene_cuestionarios && (
+                                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                        <div className="p-4 border-b border-gray-100 bg-gray-50">
+                                            <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                                                <FileQuestion className="h-5 w-5 text-indigo-600 mr-2" />
+                                                Evaluación
+                                            </h3>
                                         </div>
-
-                                        {/* Cuestionario Post */}
-                                        <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
-                                            <div className="flex justify-between items-center mb-3">
-                                                <h4 className="font-medium text-gray-800 flex items-center">
-                                                    <FileQuestion className="h-5 w-5 text-indigo-600 mr-2" />
-                                                    Cuestionario Post
-                                                </h4>
-                                                {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_post && (
-                                                    <button
-                                                        onClick={handleNuevoCuestionarioPost}
-                                                        className="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                                    >
-                                                        <Plus className="h-5 w-5 mr-1" />
-                                                        Crear
-                                                    </button>
+                                        <div className="p-4 space-y-4">
+                                            {/* Cuestionario Pre */}
+                                            <div className="bg-gray-50 rounded-lg p-4">
+                                                <div className="flex justify-between items-center mb-3">
+                                                    <h4 className="font-medium text-gray-900 flex items-center">
+                                                        <FileQuestion className="h-5 w-5 text-indigo-600 mr-2" />
+                                                        Cuestionario Pre
+                                                    </h4>
+                                                    {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_pre && (
+                                                        <button
+                                                            onClick={handleNuevoCuestionarioPre}
+                                                            className="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                                                        >
+                                                            <Plus className="h-4 w-4 mr-1" />
+                                                            Crear
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                {programa.cuestionario_pre ? (
+                                                    <div className="flex justify-between items-center">
+                                                        <a
+                                                            href={`/programas/${id}/cuestionarios/${programa.cuestionario_pre.id}`}
+                                                            className="text-indigo-600 hover:text-indigo-800 text-base font-medium"
+                                                        >
+                                                            Ver vista previa
+                                                        </a>
+                                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                                            <div className="flex space-x-1">
+                                                                <button
+                                                                    onClick={() => handleEditarCuestionario(programa.cuestionario_pre.id)}
+                                                                    className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                                    title="Editar"
+                                                                >
+                                                                    <Edit className="h-4 w-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleEliminarCuestionario(programa.cuestionario_pre.id)}
+                                                                    className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                    title="Eliminar"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-gray-500 text-base">No se ha creado cuestionario pre</p>
                                                 )}
                                             </div>
 
-                                            {programa.cuestionario_post ? (
-                                                <div className="flex justify-between items-center">
-                                                    <a
-                                                        href={`/programas/${id}/cuestionarios/${programa.cuestionario_post.id}`}
-                                                        className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
-                                                    >
-                                                        Ver vista previa del cuestionario
-                                                    </a>
-                                                    {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
-                                                        <div className="flex space-x-2">
-                                                            <button
-                                                                onClick={() => handleEditarCuestionario(programa.cuestionario_post.id)}
-                                                                className="text-gray-500 hover:text-indigo-600 focus:outline-none"
-                                                                title="Editar"
-                                                            >
-                                                                <Edit className="h-5 w-5" />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleEliminarCuestionario(programa.cuestionario_post.id)}
-                                                                className="text-gray-500 hover:text-red-600 focus:outline-none"
-                                                                title="Eliminar"
-                                                            >
-                                                                <Trash2 className="h-5 w-5" />
-                                                            </button>
-                                                        </div>
+                                            {/* Cuestionario Post */}
+                                            <div className="bg-gray-50 rounded-lg p-4">
+                                                <div className="flex justify-between items-center mb-3">
+                                                    <h4 className="font-medium text-gray-900 flex items-center">
+                                                        <FileQuestion className="h-5 w-5 text-indigo-600 mr-2" />
+                                                        Cuestionario Post
+                                                    </h4>
+                                                    {isInvestigador() && programa?.estado_publicacion === 'borrador' && !programa.cuestionario_post && (
+                                                        <button
+                                                            onClick={handleNuevoCuestionarioPost}
+                                                            className="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                                                        >
+                                                            <Plus className="h-4 w-4 mr-1" />
+                                                            Crear
+                                                        </button>
                                                     )}
                                                 </div>
-                                            ) : (
-                                                <p className="text-gray-500 text-sm">No se ha creado cuestionario post</p>
-                                            )}
+                                                {programa.cuestionario_post ? (
+                                                    <div className="flex justify-between items-center">
+                                                        <a
+                                                            href={`/programas/${id}/cuestionarios/${programa.cuestionario_post.id}`}
+                                                            className="text-indigo-600 hover:text-indigo-800 text-base font-medium"
+                                                        >
+                                                            Ver vista previa
+                                                        </a>
+                                                        {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
+                                                            <div className="flex space-x-1">
+                                                                <button
+                                                                    onClick={() => handleEditarCuestionario(programa.cuestionario_post.id)}
+                                                                    className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                                    title="Editar"
+                                                                >
+                                                                    <Edit className="h-4 w-4" />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleEliminarCuestionario(programa.cuestionario_post.id)}
+                                                                    className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                    title="Eliminar"
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <p className="text-gray-500 text-base">No se ha creado cuestionario post</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            {/**************************************************************** */}
-                            {/* Sesiones */}
-                            <div>
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-xl font-semibold text-gray-900">Sesiones del Programa</h2>
-                                    {isInvestigador() && programa?.estado_publicacion === 'borrador' && sesiones.length < programa.duracion_semanas && (
-                                        <button
-                                            onClick={handleNuevaSesion}
-                                            className="flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                                        >
-                                            <Plus className="h-5 w-5 mr-2" />
-                                            Nueva Sesión
-                                        </button>
-                                    )}
-                                </div>
-                                <div className="space-y-4">
-                                    {sesiones.length == 0 ? (
-                                        <p className="text-gray-500">No hay sesiones creadas todavía.</p>
-                                    ) : (sesiones.map((sesion) => (
-                                        <div key={sesion.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                                            <div className="flex items-center space-x-4">
-                                                <div className="flex items-center justify-center w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full font-semibold">
-                                                    {sesion.semana}
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-medium text-gray-900">{sesion.titulo}</h3>
-                                                    <p className="text-gray-600 mt-1">{sesion.descripcion}</p>
-                                                    <div className="flex items-center mt-2 text-sm text-gray-500">
-                                                        <Clock className="h-4 w-4 mr-1" />
-                                                        <span>{sesion.duracion_estimada} minutos</span>
-                                                        <span className="mx-2">•</span>
-                                                        {sesion.tipo_contenido === 'temporizador' && (
-                                                            <div className="flex items-center">
-                                                                <Timer className="h-4 w-4 mr-1 text-blue-500" />
-                                                                <span>Temporizador</span>
-                                                            </div>
-                                                        )}
-                                                        {sesion.tipo_contenido === 'enlace' && (
-                                                            <div className="flex items-center">
-                                                                <Link className="h-4 w-4 mr-1 text-green-500" />
-                                                                <span>Enlace</span>
-                                                            </div>
-                                                        )}
-                                                        {sesion.tipo_contenido === 'audio' && (
-                                                            <div className="flex items-center">
-                                                                <Music className="h-4 w-4 mr-1 text-purple-500" />
-                                                                <span>Audio</span>
-                                                            </div>
-                                                        )}
-                                                        {sesion.tipo_contenido === 'video' && (
-                                                            <div className="flex items-center">
-                                                                <Video className="h-4 w-4 mr-1 text-red-500" />
-                                                                <span>Video</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center space-x-2">
-                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${(sesion.tipo_practica === 'breath' || sesion.tipo_practica === 'sounds' || sesion.tipo_practica === 'visual_object' || sesion.tipo_practica === 'senses' || sesion.tipo_practica === 'open_awareness') ? 'bg-blue-100 text-blue-800' :
-                                                    sesion.tipo_practica === 'open_monitoring' ? 'bg-green-100 text-green-800' :
-                                                        sesion.tipo_practica === 'loving_kindness' ? 'bg-purple-100 text-purple-800' :
-                                                            sesion.tipo_practica === 'body_scan' ? 'bg-yellow-100 text-yellow-800' :
-                                                                sesion.tipo_practica === 'mindful_movement' ? 'bg-red-100 text-red-800' :
-                                                                    sesion.tipo_practica === 'self_compassion' ? 'bg-pink-100 text-pink-800' :
-                                                                        'bg-gray-100 text-gray-800'
-                                                    }`}>
-                                                    {sesion.tipo_practica_display}
-                                                </span>
-                                                {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
-                                                    <div className="flex space-x-2">
-                                                        <button
-                                                            onClick={() => navigate(`/programas/${id}/sesiones/${sesion.id}/editar`)}
-                                                            className="p-2 text-gray-600 hover:text-indigo-600 transition-colors"
-                                                            title="Editar sesión"
-                                                        >
-                                                            <Edit className="h-5 w-5" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleEliminarSesion(sesion.id)}
-                                                            className="p-2 text-gray-600 hover:text-red-600 transition-colors"
-                                                            title="Eliminar sesión"
-                                                        >
-                                                            <Trash2 className="h-5 w-5" />
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )))}
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>

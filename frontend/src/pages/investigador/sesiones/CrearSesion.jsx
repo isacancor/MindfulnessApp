@@ -29,6 +29,24 @@ const CrearSesion = () => {
         contenido_video: null
     });
 
+    // TODO: Eliminar este método
+    const fillTestData = () => {
+        setFormData({
+            programa: id,
+            titulo: 'Sesión de Prueba',
+            descripcion: 'Esta es una sesión de prueba que incluye ejercicios de respiración y meditación guiada.',
+            semana: '1',
+            duracion_estimada: '45',
+            tipo_practica: 'otro',
+            tipo_contenido: 'enlace',
+            tipo_escala: programa?.tiene_diarios ? 'EMOCIONAL' : '',
+            contenido_temporizador: null,
+            contenido_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            contenido_audio: null,
+            contenido_video: null
+        });
+    };
+
     const tiposPractica = getEnumArray(EtiquetaPractica);
     const tiposContenido = getEnumArray(TipoContenido);
     const tiposEscala = getEnumArray(Escala);
@@ -69,6 +87,9 @@ const CrearSesion = () => {
 
         try {
             const formDataToSend = prepareSessionFormData(formData);
+            if (!programa.tiene_diarios) {
+                delete formDataToSend.tipo_escala;
+            }
             await api.post('sesiones', formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -107,6 +128,14 @@ const CrearSesion = () => {
                         aria-label="Volver atrás"
                     >
                         <ArrowLeft className="h-5 w-5" />
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={fillTestData}
+                        className="absolute top-6 right-6 px-3 py-2 text-sm rounded-lg transition-all duration-200 text-gray-500 hover:text-indigo-600 border border-gray-300/30 hover:border-indigo-300 bg-white/90 hover:bg-indigo-100 focus:outline-none shadow-sm"
+                    >
+                        Rellenar datos de prueba
                     </button>
 
                     <div className="text-center mt-2">
@@ -200,7 +229,9 @@ const CrearSesion = () => {
                                     disabled={loading}
                                 />
                             </div>
+                        </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label htmlFor="tipo_practica" className="block text-sm font-medium text-gray-700 mb-1">
                                     Tipo de Práctica *
@@ -240,10 +271,12 @@ const CrearSesion = () => {
                                     ))}
                                 </select>
                             </div>
+                        </div>
 
+                        {programa.tiene_diarios && (
                             <div>
                                 <label htmlFor="tipo_escala" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Tipo de Escala de Evaluación *
+                                    Escala de Evaluación Post-Sesión *
                                 </label>
                                 <select
                                     id="tipo_escala"
@@ -254,13 +287,16 @@ const CrearSesion = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 >
-                                    <option value="">Selecciona un tipo de escala</option>
+                                    <option value="">Selecciona una escala de evaluación</option>
                                     {tiposEscala.map((tipo) => (
                                         <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
                                     ))}
                                 </select>
+                                <p className="mt-1 text-sm text-gray-500">
+                                    Esta escala se utilizará para evaluar la experiencia de los participantes después de la sesión
+                                </p>
                             </div>
-                        </div>
+                        )}
 
                         {formData.tipo_contenido === 'temporizador' && (
                             <div>

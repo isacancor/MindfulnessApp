@@ -6,7 +6,7 @@ import Landing from './pages/Landing';
 import InvestigadorDashboard from './pages/investigador/InvestigadorDashboard';
 import ParticipanteDashboard from './pages/participante/ParticipanteDashboard';
 import PrivateRoute from './components/PrivateRoute';
-import { SesionProtectedRoute, CuestionarioPostProtectedRoute } from './components/ProtectedRoutes';
+import { SesionProtectedRoute, CuestionarioPostProtectedRoute, CuestionarioPreProtectedRoute } from './components/ProtectedRoutes';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import RegisterInvestigador from '@/pages/auth/RegisterInvestigador';
@@ -89,7 +89,12 @@ function App() {
             </SesionProtectedRoute>
           } />
 
-          <Route path="/miprograma/cuestionario-pre" element={<ResponderCuestionario tipo="pre" />} />
+          {/* Proteger ruta de cuestionario pre */}
+          <Route path="/miprograma/cuestionario-pre" element={
+            <CuestionarioPreProtectedRoute>
+              <ResponderCuestionario tipo="pre" />
+            </CuestionarioPreProtectedRoute>
+          } />
 
           {/* Proteger ruta de cuestionario post */}
           <Route path="/miprograma/cuestionario-post" element={

@@ -1,11 +1,10 @@
 from django.db import models
 from usuario.models import Participante, Investigador
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import timedelta
 from config.enums import (
     TipoContexto, EnfoqueMetodologico,
-    EstadoPublicacion, EstadoInscripcion,
-    TipoEvaluacion
+    EstadoPublicacion, EstadoInscripcion
 )
 
 class Programa(models.Model):
@@ -28,11 +27,8 @@ class Programa(models.Model):
     duracion_semanas = models.PositiveIntegerField()
 
     # Configuración de Evaluación
-    tipo_evaluacion = models.CharField(
-        max_length=20,
-        choices=TipoEvaluacion.choices,
-        default=TipoEvaluacion.AMBOS
-    )
+    tiene_cuestionarios = models.BooleanField(default=True, help_text='Indica si el programa usa cuestionarios pre/post')
+    tiene_diarios = models.BooleanField(default=True, help_text='Indica si el programa usa diarios de autoevaluación post-sesión')
 
     # Evaluaciones
     cuestionario_pre = models.ForeignKey(
@@ -112,7 +108,7 @@ class Programa(models.Model):
     # Comprobar si tiene los cuestionarios necesarios según el tipo de evaluación
     def puede_ser_publicado3(self):
         if self.estado_publicacion == EstadoPublicacion.PUBLICADO:
-            if self.tipo_evaluacion in [TipoEvaluacion.CUESTIONARIOS, TipoEvaluacion.AMBOS]:
+            if self.tiene_cuestionarios:
                 tiene_pre = self.cuestionario_pre is not None
                 tiene_post = self.cuestionario_post is not None
                 if not (tiene_pre and tiene_post):
@@ -185,7 +181,19 @@ class InscripcionPrograma(models.Model):
             # o si todas las sesiones están completadas
             usuario = self.participante
             sesiones_completadas = self.programa.sesiones.filter(completadas__participante=usuario).count()
-            if sesiones_completadas == self.programa.sesiones.count():
+            total_sesiones = self.programa.sesiones.count()
+            
+            # Si el programa no tiene cuestionarios, se marca como completado al terminar todas las sesiones
+            if not self.programa.tiene_cuestionarios and sesiones_completadas == total_sesiones:
                 self.estado_inscripcion = EstadoInscripcion.COMPLETADO
+            # Si tiene cuestionarios, se marca como completado solo si se completaron todas las sesiones y se respondió el cuestionario post
+            elif self.programa.tiene_cuestionarios and sesiones_completadas == total_sesiones:
+                from cuestionario.models import RespuestaCuestionario
+                cuestionario_post_respondido = RespuestaCuestionario.objects.filter(
+                    usuario=usuario.usuario,
+                    cuestionario=self.programa.cuestionario_post
+                ).exists()
+                if cuestionario_post_respondido:
+                    self.estado_inscripcion = EstadoInscripcion.COMPLETADO
 
             self.save()

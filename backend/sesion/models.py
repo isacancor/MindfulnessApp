@@ -23,7 +23,9 @@ class Sesion(models.Model):
     tipo_escala = models.CharField(
         max_length=50,
         choices=Escala.choices,
-        default=Escala.EMOCIONAL
+        default=Escala.EMOCIONAL,
+        null=True,
+        blank=True
     )
     contenido_temporizador = models.PositiveIntegerField(blank=True, null=True, help_text="Duración del temporizador en minutos")
     contenido_url = models.URLField(blank=True, null=True, help_text="URL para contenido externo o cargado")

@@ -22,8 +22,8 @@ export const SesionProtectedRoute = ({ children }) => {
                 // Verificar que el usuario tenga acceso a esta sesión
                 const programaResponse = await api.get('/programas/mi-programa/');
 
-                // Verificar que haya completado el cuestionario pre
-                if (!programaResponse.data.cuestionario_pre_respondido) {
+                // Verificar que haya completado el cuestionario pre si el programa tiene cuestionarios
+                if (programaResponse.data.tiene_cuestionarios && !programaResponse.data.cuestionario_pre_respondido) {
                     setIsAuthorized(false);
                     setLoading(false);
                     return;
@@ -105,6 +105,13 @@ export const CuestionarioPostProtectedRoute = ({ children }) => {
                 // Verificar que el usuario haya completado todas las sesiones
                 const programaResponse = await api.get('/programas/mi-programa/');
 
+                // Si el programa no tiene cuestionarios, no permitir acceso
+                if (!programaResponse.data.tiene_cuestionarios) {
+                    setIsAuthorized(false);
+                    setLoading(false);
+                    return;
+                }
+
                 // Primero verificar que tenga el cuestionario pre respondido
                 if (!programaResponse.data.cuestionario_pre_respondido) {
                     setIsAuthorized(false);
@@ -145,6 +152,65 @@ export const CuestionarioPostProtectedRoute = ({ children }) => {
                 setIsAuthorized(sesionesCompletadas.every(completada => completada));
             } catch (error) {
                 console.error('Error al verificar acceso al cuestionario post:', error);
+                setIsAuthorized(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        verificarAcceso();
+    }, [isAuthenticated]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                <p className="mt-4 text-gray-600">Verificando acceso...</p>
+            </div>
+        );
+    }
+
+    if (!isAuthorized) {
+        return <Navigate to="/miprograma" replace />;
+    }
+
+    return children;
+};
+
+// Componente para proteger la ruta del cuestionario pre
+export const CuestionarioPreProtectedRoute = ({ children }) => {
+    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const { isAuthenticated } = useAuth();
+
+    useEffect(() => {
+        const verificarAcceso = async () => {
+            if (!isAuthenticated()) {
+                setIsAuthorized(false);
+                setLoading(false);
+                return;
+            }
+
+            try {
+                const programaResponse = await api.get('/programas/mi-programa/');
+
+                // Si el programa no tiene cuestionarios, no permitir acceso
+                if (!programaResponse.data.tiene_cuestionarios) {
+                    setIsAuthorized(false);
+                    setLoading(false);
+                    return;
+                }
+
+                // Si ya respondió el cuestionario pre, no puede volver a responderlo
+                if (programaResponse.data.cuestionario_pre_respondido) {
+                    setIsAuthorized(false);
+                    setLoading(false);
+                    return;
+                }
+
+                setIsAuthorized(true);
+            } catch (error) {
+                console.error('Error al verificar acceso al cuestionario pre:', error);
                 setIsAuthorized(false);
             } finally {
                 setLoading(false);

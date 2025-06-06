@@ -9,8 +9,9 @@ import PageHeader from '../../components/layout/PageHeader';
 
 const HacerSesion = ({ completado }) => {
     const navigate = useNavigate();
-    const { sesionId, programaId } = useParams();
+    const { sesionId } = useParams();
     const [sesion, setSesion] = useState(null);
+    const [programa, setPrograma] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [tiempoRestante, setTiempoRestante] = useState(null);
@@ -20,20 +21,22 @@ const HacerSesion = ({ completado }) => {
     const [mostrarDiario, setMostrarDiario] = useState(false);
     const [diarioCompletado, setDiarioCompletado] = useState(false);
     const [esSesionCompletada, setEsSesionCompletada] = useState(false);
+    const [isLastSession, setIsLastSession] = useState(false);
 
     useEffect(() => {
         const fetchSesion = async () => {
             try {
+                /*
                 if (completado) {
                     // Verificar si el usuario tiene acceso a este programa completado
                     const completadosResponse = await api.get('/programas/mis-completados/');
-                    const tieneAcceso = completadosResponse.data.some(prog => prog.id === parseInt(programaId));
+                    const tieneAcceso = completadosResponse.data.some(prog => prog.id === parseInt(sesion.programa));
 
                     if (!tieneAcceso) {
                         navigate('/forbidden');
                         return;
                     }
-                }
+                }*/
 
                 const response = await api.get(`/sesiones/${sesionId}/`);
                 setSesion(response.data);
@@ -42,6 +45,15 @@ const HacerSesion = ({ completado }) => {
                     setTiempoOriginal(response.data.contenido_temporizador * 60);
                 }
 
+                // Obtener información del programa
+                const programaResponse = await api.get(`/programas/${response.data.programa}/`);
+                setPrograma(programaResponse.data)
+
+                // Verificar si es la última sesión
+                const todasSesiones = programaResponse.data.sesiones || [];
+                const ultimaSesion = todasSesiones[todasSesiones.length - 1];
+                setIsLastSession(response.data.id === ultimaSesion.id);
+
                 // Verificar si ya existe un diario para esta sesión
                 const diarioResponse = await api.get(`/sesiones/${sesionId}/diario_info/`);
                 if (diarioResponse.data) {
@@ -49,6 +61,7 @@ const HacerSesion = ({ completado }) => {
                     setCompletada(true);
                     setEsSesionCompletada(true);
                 }
+
             } catch (err) {
                 if (err.response?.status === 404) {
                     // No hay diario, continuar normalmente
@@ -63,7 +76,7 @@ const HacerSesion = ({ completado }) => {
         };
 
         fetchSesion();
-    }, [sesionId, programaId, navigate, completado]);
+    }, [sesionId, navigate, completado]);
 
     useEffect(() => {
         let timer;
@@ -82,15 +95,44 @@ const HacerSesion = ({ completado }) => {
         return () => clearInterval(timer);
     }, [sesion?.tipo_contenido, temporizadorActivo, completada]);
 
-    const handleCompletar = () => {
+    const marcarComoCompletada = async () => {
         if (diarioCompletado) {
             if (esSesionCompletada) {
-                navigate(`/completados/${programaId}`);
+                navigate(`/completados/${sesion.programa}`);
             } else {
                 navigate('/miprograma');
             }
-        } else {
+            return;
+        }
+
+        // Si el programa tiene diarios, mostrar el formulario de diario
+        if (programa?.tiene_diarios) {
             setMostrarDiario(true);
+            return;
+        }
+
+        // Si no tiene diarios, marcar como completada directamente
+        await handleDiarioCompletado();
+    };
+
+    const handleDiarioCompletado = async () => {
+        setDiarioCompletado(true);
+        setMostrarDiario(false);
+
+        try {
+            // Si tiene cuestionarios pero no tiene diarios, enviar un diario vacío
+            if (programa?.tiene_cuestionarios && !programa?.tiene_diarios) {
+                await api.post(`/sesiones/diario/`, {
+                    sesion_id: sesionId,
+                    valoracion: -1,
+                    comentario: ""
+                });
+            }
+
+            navigate('/miprograma');
+        } catch (error) {
+            console.error('Error al verificar estado del programa:', error);
+            navigate('/miprograma');
         }
     };
 
@@ -146,7 +188,7 @@ const HacerSesion = ({ completado }) => {
 
                     <div className="space-y-8">
                         {sesion.tipo_contenido === 'temporizador' && (
-                            <div className="text-center bg-gradient-to-br from-indigo-50 to-blue-50 p-8 rounded-xl">
+                            <div className="text-center p-8 rounded-xl">
                                 <div className="text-6xl font-bold text-indigo-600 mb-6 font-mono">
                                     {formatTime(tiempoRestante)}
                                 </div>
@@ -166,7 +208,7 @@ const HacerSesion = ({ completado }) => {
                         )}
 
                         {sesion.tipo_contenido === 'enlace' && (
-                            <div className="text-center bg-gradient-to-br from-indigo-50 to-blue-50 p-8 rounded-xl">
+                            <div className="text-center p-8 rounded-xl">
                                 <a
                                     href={sesion.contenido_url}
                                     target="_blank"
@@ -190,7 +232,7 @@ const HacerSesion = ({ completado }) => {
                         )}
 
                         {sesion.tipo_contenido === 'audio' && (
-                            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-8 rounded-xl">
+                            <div className="p-8 rounded-xl">
                                 <audio
                                     src={getMediaUrl(sesion.contenido_audio)}
                                     controls
@@ -203,7 +245,7 @@ const HacerSesion = ({ completado }) => {
                     <div className="flex justify-center mt-12">
                         {!esSesionCompletada && (
                             <button
-                                onClick={handleCompletar}
+                                onClick={marcarComoCompletada}
                                 disabled={sesion.tipo_contenido === 'temporizador' && !completada}
                                 className={`inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl transition-all duration-300 transform hover:scale-105 ${sesion.tipo_contenido === 'temporizador' && !completada
                                     ? 'bg-gray-400 cursor-not-allowed text-white'
@@ -222,12 +264,11 @@ const HacerSesion = ({ completado }) => {
 
             {mostrarDiario && !diarioCompletado && !esSesionCompletada && (
                 <DiarioForm
+                    programa={programa}
                     sesion={sesion}
                     onClose={() => setMostrarDiario(false)}
-                    onSuccess={() => {
-                        setDiarioCompletado(true);
-                        setMostrarDiario(false);
-                    }}
+                    onSuccess={handleDiarioCompletado}
+                    isLastSession={isLastSession}
                 />
             )}
             <MobileNavBar />

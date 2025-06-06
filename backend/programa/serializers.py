@@ -36,6 +36,7 @@ class ProgramaSerializer(serializers.ModelSerializer):
             'id', 'nombre', 'descripcion',
             'tipo_contexto', 'enfoque_metodologico',
             'poblacion_objetivo', 'duracion_semanas',
+            'tiene_cuestionarios', 'tiene_diarios',
             'cuestionario_pre', 'cuestionario_post',
             'estado_publicacion', 'creado_por', 'participantes',
             'fecha_creacion', 'fecha_actualizacion', 'fecha_publicacion', 'puede_ser_publicado',

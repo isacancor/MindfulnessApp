@@ -20,7 +20,7 @@ class SesionSerializer(serializers.ModelSerializer):
     tipo_practica_display = serializers.CharField(source='get_tipo_practica_display', read_only=True)
     tipo_contenido_display = serializers.CharField(source='get_tipo_contenido_display', read_only=True)
     tipo_escala_display = serializers.CharField(source='get_tipo_escala_display', read_only=True)
-    tipo_escala = serializers.ChoiceField(choices=Escala.choices)
+    tipo_escala = serializers.ChoiceField(choices=Escala.choices, required=False, allow_null=True)
 
     class Meta:
         model = Sesion

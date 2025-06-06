@@ -3,9 +3,12 @@ import { CheckCircle2, AlertCircle, Timer, Music, Video, Clock, Link, Repeat, Ca
 import { useNavigate } from 'react-router-dom';
 import { EtiquetaPractica, TipoContenido } from '../constants/enums';
 
-const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, programaCompletado = false }) => {
+const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, programaCompletado = false, tieneCuestionarios = true }) => {
     const navigate = useNavigate();
-    const isAvailable = cuestionarioPreRespondido && (index === 0 || sesiones[index - 1]?.completada);
+    // Si no hay cuestionarios, la sesión está disponible si es la primera o la anterior está completada
+    const isAvailable = tieneCuestionarios ?
+        (cuestionarioPreRespondido && (index === 0 || sesiones[index - 1]?.completada)) :
+        (index === 0 || sesiones[index - 1]?.completada);
     const isCompleted = sesion.completada;
 
     const getTipoPracticaColor = (tipo) => {
@@ -149,7 +152,7 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                     </button>
                 ) : (
                     <span className="w-full md:w-auto inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 text-center">
-                        {!cuestionarioPreRespondido ? 'Completa el cuestionario pre' :
+                        {tieneCuestionarios && !cuestionarioPreRespondido ? 'Completa el cuestionario pre' :
                             (index > 0 && !sesiones[index - 1]?.completada) ? 'Completa la sesión anterior' : 'Bloqueada'}
                     </span>
                 )}

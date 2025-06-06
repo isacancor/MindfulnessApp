@@ -1079,6 +1079,8 @@ def programa_duplicar(request, pk):
             enfoque_metodologico=programa_original.enfoque_metodologico,
             poblacion_objetivo=programa_original.poblacion_objetivo,
             duracion_semanas=programa_original.duracion_semanas,
+            tiene_cuestionarios=programa_original.tiene_cuestionarios,
+            tiene_diarios=programa_original.tiene_diarios,
             creado_por=request.user.perfil_investigador,
             estado_publicacion=EstadoPublicacion.BORRADOR
         )
@@ -1090,19 +1092,20 @@ def programa_duplicar(request, pk):
             sesion.save()
 
         # Copiar los cuestionarios si existen
-        if programa_original.cuestionario_pre:
-            cuestionario_pre = programa_original.cuestionario_pre
-            cuestionario_pre.pk = None
-            cuestionario_pre.programa = programa_duplicado
-            cuestionario_pre.save()
-            programa_duplicado.cuestionario_pre = cuestionario_pre
+        if programa_original.tiene_cuestionarios:
+            if programa_original.cuestionario_pre:
+                cuestionario_pre = programa_original.cuestionario_pre
+                cuestionario_pre.pk = None
+                cuestionario_pre.programa = programa_duplicado
+                cuestionario_pre.save()
+                programa_duplicado.cuestionario_pre = cuestionario_pre
 
-        if programa_original.cuestionario_post:
-            cuestionario_post = programa_original.cuestionario_post
-            cuestionario_post.pk = None
-            cuestionario_post.programa = programa_duplicado
-            cuestionario_post.save()
-            programa_duplicado.cuestionario_post = cuestionario_post
+            if programa_original.cuestionario_post:
+                cuestionario_post = programa_original.cuestionario_post
+                cuestionario_post.pk = None
+                cuestionario_post.programa = programa_duplicado
+                cuestionario_post.save()
+                programa_duplicado.cuestionario_post = cuestionario_post
 
         programa_duplicado.save()
 

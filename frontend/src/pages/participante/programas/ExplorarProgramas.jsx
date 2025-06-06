@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle, Star, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { Search, Calendar, Users, FileText, ArrowRight, Loader2, ArrowLeft, CheckCircle, Star, ChevronRight, CheckCircle2, FileQuestion } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
 import EnrolarProgramaModal from '../../../components/modals/EnrolarProgramaModal';
@@ -155,12 +155,28 @@ const ExplorarProgramas = () => {
                                             <span>{programa.duracion_semanas} semanas</span>
                                         </div>
                                         <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
-                                            <Users className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
-                                            <span>{programa.participantes?.length || 0} participantes</span>
-                                        </div>
-                                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
                                             <FileText className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
                                             <span className="capitalize">{programa.enfoque_metodologico}</span>
+                                        </div>
+                                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
+                                            <FileQuestion className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
+                                            <div className="flex flex-wrap gap-2">
+                                                {programa.tiene_cuestionarios && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-s font-medium bg-indigo-100 text-indigo-800">
+                                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                                        Cuestionarios
+                                                    </span>
+                                                )}
+                                                {programa.tiene_diarios && (
+                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-s font-medium bg-emerald-100 text-emerald-800">
+                                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                                        Diarios
+                                                    </span>
+                                                )}
+                                                {!programa.tiene_cuestionarios && !programa.tiene_diarios && (
+                                                    <span className="text-gray-500">Sin evaluación</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
 
