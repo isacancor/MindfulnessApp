@@ -192,6 +192,23 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Función para eliminar la cuenta
+    const deleteAccount = async () => {
+        try {
+            await api.delete('/auth/delete');
+            logout();
+        } catch (error) {
+            console.error('Error al eliminar la cuenta:', error);
+            if (error.response?.data?.error) {
+                throw new Error(error.response?.data?.error);
+            } else if (error.response?.data) {
+                throw new Error(error.response?.data);
+            } else {
+                throw new Error('Error al eliminar la cuenta');
+            }
+        }
+    };
+
     const value = {
         user,
         loading,
@@ -201,6 +218,7 @@ export const AuthProvider = ({ children }) => {
         logout,
         updateProfile,
         changePassword,
+        deleteAccount,
         hasPermission,
         hasRole,
         resetError,

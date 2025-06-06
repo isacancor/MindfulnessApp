@@ -4,7 +4,6 @@ import { ArrowLeft, Calendar, Users, FileText, Search, CheckCircle2, Star, Lock 
 import SesionCard from './SesionCard';
 import ErrorAlert from './ErrorAlert';
 import ProgresoPrograma from './ProgresoPrograma';
-import ProgramaFinalizado from '../pages/participante/programas/ProgramaFinalizado';
 import CTOExplorar from './CTOExplorar';
 import MobileNavBar from './layout/MobileNavBar';
 
@@ -39,7 +38,6 @@ const ProgramaDetalle = ({
         return (
             <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
                 <div className="max-w-7xl mx-auto">
-
                     <div className="text-center mb-10">
                         <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
                             {esCompletado ? "Programa no encontrado" : "Mi Programa"}
@@ -62,11 +60,6 @@ const ProgramaDetalle = ({
                 <MobileNavBar />
             </div>
         );
-    }
-
-    // Si el programa está finalizado, mostrar la vista de programa finalizado
-    if (programa.estado_publicacion === 'finalizado') {
-        return <ProgramaFinalizado programa={programa} />;
     }
 
     return (

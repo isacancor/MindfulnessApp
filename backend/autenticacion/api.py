@@ -11,6 +11,7 @@ from usuario.serializers import (
     RegisterSerializer,
     ChangePasswordSerializer
 )
+from programa.models import Programa, EstadoPublicacion
 
 Usuario = get_user_model()
 
@@ -109,4 +110,43 @@ def change_password(request):
             'user': UsuarioSerializer(user).data
         }, status=status.HTTP_200_OK)
     
-    return Response(serializer.errors.get('new_password')[-1], status=status.HTTP_400_BAD_REQUEST) 
+    return Response(serializer.errors.get('new_password')[-1], status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_account(request):
+    user = request.user
+    
+    try:
+        # Si es investigador, verificar si tiene programas publicados
+        if user.is_investigador():
+            programas_publicados = Programa.objects.filter(
+                creado_por=user.perfil_investigador,
+                estado_publicacion=EstadoPublicacion.PUBLICADO
+            ).exists()
+            
+            if programas_publicados:
+                return Response(
+                    {'error': 'No puedes eliminar tu cuenta mientras tengas programas publicados'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Eliminar programas en borrador
+            Programa.objects.filter(
+                creado_por=user.perfil_investigador,
+                estado_publicacion=EstadoPublicacion.BORRADOR
+            ).delete()
+        
+        # Eliminar el usuario
+        user.delete()
+        
+        return Response(
+            {'message': 'Cuenta eliminada exitosamente'},
+            status=status.HTTP_200_OK
+        )
+        
+    except Exception as e:
+        return Response(
+            {'error': 'Error al eliminar la cuenta'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        ) 

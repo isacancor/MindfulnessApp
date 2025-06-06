@@ -104,18 +104,6 @@ const DetallePrograma = () => {
         navigate(`/programas/${id}/cuestionarios/${cuestionarioId}/editar`);
     };
 
-    const handleFinalizar = async () => {
-        try {
-            setLoading(true);
-            await api.post(`/programas/${id}/finalizar/`);
-            fetchPrograma();
-        } catch (error) {
-            setError(error.response?.data?.error || 'Error al finalizar el programa');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleDuplicar = async () => {
         try {
             setLoading(true);
@@ -168,39 +156,28 @@ const DetallePrograma = () => {
                                             <div className="flex items-center gap-3">
                                                 <div className={`p-2 rounded-lg ${programa.estado_publicacion === EstadoPublicacion.PUBLICADO.value
                                                     ? 'bg-emerald-50'
-                                                    : programa.estado_publicacion === EstadoPublicacion.FINALIZADO.value
-                                                        ? 'bg-red-50'
-                                                        : 'bg-amber-50'
+                                                    : 'bg-amber-50'
                                                     }`}>
                                                     <div className={`h-5 w-5 ${programa.estado_publicacion === EstadoPublicacion.PUBLICADO.value
                                                         ? 'text-emerald-600'
-                                                        : programa.estado_publicacion === EstadoPublicacion.FINALIZADO.value
-                                                            ? 'text-red-600'
-                                                            : 'text-amber-600'
+                                                        : 'text-amber-600'
                                                         }`}>
                                                         {programa.estado_publicacion === EstadoPublicacion.PUBLICADO.value && <BookOpen className="h-5 w-5" />}
-                                                        {programa.estado_publicacion === EstadoPublicacion.FINALIZADO.value && <CheckCircle className="h-5 w-5" />}
                                                         {programa.estado_publicacion === EstadoPublicacion.BORRADOR.value && <Edit className="h-5 w-5" />}
                                                     </div>
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className={`text-sm font-medium ${programa.estado_publicacion === EstadoPublicacion.PUBLICADO.value
                                                         ? 'text-emerald-600'
-                                                        : programa.estado_publicacion === EstadoPublicacion.FINALIZADO.value
-                                                            ? 'text-red-600'
-                                                            : 'text-amber-600'
+                                                        : 'text-amber-600'
                                                         }`}>Estado</span>
                                                     <span className={`font-semibold ${programa.estado_publicacion === EstadoPublicacion.PUBLICADO.value
                                                         ? 'text-emerald-700'
-                                                        : programa.estado_publicacion === EstadoPublicacion.FINALIZADO.value
-                                                            ? 'text-red-700'
-                                                            : 'text-amber-700'
+                                                        : 'text-amber-700'
                                                         }`}>
                                                         {programa.estado_publicacion === EstadoPublicacion.PUBLICADO.value
                                                             ? 'Publicado'
-                                                            : programa.estado_publicacion === EstadoPublicacion.FINALIZADO.value
-                                                                ? 'Finalizado'
-                                                                : 'Borrador'}
+                                                            : 'Borrador'}
                                                     </span>
                                                 </div>
                                             </div>
@@ -250,22 +227,14 @@ const DetallePrograma = () => {
                             {isInvestigador() && programa?.estado_publicacion === 'publicado' && (
                                 <>
                                     <button
-                                        onClick={handleFinalizar}
-                                        className="flex items-center px-6 py-3 bg-red-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-red-600"
+                                        onClick={handleDuplicar}
+                                        className="flex items-center px-6 py-3 bg-indigo-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-indigo-600"
                                     >
-                                        <CheckCircle className="h-5 w-5 mr-2" />
-                                        Finalizar Programa
+                                        <Copy className="h-5 w-5 mr-2" />
+                                        Duplicar Programa
                                     </button>
                                 </>
                             )}
-
-                            <button
-                                onClick={handleDuplicar}
-                                className="flex items-center px-6 py-3 bg-indigo-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-indigo-600"
-                            >
-                                <Copy className="h-5 w-5 mr-2" />
-                                Duplicar Programa
-                            </button>
                         </div>
                     </div>
 

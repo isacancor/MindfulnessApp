@@ -1,4 +1,4 @@
-import { User, Mail, Calendar, Heart, Activity, Phone, MapPin, BookOpen, Clock, ArrowLeft, Lock, LogOut } from 'lucide-react';
+import { User, Mail, Calendar, Heart, Activity, Phone, MapPin, BookOpen, Clock, ArrowLeft, Lock, LogOut, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ErrorAlert from '../ErrorAlert';
@@ -8,11 +8,11 @@ import ChangePasswordModal from '../auth/ChangePasswordModal';
 import MobileNavBar from '../layout/MobileNavBar';
 
 const PerfilParticipante = () => {
-    const { user, error, resetError, logout } = useAuth();
+    const { user, error, resetError, logout, deleteAccount } = useAuth();
     const navigate = useNavigate();
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
-
-    console.log(user);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deleteError, setDeleteError] = useState(null);
 
     // Función para formatear la fecha de registro
     const formatDate = (dateString) => {
@@ -44,6 +44,15 @@ const PerfilParticipante = () => {
         return ExperienciaMindfulness[experiencia?.toUpperCase()]?.label || 'No especificada';
     };
 
+    const handleDeleteAccount = async () => {
+        try {
+            await deleteAccount();
+            navigate('/login');
+        } catch (error) {
+            setDeleteError(error.message);
+        }
+    };
+
     return (
         <div className="bg-white rounded-2xl overflow-hidden max-w-4xl mx-auto my-4 md:my-8 shadow-xl pb-20 md:pb-8">
             {/* Header del perfil con botón de retroceso */}
@@ -66,13 +75,20 @@ const PerfilParticipante = () => {
                                 Miembro desde {formatDate(user.date_joined)}
                             </span>
                         </div>
-                        <div className="mt-4">
+                        <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
                             <button
                                 onClick={() => setIsChangePasswordModalOpen(true)}
-                                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2 mx-auto md:mx-0"
+                                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
                             >
                                 <Lock className="h-5 w-5" />
                                 <span>Cambiar Contraseña</span>
+                            </button>
+                            <button
+                                onClick={() => setIsDeleteModalOpen(true)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
+                            >
+                                <Trash2 className="h-5 w-5" />
+                                <span>Eliminar Cuenta</span>
                             </button>
                         </div>
                     </div>
@@ -132,7 +148,7 @@ const PerfilParticipante = () => {
                 </div>
 
                 {/* Información personal */}
-                <div className="bg-gray-50 p-4 md:p-6 rounded-xl shadow-sm mb-6 md:mb-8">
+                <div className="bg-gray-50 p-4 md:p-6 rounded-xl shadow-sm">
                     <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 flex items-center">
                         <User className="h-5 w-5 text-teal-600 mr-2" />
                         Detalles Personales
@@ -155,74 +171,44 @@ const PerfilParticipante = () => {
                     </div>
                 </div>
 
-                {/* Progreso actual */}
-                <div className="mb-6 md:mb-8">
-                    <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <Activity className="h-5 w-5 text-teal-600 mr-2" />
-                        Progreso Actual
-                    </h3>
-                    <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
-                        {user.perfil_participante?.estudiosActivos?.length > 0 ? (
-                            user.perfil_participante.estudiosActivos.map((estudio) => (
-                                <div key={estudio.id} className="mb-4 last:mb-0">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h4 className="font-medium text-gray-800">{estudio.nombre}</h4>
-                                        <span className="text-sm font-medium text-teal-600">{estudio.progreso}%</span>
-                                    </div>
-                                    <div className="w-full bg-gray-100 rounded-full h-2.5">
-                                        <div
-                                            className="bg-gradient-to-r from-emerald-400 to-teal-500 h-2.5 rounded-full shadow-sm"
-                                            style={{ width: `${estudio.progreso}%` }}
-                                        ></div>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="text-center py-4 md:py-6">
-                                <p className="text-gray-500">No hay programas activos en este momento.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Historial de programas */}
-                <div>
-                    <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <Heart className="h-5 w-5 text-teal-600 mr-2" />
-                        Programas Completados
-                    </h3>
-                    <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
-                        {user.perfil_participante?.estudiosCompletados?.length > 0 ? (
-                            <div className="divide-y divide-gray-100">
-                                {user.perfil_participante.estudiosCompletados.map((estudio) => (
-                                    <div key={estudio.id} className="py-4 first:pt-0 last:pb-0">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h4 className="font-medium text-gray-800">{estudio.nombre}</h4>
-                                                <p className="text-sm text-gray-500 mt-1">
-                                                    Completado el {new Date(estudio.fechaCompletado).toLocaleDateString('es-ES')}
-                                                </p>
-                                            </div>
-                                            <span className="inline-flex items-center bg-emerald-100 text-emerald-800 text-sm font-medium px-3 py-1 rounded-full">
-                                                {estudio.puntuacion}/10
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-4 md:py-6">
-                                <p className="text-gray-500">No hay programas completados.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
             </div>
 
             <ChangePasswordModal
                 isOpen={isChangePasswordModalOpen}
                 onClose={() => setIsChangePasswordModalOpen(false)}
             />
+
+            {/* Modal de confirmación de eliminación */}
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Eliminar Cuenta</h3>
+                        <p className="text-gray-600 mb-6">
+                            ¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.
+                            Se eliminarán todos tus datos, incluyendo inscripciones a programas y diarios de sesión.
+                        </p>
+                        {deleteError && (
+                            <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4">
+                                {deleteError}
+                            </div>
+                        )}
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={() => setIsDeleteModalOpen(false)}
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleDeleteAccount}
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                            >
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Botón de cerrar sesión móvil */}
             <div className="fixed bottom-20 left-4 right-4 md:hidden">

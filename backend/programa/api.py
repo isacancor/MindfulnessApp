@@ -211,7 +211,7 @@ def programa_enrolar(request, pk):
 
     if programa.estado_publicacion != EstadoPublicacion.PUBLICADO:
         return Response(
-            {'error': 'No se puede enrolar en un programa que no está publicado o está finalizado'},
+            {'error': 'No se puede enrolar en un programa que no está publicado'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -271,39 +271,6 @@ def mis_programas_completados(request):
     except Exception as e:
         return Response(
             {'error': f'Error al obtener programas completados: {str(e)}'},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def programa_finalizar(request, pk):
-    try:
-        programa = Programa.objects.get(pk=pk)
-    except Programa.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    # Verificar que el usuario es el investigador del programa
-    if programa.creado_por != request.user.perfil_investigador:
-        return Response(
-            {"error": "No tienes permiso para finalizar este programa"},
-            status=status.HTTP_403_FORBIDDEN
-        )
-
-    # Verificar que el programa está publicado
-    if programa.estado_publicacion != EstadoPublicacion.PUBLICADO:
-        return Response(
-            {"error": "Solo se pueden finalizar programas que estén publicados"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    try:
-        programa.estado_publicacion = EstadoPublicacion.FINALIZADO
-        programa.fecha_finalizacion = timezone.now()
-        programa.save()
-        return Response({"message": "Programa finalizado exitosamente"})
-    except Exception as e:
-        return Response(
-            {"error": "Ha ocurrido un error al finalizar el programa"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
@@ -444,7 +411,7 @@ def investigador_estadisticas(request):
 @permission_classes([IsAuthenticated, IsInvestigador])
 def exportar_datos_programa(request, pk):
     """
-    Exporta datos de un programa finalizado en diferentes formatos:
+    Exporta datos de un programa en diferentes formatos:
     - CSV
     - Excel
     - JSON
@@ -463,13 +430,6 @@ def exportar_datos_programa(request, pk):
             return Response(
                 {"error": "No tienes permiso para exportar datos de este programa"}, 
                 status=status.HTTP_403_FORBIDDEN
-            )
-        
-        # Verificar que el programa está finalizado
-        if programa.estado_publicacion != 'finalizado':
-            return Response(
-                {"error": "Solo se pueden exportar datos de programas finalizados"}, 
-                status=status.HTTP_400_BAD_REQUEST
             )
         
         # Obtener parámetros
@@ -532,7 +492,6 @@ def recopilar_datos(programa, tipo_exportacion):
             'duracion_semanas': programa.duracion_semanas,
             'fecha_creacion': programa.fecha_creacion,
             'fecha_publicacion': programa.fecha_publicacion,
-            'fecha_finalizacion': programa.fecha_finalizacion
         }
         
         # Datos de participantes

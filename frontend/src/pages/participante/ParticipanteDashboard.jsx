@@ -14,7 +14,6 @@ const ParticipanteDashboard = () => {
     const [progreso, setProgreso] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [programaFinalizado, setProgramaFinalizado] = useState(false);
     const [cuestionarioPreRespondido, setCuestionarioPreRespondido] = useState(false);
     const [cuestionarioPostRespondido, setCuestionarioPostRespondido] = useState(false);
     const [proximaAccion, setProximaAccion] = useState(null);
@@ -28,13 +27,6 @@ const ParticipanteDashboard = () => {
                 const programaData = response.data;
 
                 if (programaData) {
-                    // Verificar si el programa está finalizado
-                    if (programaData.estado_publicacion === 'finalizado') {
-                        setProgramaFinalizado(true);
-                        setLoading(false);
-                        return;
-                    }
-
                     // Obtener el estado de los cuestionarios
                     setCuestionarioPreRespondido(programaData.cuestionario_pre_respondido || false);
                     setCuestionarioPostRespondido(programaData.cuestionario_post_respondido || false);
@@ -153,7 +145,7 @@ const ParticipanteDashboard = () => {
                 )}
 
                 {/* Próxima acción */}
-                {proximaAccion && !programaFinalizado && (
+                {proximaAccion && (
                     <div className="mb-8">
                         <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-[2px] rounded-2xl shadow-xl overflow-hidden">
                             <div className="bg-white p-6 md:p-8 rounded-2xl relative overflow-hidden">
@@ -196,7 +188,7 @@ const ParticipanteDashboard = () => {
                 )}
 
                 {/* Progreso */}
-                {progreso && !programaFinalizado && (
+                {progreso && (
                     <div className="mb-8">
                         <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100">
                             <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-6 flex items-center">

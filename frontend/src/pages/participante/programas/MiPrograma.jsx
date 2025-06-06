@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../config/axios';
-import ProgramaFinalizado from './ProgramaFinalizado';
 import ProgramaDetalle from '../../../components/ProgramaDetalleParticipante';
 import MobileNavBar from '../../../components/layout/MobileNavBar';
 import CTOExplorar from '../../../components/CTOExplorar';
@@ -106,11 +105,6 @@ const MiPrograma = () => {
                 <MobileNavBar />
             </div>
         );
-    }
-
-    // Si el programa está finalizado, mostrar la vista de programa finalizado
-    if (programa.estado_publicacion === 'finalizado') {
-        return <ProgramaFinalizado programa={programa} />;
     }
 
     return (

@@ -64,7 +64,6 @@ export const EnfoqueMetodologico = {
 export const EstadoPublicacion = {
     BORRADOR: { value: 'borrador', label: 'Borrador' },
     PUBLICADO: { value: 'publicado', label: 'Publicado' },
-    FINALIZADO: { value: 'finalizado', label: 'Finalizado' }
 };
 
 export const EstadoPrograma = {

@@ -1,4 +1,4 @@
-import { User, Mail, Calendar, BookOpen, Briefcase, MapPin, Phone, ClipboardList, ArrowLeft, Lock } from 'lucide-react';
+import { User, Mail, Calendar, BookOpen, Briefcase, MapPin, Phone, ClipboardList, ArrowLeft, Lock, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import ErrorAlert from '../ErrorAlert';
@@ -7,9 +7,11 @@ import { useState } from 'react';
 import ChangePasswordModal from '../auth/ChangePasswordModal';
 
 const PerfilInvestigador = () => {
-    const { user, error, resetError } = useAuth();
+    const { user, error, resetError, deleteAccount } = useAuth();
     const navigate = useNavigate();
     const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deleteError, setDeleteError] = useState(null);
 
     // Función para formatear la fecha de registro
     const formatDate = (dateString) => {
@@ -41,6 +43,15 @@ const PerfilInvestigador = () => {
         return ExperienciaInvestigacion[experiencia?.toUpperCase()]?.label || 'No especificada';
     };
 
+    const handleDeleteAccount = async () => {
+        try {
+            await deleteAccount();
+            navigate('/login');
+        } catch (error) {
+            setDeleteError(error.message);
+        }
+    };
+
     return (
         <div className="bg-white rounded-2xl overflow-hidden max-w-4xl mx-auto my-8 shadow-xl">
             {/* Header del perfil*/}
@@ -63,25 +74,20 @@ const PerfilInvestigador = () => {
                                 Miembro desde {formatDate(user.date_joined)}
                             </span>
                         </div>
-                        <div className="mt-4">
-                            {/** 
-                            <button
-                                onClick={() => navigate('/perfil/editar')}
-                                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                                <span>Editar Perfil</span>
-                            </button>
-                            */}
+                        <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
                             <button
                                 onClick={() => setIsChangePasswordModalOpen(true)}
-                                className="ml-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
+                                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
                             >
                                 <Lock className="h-5 w-5" />
                                 <span>Cambiar Contraseña</span>
+                            </button>
+                            <button
+                                onClick={() => setIsDeleteModalOpen(true)}
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-300 flex items-center space-x-2"
+                            >
+                                <Trash2 className="h-5 w-5" />
+                                <span>Eliminar Cuenta</span>
                             </button>
                         </div>
                     </div>
@@ -161,7 +167,7 @@ const PerfilInvestigador = () => {
                 </div>
 
                 {/* Áreas de interés */}
-                <div className="mb-8">
+                <div className="mb-2">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                         <ClipboardList className="h-5 w-5 text-blue-600 mr-2" />
                         Áreas de Interés
@@ -186,43 +192,44 @@ const PerfilInvestigador = () => {
                     </div>
                 </div>
 
-                {/* Programas activos */}
-                <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                        <Briefcase className="h-5 w-5 text-blue-600 mr-2" />
-                        Programas Activos
-                    </h3>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        {user.investigador?.estudiosActivos?.length > 0 ? (
-                            <div className="divide-y divide-gray-100">
-                                {user.investigador.estudiosActivos.map((estudio) => (
-                                    <div key={estudio.id} className="py-4 first:pt-0 last:pb-0">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h4 className="font-medium text-gray-800">{estudio.nombre}</h4>
-                                                <p className="text-sm text-gray-500 mt-1">
-                                                    {estudio.participantesActivos} participantes activos
-                                                </p>
-                                            </div>
-                                            <span className="inline-flex items-center bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
-                                                {estudio.estado}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-6">
-                                <p className="text-gray-500">No hay programas activos en este momento.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
             </div>
             <ChangePasswordModal
                 isOpen={isChangePasswordModalOpen}
                 onClose={() => setIsChangePasswordModalOpen(false)}
             />
+
+            {/* Modal de confirmación de eliminación */}
+            {isDeleteModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Eliminar Cuenta</h3>
+                        <p className="text-gray-600 mb-6">
+                            ¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.
+                            {user.perfil_investigador?.programa_set?.some(p => p.estado_publicacion === 'publicado') &&
+                                " No podrás eliminar tu cuenta mientras tengas programas publicados."}
+                        </p>
+                        {deleteError && (
+                            <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4">
+                                {deleteError}
+                            </div>
+                        )}
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={() => setIsDeleteModalOpen(false)}
+                                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleDeleteAccount}
+                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                            >
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

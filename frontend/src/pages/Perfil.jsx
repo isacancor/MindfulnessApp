@@ -2,6 +2,7 @@ import { useAuth } from '@/context/AuthContext';
 import PerfilInvestigador from '../components/perfiles/PerfilInvestigador';
 import PerfilParticipante from '../components/perfiles/PerfilParticipante';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { Navigate } from 'react-router-dom';
 
 const Perfil = () => {
     const { user, loading, hasRole } = useAuth();

@@ -60,7 +60,6 @@ class EnfoqueMetodologico(models.TextChoices):
 class EstadoPublicacion(models.TextChoices):
     BORRADOR = 'borrador', 'Borrador'
     PUBLICADO = 'publicado', 'Publicado'
-    FINALIZADO = 'finalizado', 'Finalizado'
 
 class EstadoPrograma(models.TextChoices):
     EN_PROGRESO = 'en_progreso', 'En progreso'

@@ -5,7 +5,7 @@ import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
 
 const ExportarDatos = () => {
-    const [programasFinalizados, setProgramasFinalizados] = useState([]);
+    const [programas, setProgramas] = useState([]);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -15,21 +15,19 @@ const ExportarDatos = () => {
     const [exito, setExito] = useState(false);
 
     useEffect(() => {
-        const fetchProgramasFinalizados = async () => {
+        const fetchProgramas = async () => {
             try {
-                const response = await api.get('/programas', {
-                    params: { estado: 'finalizado' }
-                });
-                setProgramasFinalizados(response.data.filter(p => p.estado_publicacion === 'finalizado'));
+                const response = await api.get('/programas');
+                setProgramas(response.data);
                 setLoading(false);
             } catch (err) {
-                console.error('Error al cargar programas finalizados:', err);
-                setError('Error al cargar los programas finalizados. Por favor, intenta nuevamente.');
+                console.error('Error al cargar programas:', err);
+                setError('Error al cargar los programas. Por favor, intenta nuevamente.');
                 setLoading(false);
             }
         };
 
-        fetchProgramasFinalizados();
+        fetchProgramas();
     }, []);
 
     // Simular exportación
@@ -75,7 +73,7 @@ const ExportarDatos = () => {
     };
 
     const handleSeleccionarPrograma = (programaId) => {
-        const programa = programasFinalizados.find(p => p.id === programaId);
+        const programa = programas.find(p => p.id === programaId);
         setProgramaSeleccionado(programa);
         setExito(false);
     };
@@ -85,7 +83,7 @@ const ExportarDatos = () => {
             <InvestigadorLayout>
                 <div className="min-h-screen flex flex-col items-center justify-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                    <p className="text-gray-600">Cargando programas finalizados...</p>
+                    <p className="text-gray-600">Cargando programas...</p>
                 </div>
             </InvestigadorLayout>
         );
@@ -99,7 +97,7 @@ const ExportarDatos = () => {
                         <div className="space-y-2">
                             <h1 className="text-3xl font-extrabold">Exportar Datos</h1>
                             <p className="text-emerald-100 max-w-xl">
-                                Descarga los datos de tus programas finalizados para análisis externos
+                                Descarga los datos de tus programas para análisis externos
                             </p>
                         </div>
                     </div>
@@ -110,12 +108,12 @@ const ExportarDatos = () => {
                     onClose={() => setError(null)}
                 />
 
-                {programasFinalizados.length === 0 ? (
+                {programas.length === 0 ? (
                     <div className="bg-white rounded-xl shadow-lg p-12 text-center">
                         <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <BookOpen className="h-10 w-10 text-emerald-600" />
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay programas finalizados</h3>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay programas</h3>
                         <p className="text-gray-600 mb-6">
                             Para exportar datos, necesitas tener programas que hayan sido completados por los participantes.
                         </p>
@@ -126,7 +124,7 @@ const ExportarDatos = () => {
                             <div className="bg-white rounded-xl shadow-md p-6">
                                 <h2 className="text-lg font-semibold text-gray-800 mb-4">Selecciona un programa</h2>
                                 <div className="space-y-2">
-                                    {programasFinalizados.map((programa) => (
+                                    {programas.map((programa) => (
                                         <button
                                             key={programa.id}
                                             onClick={() => handleSeleccionarPrograma(programa.id)}
@@ -155,7 +153,7 @@ const ExportarDatos = () => {
                                         Selecciona un programa
                                     </h3>
                                     <p className="text-gray-600">
-                                        Elige un programa finalizado de la lista para exportar sus datos.
+                                        Elige un programa de la lista para exportar sus datos.
                                     </p>
                                 </div>
                             ) : (

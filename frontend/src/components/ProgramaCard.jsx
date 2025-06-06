@@ -79,15 +79,11 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                     <div className="flex items-center space-x-2">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${programa.estado_publicacion === 'publicado'
                             ? 'bg-green-100 text-green-800'
-                            : programa.estado_publicacion === 'finalizado'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-yellow-100 text-yellow-800'
+                            : 'bg-yellow-100 text-yellow-800'
                             }`}>
                             {programa.estado_publicacion === 'publicado'
                                 ? 'Publicado'
-                                : programa.estado_publicacion === 'finalizado'
-                                    ? 'Finalizado'
-                                    : 'Borrador'}
+                                : 'Borrador'}
                         </span>
                     </div>
                 </div>

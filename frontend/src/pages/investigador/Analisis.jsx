@@ -5,7 +5,7 @@ import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
 
 const Analisis = () => {
-    const [programasFinalizados, setProgramasFinalizados] = useState([]);
+    const [programas, setProgramas] = useState([]);
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [estadisticas, setEstadisticas] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -13,21 +13,19 @@ const Analisis = () => {
     //const [tipoGrafico, setTipoGrafico] = useState('barras');
 
     useEffect(() => {
-        const fetchProgramasFinalizados = async () => {
+        const fetchProgramas = async () => {
             try {
-                const response = await api.get('/programas', {
-                    params: { estado: 'finalizado' }
-                });
-                setProgramasFinalizados(response.data.filter(p => p.estado_publicacion === 'finalizado'));
+                const response = await api.get('/programas');
+                setProgramas(response.data);
                 setLoading(false);
             } catch (err) {
-                console.error('Error al cargar programas finalizados:', err);
-                setError('Error al cargar los programas finalizados. Por favor, intenta nuevamente.');
+                console.error('Error al cargar programas:', err);
+                setError('Error al cargar los programas. Por favor, intenta nuevamente.');
                 setLoading(false);
             }
         };
 
-        fetchProgramasFinalizados();
+        fetchProgramas();
     }, []);
 
     const handleSeleccionarPrograma = async (programaId) => {
@@ -35,7 +33,7 @@ const Analisis = () => {
         try {
             const response = await api.get(`/programas/${programaId}/estadisticas`);
             setProgramaSeleccionado({
-                ...programasFinalizados.find(p => p.id === programaId),
+                ...programas.find(p => p.id === programaId),
             });
             setEstadisticas(response.data);
             console.log(response.data);
@@ -81,7 +79,7 @@ const Analisis = () => {
                         <div className="space-y-2">
                             <h1 className="text-3xl font-extrabold">Análisis de Programas</h1>
                             <p className="text-indigo-100 max-w-xl">
-                                Visualiza estadísticas y resultados de tus programas de mindfulness finalizados
+                                Visualiza estadísticas y resultados de tus programas de mindfulness
                             </p>
                         </div>
                     </div>
@@ -92,12 +90,12 @@ const Analisis = () => {
                     onClose={() => setError(null)}
                 />
 
-                {programasFinalizados.length === 0 ? (
+                {programas.length === 0 ? (
                     <div className="bg-white rounded-xl shadow-lg p-12 text-center">
                         <div className="w-20 h-20 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-4">
                             <BookOpen className="h-10 w-10 text-purple-600" />
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay programas finalizados</h3>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">No hay programas</h3>
                         <p className="text-gray-600 mb-6">
                             Para acceder a los análisis, necesitas tener programas que hayan sido completados.
                         </p>
@@ -106,9 +104,9 @@ const Analisis = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-xl shadow-md p-6">
-                                <h2 className="text-lg font-semibold text-gray-800 mb-4">Programas finalizados</h2>
+                                <h2 className="text-lg font-semibold text-gray-800 mb-4">Programas</h2>
                                 <div className="space-y-2">
-                                    {programasFinalizados.map((programa) => (
+                                    {programas.map((programa) => (
                                         <button
                                             key={programa.id}
                                             onClick={() => handleSeleccionarPrograma(programa.id)}
@@ -137,7 +135,7 @@ const Analisis = () => {
                                         Selecciona un programa
                                     </h3>
                                     <p className="text-gray-600">
-                                        Elige un programa finalizado de la lista para ver sus análisis detallados.
+                                        Elige un programa de la lista para ver sus análisis detallados.
                                     </p>
                                 </div>
                             ) : (

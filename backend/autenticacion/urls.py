@@ -4,7 +4,8 @@ from .api import (
     change_password,
     user_profile,
     update_profile,
-    register
+    register,
+    delete_account
 )
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
@@ -21,4 +22,5 @@ urlpatterns = [
     path('password/', change_password, name='change-password'),
     path('me/', user_profile, name='user-profile'),
     path('profile/', update_profile, name='update-profile'),
+    path('delete/', delete_account, name='delete-account'),
 ]

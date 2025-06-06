@@ -60,7 +60,6 @@ class Programa(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     fecha_publicacion = models.DateTimeField(null=True, blank=True)
-    fecha_finalizacion = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.nombre
@@ -126,7 +125,6 @@ class Programa(models.Model):
             # Forzar que los programas nuevos siempre se creen como BORRADOR
             self.estado_publicacion = EstadoPublicacion.BORRADOR
             self.fecha_publicacion = None
-            self.fecha_finalizacion = None
             super().save(*args, **kwargs)
         else:  # Si el programa ya existe
             programa_original = Programa.objects.get(pk=self.pk)
@@ -142,14 +140,10 @@ class Programa(models.Model):
                     raise ValueError("No se puede publicar el programa. Asegúrese de que tiene los cuestionarios necesarios.")
 
                 self.fecha_publicacion = timezone.now()
-                self.fecha_finalizacion = None
                 super().save(*args, **kwargs)
             elif programa_original.estado_publicacion == EstadoPublicacion.BORRADOR and self.participantes.exists():
                 # Si el programa está en borrador y tiene participantes, no permitir guardar
                 raise ValueError("No se pueden agregar participantes a un programa en borrador")
-            elif programa_original.estado_publicacion == EstadoPublicacion.PUBLICADO and self.estado_publicacion == EstadoPublicacion.FINALIZADO:
-                self.fecha_finalizacion = timezone.now()
-                super().save(*args, **kwargs)
             else:
                 super().save(*args, **kwargs)
 
