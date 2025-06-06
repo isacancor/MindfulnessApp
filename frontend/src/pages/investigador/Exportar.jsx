@@ -3,6 +3,7 @@ import { DownloadCloud, Check, BookOpen, Database } from 'lucide-react';
 import api from '../../config/axios';
 import InvestigadorLayout from '../../components/layout/InvestigadorLayout';
 import ErrorAlert from '../../components/ErrorAlert';
+import { exportarCuestionarios, exportarDatosGenerales } from '../../utils/exportUtils';
 
 const Exportar = () => {
     const [programas, setProgramas] = useState([]);
@@ -30,7 +31,6 @@ const Exportar = () => {
         fetchProgramas();
     }, []);
 
-    // Simular exportación
     const handleExportar = async () => {
         if (!programaSeleccionado) return;
 
@@ -38,31 +38,11 @@ const Exportar = () => {
         setExito(false);
 
         try {
-            // Llamada a la API para exportar datos
-            const response = await api.get(`/programas/${programaSeleccionado.id}/exportar/`, {
-                params: { tipo: tipoExportacion, formato },
-                responseType: 'blob' // Importante para manejar archivos binarios
-            });
-
-            // Crear un objeto URL para el archivo descargado
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-
-            // Determinar extensión de archivo según formato
-            const extension = formato === 'excel' ? 'xlsx' : formato;
-
-            // Establecer nombre del archivo para descarga
-            link.setAttribute('download', `${programaSeleccionado.titulo}_${tipoExportacion}.${extension}`);
-
-            // Simular clic para iniciar descarga
-            document.body.appendChild(link);
-            link.click();
-
-            // Limpieza
-            window.URL.revokeObjectURL(url);
-            link.remove();
-
+            if (tipoExportacion === 'cuestionarios') {
+                await exportarCuestionarios(programaSeleccionado.id, formato);
+            } else {
+                await exportarDatosGenerales(programaSeleccionado.id, tipoExportacion, formato);
+            }
             setExito(true);
         } catch (err) {
             console.error('Error al exportar datos:', err);
@@ -160,7 +140,7 @@ const Exportar = () => {
                                 <div className="bg-white rounded-xl shadow-md p-6">
                                     <div className="mb-6 pb-4 border-b">
                                         <h2 className="text-xl font-bold text-gray-800 mb-1">
-                                            Exportar datos de: {programaSeleccionado.titulo}
+                                            Exportar datos de: {programaSeleccionado.nombre}
                                         </h2>
                                         <p className="text-gray-600">
                                             Configura las opciones de exportación
@@ -314,7 +294,6 @@ const Exportar = () => {
                                                     <p className="font-medium text-green-800">Exportación exitosa</p>
                                                     <p className="text-sm text-green-700">
                                                         Los datos han sido exportados correctamente.
-                                                        <a href="#" className="underline ml-1">Descargar archivo</a>
                                                     </p>
                                                 </div>
                                             </div>

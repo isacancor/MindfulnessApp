@@ -11,10 +11,11 @@ class InscripcionProgramaSerializer(serializers.ModelSerializer):
     participante = ParticipanteSerializer(read_only=True)
     fecha_fin = serializers.DateTimeField(read_only=True)
     estado_inscripcion = serializers.ChoiceField(choices=EstadoInscripcion.choices, read_only=True)
+    estado_inscripcion_display = serializers.CharField(source='get_estado_inscripcion_display', read_only=True)
 
     class Meta:
         model = InscripcionPrograma
-        fields = ['participante', 'fecha_inicio', 'fecha_fin', 'estado_inscripcion']
+        fields = ['participante', 'fecha_inicio', 'fecha_fin', 'estado_inscripcion', 'estado_inscripcion_display']
 
 class ProgramaSerializer(serializers.ModelSerializer):
     creado_por = InvestigadorSerializer(read_only=True)
@@ -26,19 +27,24 @@ class ProgramaSerializer(serializers.ModelSerializer):
     tiene_cuestionarios_completos = serializers.SerializerMethodField()
     
     tipo_contexto = serializers.ChoiceField(choices=TipoContexto.choices)
+    tipo_contexto_display = serializers.CharField(source='get_tipo_contexto_display', read_only=True)
     enfoque_metodologico = serializers.ChoiceField(choices=EnfoqueMetodologico.choices)
+    enfoque_metodologico_display = serializers.CharField(source='get_enfoque_metodologico_display', read_only=True)
     estado_publicacion = serializers.ChoiceField(choices=EstadoPublicacion.choices)
+    estado_publicacion_display = serializers.CharField(source='get_estado_publicacion_display', read_only=True)
     puede_ser_publicado = serializers.SerializerMethodField()
     
     class Meta:
         model = Programa
         fields = [
             'id', 'nombre', 'descripcion',
-            'tipo_contexto', 'enfoque_metodologico',
+            'tipo_contexto', 'tipo_contexto_display',
+            'enfoque_metodologico', 'enfoque_metodologico_display',
             'poblacion_objetivo', 'duracion_semanas',
             'tiene_cuestionarios', 'tiene_diarios',
             'cuestionario_pre', 'cuestionario_post',
-            'estado_publicacion', 'creado_por', 'participantes',
+            'estado_publicacion', 'estado_publicacion_display',
+            'creado_por', 'participantes',
             'fecha_creacion', 'fecha_actualizacion', 'fecha_publicacion', 'puede_ser_publicado',
             'sesiones', 'inscripcion_info',
             'tiene_cuestionarios_completos'

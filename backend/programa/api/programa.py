@@ -1,13 +1,14 @@
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
+from ..models import Programa, EstadoPublicacion, InscripcionPrograma, EstadoInscripcion, Participante
+from ..serializers import ProgramaSerializer, ParticipanteSerializer
+from django.shortcuts import get_object_or_404
+from cuestionario.models import Cuestionario, RespuestaCuestionario
+from django.utils import timezone
 from rest_framework.permissions import IsAuthenticated
 from usuario.permissions import IsInvestigador
-from .models import Programa, EstadoPublicacion, InscripcionPrograma, EstadoInscripcion
-from .serializers import ProgramaSerializer
-from django.shortcuts import get_object_or_404
-from cuestionario.models import Cuestionario
-from django.utils import timezone
+
 
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -95,6 +96,116 @@ def programa_detail(request, pk):
                 {'error': 'No se pudo eliminar el programa'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def mi_programa(request):
+    """
+    Obtiene el programa actual del participante
+    """
+    try:
+        # Verificar si el usuario es participante
+        if not request.user.is_participante():
+            return Response(
+                {"detail": "El usuario no es un participante"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Obtener el objeto Participante asociado al usuario
+        participante = get_object_or_404(Participante, usuario=request.user)
+        
+        # Buscar la inscripción activa del participante
+        try:
+            inscripcion = InscripcionPrograma.objects.get(
+                participante=participante,
+                estado_inscripcion=EstadoInscripcion.EN_PROGRESO
+            )
+            programa = inscripcion.programa
+
+            # Verificar si ha respondido el cuestionario pre
+            cuestionario_pre_respondido = False
+            if programa.cuestionario_pre:
+                cuestionario_pre_respondido = RespuestaCuestionario.objects.filter(
+                    cuestionario=programa.cuestionario_pre,
+                    participante=participante
+                ).exists()
+            
+            # Verificar si ha respondido el cuestionario post
+            cuestionario_post_respondido = False
+            if programa.cuestionario_post:
+                cuestionario_post_respondido = RespuestaCuestionario.objects.filter(
+                    cuestionario=programa.cuestionario_post,
+                    participante=participante
+                ).exists()
+            
+            serializer = ProgramaSerializer(programa, context={'request': request})
+            response_data = serializer.data
+            response_data['cuestionario_pre_respondido'] = cuestionario_pre_respondido
+            response_data['cuestionario_post_respondido'] = cuestionario_post_respondido
+
+            return Response(response_data)
+            
+        except InscripcionPrograma.DoesNotExist:
+            return Response(
+                {"detail": "No tienes ningún programa activo"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+            
+    except Participante.DoesNotExist:
+        return Response(
+            {"detail": "No se encontró el perfil de participante"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_enrolar(request, pk):
+    try:
+        programa = Programa.objects.get(pk=pk)
+    except Programa.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if not request.user.is_participante():
+        return Response(
+            {'error': 'Solo los participantes pueden enrolarse en programas'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    if programa.estado_publicacion != EstadoPublicacion.PUBLICADO:
+        return Response(
+            {'error': 'No se puede enrolar en un programa que no está publicado'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Verificar si el participante ya está enrolado en algún programa en progreso
+    if InscripcionPrograma.objects.filter(
+        participante=request.user.perfil_participante,
+        estado_inscripcion=EstadoInscripcion.EN_PROGRESO
+    ).exists():
+        return Response(
+            {'error': 'Ya estás enrolado en un programa en progreso'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        # Crear la inscripción
+        inscripcion = InscripcionPrograma.objects.create(
+            programa=programa,
+            participante=request.user.perfil_participante,
+            estado_inscripcion=EstadoInscripcion.EN_PROGRESO
+        )
+        inscripcion.calcular_fecha_fin()
+        
+        # Agregar al participante al programa
+        programa.participantes.add(request.user.perfil_participante)
+        
+        return Response({'status': 'Enrolamiento exitoso'})
+    except ValueError as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
@@ -216,3 +327,102 @@ def programa_abandonar(request, pk):
             {'error': str(e)},
             status=status.HTTP_400_BAD_REQUEST
         ) 
+    
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def mis_programas_completados(request):
+    """
+    Obtiene la lista de programas completados por el usuario actual.
+    """
+    if not request.user.is_participante():
+        return Response(
+            {'error': 'Solo los participantes pueden acceder a esta vista'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    try:
+        # Obtener todos los programas en los que el usuario está inscrito y están completados
+        programas_completados = InscripcionPrograma.objects.filter(
+            participante=request.user.perfil_participante,
+            estado_inscripcion=EstadoInscripcion.COMPLETADO
+        ).select_related('programa')
+
+        # Serializar los programas
+        programas = [inscripcion.programa for inscripcion in programas_completados]
+        serializer = ProgramaSerializer(programas, many=True, context={'request': request})
+
+        return Response(serializer.data)
+    except Exception as e:
+        return Response(
+            {'error': f'Error al obtener programas completados: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def programa_inscripciones(request, pk):
+    """
+    Obtiene la lista de inscripciones de un programa.
+    """
+    try:
+        programa = Programa.objects.get(pk=pk)
+        
+        # Verificar permisos: solo el creador del programa puede ver las inscripciones
+        if programa.creado_por != request.user.perfil_investigador:
+            return Response(
+                {'error': 'No tienes permiso para ver las inscripciones de este programa'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Obtener todas las inscripciones del programa
+        inscripciones = InscripcionPrograma.objects.filter(
+            programa=programa
+        ).select_related('participante')
+        
+        # Crear una lista de datos de inscripción
+        inscripciones_data = []
+        for inscripcion in inscripciones:
+            inscripciones_data.append({
+                'id': inscripcion.id,
+                'participante': inscripcion.participante.id,
+                'fecha_inicio': inscripcion.fecha_inicio,
+                'fecha_fin': inscripcion.fecha_fin,
+                'estado_inscripcion': inscripcion.estado_inscripcion
+            })
+        
+        return Response(inscripciones_data)
+    except Programa.DoesNotExist:
+        return Response(
+            {'error': 'El programa no existe'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except Exception as e:
+        return Response(
+            {'error': f'Error al obtener inscripciones: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated, IsInvestigador])
+def obtener_participantes_programa(request, programa_id):
+    programa = get_object_or_404(Programa, id=programa_id)
+    
+    # Verificar que el investigador tiene permiso para ver este programa
+    if programa.creado_por.usuario != request.user:
+        return Response(
+            {"error": "No tienes permiso para ver los participantes de este programa"},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Obtener participantes con datos anonimizados
+    participantes = programa.participantes.all()
+    serializer = ParticipanteSerializer(participantes, many=True)
+    
+    return Response({
+        "id": programa.id,
+        "nombre": programa.nombre,
+        "participantes": serializer.data
+    })
+

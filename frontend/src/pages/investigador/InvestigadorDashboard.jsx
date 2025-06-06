@@ -22,10 +22,7 @@ const InvestigadorDashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Obtener estadísticas desde el endpoint del backend
                 const estadisticasResponse = await api.get('/programas/estadisticas/');
-
-                console.log(estadisticasResponse.data);
 
                 setEstadisticas({
                     totalProgramas: estadisticasResponse.data.total_programas,
@@ -34,11 +31,9 @@ const InvestigadorDashboard = () => {
                     cuestionariosRespondidos: estadisticasResponse.data.cuestionarios_respondidos
                 });
 
-                // Establecer programas y programas destacados
                 const programasData = estadisticasResponse.data.programas_stats || [];
                 setProgramas(programasData);
 
-                // Usar programas destacados del backend o calcularlos si no vienen
                 if (estadisticasResponse.data.programas_destacados) {
                     setProgramasDestacados(estadisticasResponse.data.programas_destacados);
                 } else {

@@ -43,6 +43,9 @@ class Cuestionario(models.Model):
     def __str__(self):
         return f"{self.titulo} - {self.get_tipo_display()}"
 
+    def get_tipo_display(self):
+        return dict(TipoCuestionario.choices).get(self.tipo, self.tipo)
+
 class RespuestaCuestionario(models.Model):
     cuestionario = models.ForeignKey(
         Cuestionario, 

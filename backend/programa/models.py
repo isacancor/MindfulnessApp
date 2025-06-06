@@ -149,6 +149,15 @@ class Programa(models.Model):
             else:
                 super().save(*args, **kwargs)
 
+    def get_tipo_contexto_display(self):
+        return dict(TipoContexto.choices).get(self.tipo_contexto, self.tipo_contexto)
+
+    def get_enfoque_metodologico_display(self):
+        return dict(EnfoqueMetodologico.choices).get(self.enfoque_metodologico, self.enfoque_metodologico)
+
+    def get_estado_publicacion_display(self):
+        return dict(EstadoPublicacion.choices).get(self.estado_publicacion, self.estado_publicacion)
+
     class Meta:
         ordering = ['-fecha_creacion']
 
@@ -197,3 +206,6 @@ class InscripcionPrograma(models.Model):
                     self.estado_inscripcion = EstadoInscripcion.COMPLETADO
 
             self.save()
+
+    def get_estado_inscripcion_display(self):
+        return dict(EstadoInscripcion.choices).get(self.estado_inscripcion, self.estado_inscripcion)

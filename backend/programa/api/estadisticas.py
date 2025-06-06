@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from usuario.permissions import IsInvestigador
 from django.shortcuts import get_object_or_404
 from django.db.models import Count, Q
-from .models import Programa, InscripcionPrograma
+from ..models import Programa, InscripcionPrograma
 from sesion.models import DiarioSesion
 from cuestionario.models import RespuestaCuestionario
 

@@ -11,7 +11,6 @@ const Analisis = () => {
     const [programaSeleccionado, setProgramaSeleccionado] = useState(null);
     const [estadisticasGenerales, setEstadisticasGenerales] = useState(null);
     const [estadisticasProgreso, setEstadisticasProgreso] = useState(null);
-    //const [cuestionariosDetalle, setCuestionariosDetalle] = useState(null);
     const [pre, setPre] = useState(null);
     const [post, setPost] = useState(null);
     const [diarios, setDiarios] = useState(null);
@@ -51,7 +50,6 @@ const Analisis = () => {
             // Solo si el programa tiene cuestionarios
             if (programa.tiene_cuestionarios) {
                 const responseCuestionarios = await api.get(`/programas/${programaId}/cuestionarios-y-respuestas`);
-                console.log(responseCuestionarios.data);
                 setPre(responseCuestionarios.data.pre);
                 setPost(responseCuestionarios.data.post);
             }
@@ -306,7 +304,7 @@ const Analisis = () => {
                                                                     {participante.id_anonimo}
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                    {participante.genero}
+                                                                    {participante.genero_display}
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                     {edad} años
@@ -315,13 +313,13 @@ const Analisis = () => {
                                                                     {participante.ocupacion}
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                    {participante.nivel_educativo}
+                                                                    {participante.nivel_educativo_display}
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                     {participante.ubicacion}
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                                    {participante.experiencia_mindfulness}
+                                                                    {participante.experiencia_mindfulness_display}
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                                     {participante.condiciones_salud}

@@ -7,10 +7,11 @@ import django.db.utils
 
 class InvestigadorSerializer(serializers.ModelSerializer):
     nombre_completo_investigador = serializers.SerializerMethodField()
+    experiencia_investigacion_display = serializers.CharField(source='get_experiencia_investigacion_display', read_only=True)
 
     class Meta:
         model = Investigador
-        fields = ['id', 'usuario', 'experienciaInvestigacion', 'areasInteres', 'programas', 'nombre_completo_investigador']
+        fields = ['id', 'usuario', 'experienciaInvestigacion', 'experiencia_investigacion_display', 'areasInteres', 'programas', 'nombre_completo_investigador']
 
     def get_nombre_completo_investigador(self, obj):
         if obj.usuario:
@@ -20,11 +21,14 @@ class InvestigadorSerializer(serializers.ModelSerializer):
 class ParticipanteSerializer(serializers.ModelSerializer):
     id_anonimo = serializers.SerializerMethodField()
     genero = serializers.CharField(source='usuario.genero')
+    genero_display = serializers.CharField(source='usuario.get_genero_display', read_only=True)
     fecha_nacimiento = serializers.DateField(source='usuario.fechaNacimiento')
     ocupacion = serializers.CharField(source='usuario.ocupacion')
     nivel_educativo = serializers.CharField(source='usuario.nivelEducativo')
+    nivel_educativo_display = serializers.CharField(source='usuario.get_nivel_educativo_display', read_only=True)
     ubicacion = serializers.CharField(source='usuario.ubicacion')
     experiencia_mindfulness = serializers.CharField(source='experienciaMindfulness')
+    experiencia_mindfulness_display = serializers.CharField(source='get_experiencia_mindfulness_display', read_only=True)
     condiciones_salud = serializers.CharField(source='condicionesSalud')
 
     class Meta:
@@ -32,11 +36,14 @@ class ParticipanteSerializer(serializers.ModelSerializer):
         fields = [
             'id_anonimo',
             'genero',
+            'genero_display',
             'fecha_nacimiento',
             'ocupacion',
             'nivel_educativo',
+            'nivel_educativo_display',
             'ubicacion',
             'experiencia_mindfulness',
+            'experiencia_mindfulness_display',
             'condiciones_salud'
         ]
 
@@ -56,13 +63,16 @@ class ParticipanteProfileSerializer(serializers.ModelSerializer):
 class UsuarioSerializer(serializers.ModelSerializer):
     perfil_investigador = InvestigadorProfileSerializer(read_only=True)
     perfil_participante = ParticipanteProfileSerializer(read_only=True)
+    role_display = serializers.CharField(source='get_role_display', read_only=True)
+    genero_display = serializers.CharField(source='get_genero_display', read_only=True)
+    nivel_educativo_display = serializers.CharField(source='get_nivel_educativo_display', read_only=True)
 
     class Meta:
         model = Usuario
         fields = ('id', 'nombre', 'apellidos', 'username', 'password', 'email', 
-                 'telefono', 'genero', 'fechaNacimiento', 'ubicacion', 
-                 'ocupacion', 'nivelEducativo', 'perfil_investigador', 
-                 'perfil_participante', 'date_joined', 'role')
+                 'telefono', 'genero', 'genero_display', 'fechaNacimiento', 'ubicacion', 
+                 'ocupacion', 'nivelEducativo', 'nivel_educativo_display', 'role', 'role_display',
+                 'perfil_investigador', 'perfil_participante', 'date_joined')
         read_only_fields = ('id', 'date_joined')
         extra_kwargs = {
             'password': {'write_only': True}

@@ -4,9 +4,11 @@ from usuario.models import Participante
 from config.enums import TipoCuestionario, TipoPregunta
 
 class CuestionarioSerializer(serializers.ModelSerializer):
+    tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
+
     class Meta:
         model = Cuestionario
-        fields = ['id', 'programa', 'tipo', 'titulo', 'descripcion', 'preguntas', 'fecha_creacion', 'fecha_actualizacion']
+        fields = ['id', 'programa', 'tipo', 'tipo_display', 'titulo', 'descripcion', 'preguntas', 'fecha_creacion', 'fecha_actualizacion']
         read_only_fields = ['fecha_creacion', 'fecha_actualizacion']
 
     def validate_preguntas(self, value):

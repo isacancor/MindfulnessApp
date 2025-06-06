@@ -94,6 +94,15 @@ class Usuario(AbstractUser):
         super().set_password(raw_password)
         self._password_changed = True
 
+    def get_role_display(self):
+        return dict(RoleUsuario.choices).get(self.role, self.role)
+
+    def get_genero_display(self):
+        return dict(Genero.choices).get(self.genero, self.genero)
+
+    def get_nivel_educativo_display(self):
+        return dict(NivelEducativo.choices).get(self.nivelEducativo, self.nivelEducativo)
+
 class Investigador(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_investigador')
     experienciaInvestigacion = models.CharField(
@@ -107,6 +116,9 @@ class Investigador(models.Model):
     def __str__(self):
         return f"Investigador: {self.usuario.nombre_completo}"
 
+    def get_experiencia_investigacion_display(self):
+        return dict(ExperienciaInvestigacion.choices).get(self.experienciaInvestigacion, self.experienciaInvestigacion)
+
 class Participante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='perfil_participante')
     experienciaMindfulness = models.CharField(
@@ -119,4 +131,7 @@ class Participante(models.Model):
 
     def __str__(self):
         return f"Participante: {self.usuario.nombre_completo}"
+
+    def get_experiencia_mindfulness_display(self):
+        return dict(ExperienciaMindfulness.choices).get(self.experienciaMindfulness, self.experienciaMindfulness)
 

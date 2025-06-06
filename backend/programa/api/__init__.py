@@ -1,9 +1,14 @@
 from .programa import (
+    mi_programa,
     programa_list_create,
     programa_detail,
     programa_publicar,
     programa_duplicar,
-    programa_abandonar
+    programa_abandonar,
+    programa_enrolar,
+    mis_programas_completados,
+    programa_inscripciones,
+    obtener_participantes_programa
 )
 from .cuestionarios import programa_cuestionarios_y_respuestas
 from .diarios import programa_diarios_sesion
@@ -13,13 +18,6 @@ from .estadisticas import (
     programa_estadisticas_progreso
 )
 from .exportacion import exportar_datos_programa
-from .participantes import (
-    mi_programa,
-    programa_enrolar,
-    mis_programas_completados,
-    programa_inscripciones,
-    obtener_participantes_programa
-)
 
 __all__ = [
     'programa_list_create',

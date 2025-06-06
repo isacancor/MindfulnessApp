@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from usuario.permissions import IsInvestigador
 from django.shortcuts import get_object_or_404
-from .models import Programa
+from ..models import Programa
 from cuestionario.models import RespuestaCuestionario
 
 @api_view(['GET'])

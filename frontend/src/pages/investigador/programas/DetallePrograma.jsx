@@ -194,16 +194,6 @@ const DetallePrograma = () => {
                         />
 
                         <div className="flex flex-wrap justify-center gap-4 mt-6">
-                            {/*programa.estado_publicacion !== 'borrador' && (
-                                <button
-                                    onClick={() => navigate(`/programas/${id}/participantes`)}
-                                    className="flex items-center px-6 py-3 bg-white text-indigo-700 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                                >
-                                    <UserCheck className="h-5 w-5 mr-2" />
-                                    Ver Participantes ({programa.participantes?.length || 0})
-                                </button>
-                            )*/}
-
                             {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
                                 <>
                                     <button
@@ -377,14 +367,14 @@ const DetallePrograma = () => {
                                             <Calendar className="h-5 w-5 text-indigo-600 mt-0.5 mr-3 flex-shrink-0" />
                                             <div>
                                                 <p className="text-sm text-gray-500">Tipo de Contexto</p>
-                                                <p className="text-gray-900 text-base font-medium mt-0.5">{programa.tipo_contexto}</p>
+                                                <p className="text-gray-900 text-base font-medium mt-0.5">{programa.tipo_contexto_display}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-start">
                                             <BookOpen className="h-5 w-5 text-indigo-600 mt-0.5 mr-3 flex-shrink-0" />
                                             <div>
                                                 <p className="text-sm text-gray-500">Enfoque Metodológico</p>
-                                                <p className="text-gray-900 text-base font-medium mt-0.5">{programa.enfoque_metodologico}</p>
+                                                <p className="text-gray-900 text-base font-medium mt-0.5">{programa.enfoque_metodologico_display}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-start">

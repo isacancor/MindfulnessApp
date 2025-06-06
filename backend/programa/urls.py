@@ -1,6 +1,7 @@
 from django.urls import path
 from cuestionario.api import cuestionario_list
 from . import api
+from .api.exportacion import exportar_datos_programa
 
 # /api/programas/
 urlpatterns = [
@@ -18,8 +19,8 @@ urlpatterns = [
     path('estadisticas/', api.investigador_estadisticas, name='investigador-estadisticas'),
     path('<int:pk>/estadisticas/', api.programa_estadisticas, name='programa-estadisticas'),
     path('<int:pk>/estadisticas-progreso/', api.programa_estadisticas_progreso, name='programa-estadisticas-progreso'),
-    path('<int:pk>/exportar/', api.exportar_datos_programa, name='exportar-datos-programa'),
     path('<int:pk>/participantes/', api.obtener_participantes_programa, name='listar-participantes-programa'),
     path('<int:pk>/cuestionarios-y-respuestas/', api.programa_cuestionarios_y_respuestas, name='programa-cuestionarios-y-respuestas'),
     path('<int:pk>/diarios-sesion/', api.programa_diarios_sesion, name='programa-diarios-sesion'),
+    path('<int:pk>/exportar/', exportar_datos_programa, name='programa-exportar'),
 ]
