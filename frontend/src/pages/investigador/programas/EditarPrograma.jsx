@@ -4,7 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
-import { TipoContexto, EnfoqueMetodologico, EstadoPublicacion, getEnumArray } from '../../../constants/enums';
+import { TipoContexto, EnfoqueMetodologico, EstadoPublicacion, TipoEvaluacion, getEnumArray } from '../../../constants/enums';
 
 const EditarPrograma = () => {
     const navigate = useNavigate();
@@ -19,12 +19,14 @@ const EditarPrograma = () => {
         enfoque_metodologico: EnfoqueMetodologico.MBSR.value,
         duracion_semanas: '',
         poblacion_objetivo: '',
+        tipo_evaluacion: TipoEvaluacion.AMBOS.value,
         creado_por: user.id,
         estado_publicacion: EstadoPublicacion.BORRADOR.value
     });
 
     const tiposContexto = getEnumArray(TipoContexto);
     const enfoquesMetodologicos = getEnumArray(EnfoqueMetodologico);
+    const tiposEvaluacion = getEnumArray(TipoEvaluacion);
 
     useEffect(() => {
         const fetchPrograma = async () => {
@@ -237,6 +239,27 @@ const EditarPrograma = () => {
                                     onChange={handleChange}
                                     disabled={loading}
                                 />
+                            </div>
+
+                            <div>
+                                <label htmlFor="tipo_evaluacion" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Tipo de Evaluación *
+                                </label>
+                                <select
+                                    id="tipo_evaluacion"
+                                    name="tipo_evaluacion"
+                                    required
+                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                    value={formData.tipo_evaluacion}
+                                    onChange={handleChange}
+                                    disabled={loading}
+                                >
+                                    {tiposEvaluacion.map((tipo) => (
+                                        <option key={tipo.value} value={tipo.value}>
+                                            {tipo.label}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
 

@@ -2,10 +2,10 @@ from django.db import models
 from usuario.models import Participante, Investigador
 from django.utils import timezone
 from datetime import datetime, timedelta
-from django.core.exceptions import ValidationError
 from config.enums import (
     TipoContexto, EnfoqueMetodologico,
-    EstadoPublicacion, EstadoInscripcion
+    EstadoPublicacion, EstadoInscripcion,
+    TipoEvaluacion
 )
 
 class Programa(models.Model):
@@ -26,6 +26,13 @@ class Programa(models.Model):
     
     # Configuración de Duración
     duracion_semanas = models.PositiveIntegerField()
+
+    # Configuración de Evaluación
+    tipo_evaluacion = models.CharField(
+        max_length=20,
+        choices=TipoEvaluacion.choices,
+        default=TipoEvaluacion.AMBOS
+    )
 
     # Evaluaciones
     cuestionario_pre = models.ForeignKey(
@@ -102,15 +109,14 @@ class Programa(models.Model):
                 
         return True
 
-    # Comprobar si tiene los cuestionarios
+    # Comprobar si tiene los cuestionarios necesarios según el tipo de evaluación
     def puede_ser_publicado3(self):
-        # Solo validar cuestionarios si se intenta publicar
         if self.estado_publicacion == EstadoPublicacion.PUBLICADO:
-            tiene_pre = self.cuestionario_pre is not None
-            tiene_post = self.cuestionario_post is not None
-            
-            if not (tiene_pre and tiene_post):
-                return False
+            if self.tipo_evaluacion in [TipoEvaluacion.CUESTIONARIOS, TipoEvaluacion.AMBOS]:
+                tiene_pre = self.cuestionario_pre is not None
+                tiene_post = self.cuestionario_post is not None
+                if not (tiene_pre and tiene_post):
+                    return False
                 
         return True
 
