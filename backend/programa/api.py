@@ -1387,4 +1387,61 @@ def programa_cuestionarios_y_respuestas(request, pk):
         return Response(
             {'error': 'Error al obtener los cuestionarios y respuestas'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def programa_diarios_sesion(request, pk):
+    """
+    Obtiene los diarios de sesión de un programa, agrupados por sesión
+    """
+    try:
+        programa = get_object_or_404(Programa, pk=pk)
+        
+        # Verificar que el programa pertenece al investigador actual
+        if programa.creado_por != request.user.perfil_investigador:
+            return Response(
+                {'error': 'No tienes permiso para ver este programa'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Obtener todas las sesiones del programa ordenadas por semana
+        sesiones = Sesion.objects.filter(programa=programa).order_by('semana')
+        
+        resultado = []
+        for sesion in sesiones:
+            # Obtener todos los diarios para esta sesión
+            diarios = DiarioSesion.objects.filter(
+                sesion=sesion
+            ).select_related('participante').order_by('participante__id', 'fecha_creacion')
+            
+            # Agrupar diarios por participante
+            diarios_por_participante = {}
+            for diario in diarios:
+                id_participante = f"P{diario.participante.id}"
+                if id_participante not in diarios_por_participante:
+                    diarios_por_participante[id_participante] = []
+                
+                diarios_por_participante[id_participante].append({
+                    'valoracion': diario.valoracion,
+                    'comentario': diario.comentario,
+                    'fecha': diario.fecha_creacion
+                })
+            
+            resultado.append({
+                'id': sesion.id,
+                'semana': sesion.semana,
+                'titulo': sesion.titulo,
+                'tipo_practica': sesion.get_tipo_practica_display(),
+                'duracion_estimada': sesion.duracion_estimada,
+                'diarios': diarios_por_participante
+            })
+
+        return Response(resultado)
+
+    except Exception as e:
+        print(f"Error al obtener diarios de sesión: {str(e)}")
+        return Response(
+            {'error': 'Error al obtener los diarios de sesión'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) 

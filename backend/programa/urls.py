@@ -21,4 +21,5 @@ urlpatterns = [
     path('<int:pk>/exportar/', api.exportar_datos_programa, name='exportar-datos-programa'),
     path('<int:pk>/participantes/', api.obtener_participantes_programa, name='listar-participantes-programa'),
     path('<int:pk>/cuestionarios-y-respuestas/', api.programa_cuestionarios_y_respuestas, name='programa-cuestionarios-y-respuestas'),
+    path('<int:pk>/diarios-sesion/', api.programa_diarios_sesion, name='programa-diarios-sesion'),
 ]

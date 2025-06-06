@@ -13,6 +13,7 @@ const Analisis = () => {
     //const [cuestionariosDetalle, setCuestionariosDetalle] = useState(null);
     const [pre, setPre] = useState(null);
     const [post, setPost] = useState(null);
+    const [diarios, setDiarios] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     //const [tipoGrafico, setTipoGrafico] = useState('barras');
@@ -51,6 +52,12 @@ const Analisis = () => {
                 console.log(responseCuestionarios.data);
                 setPre(responseCuestionarios.data.pre);
                 setPost(responseCuestionarios.data.post);
+            }
+
+            // Solo si el programa tiene diarios
+            if (programa.tiene_diarios) {
+                const responseDiarios = await api.get(`/programas/${programaId}/diarios-sesion`);
+                setDiarios(responseDiarios.data);
             }
 
         } catch (err) {
@@ -493,6 +500,65 @@ const Analisis = () => {
                         />
                     )}
                 </>
+            )}
+
+            {/* Tabla de Diarios de Sesión */}
+            {programaSeleccionado?.tiene_diarios && diarios && (
+                <div className="mt-8">
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">Diarios de Sesión</h2>
+                    {diarios.map((sesion) => (
+                        <div key={sesion.id} className="bg-white rounded-xl shadow-md p-6 mb-6">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-semibold text-gray-800">
+                                    Semana {sesion.semana}: {sesion.titulo}
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                    Tipo de práctica: {sesion.tipo_practica} • Duración estimada: {sesion.duracion_estimada} minutos
+                                </p>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Participante
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Valoración
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Comentario
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Fecha
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {Object.entries(sesion.diarios).map(([participanteId, diariosParticipante]) => (
+                                            diariosParticipante.map((diario, index) => (
+                                                <tr key={`${participanteId}-${index}`}>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                        {participanteId}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {diario.valoracion}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm text-gray-500">
+                                                        {diario.comentario || 'Sin comentario'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        {new Date(diario.fecha).toLocaleDateString()}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             )}
         </InvestigadorLayout>
     );
