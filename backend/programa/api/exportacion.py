@@ -16,9 +16,303 @@ from config.enums import (
 import csv
 import json
 import xlsxwriter
+import zipfile
 from io import BytesIO, StringIO
 from django.http import HttpResponse
 from datetime import datetime
+
+def generar_archivo_participantes(programa, formato):
+    """Genera el archivo de participantes en el formato especificado"""
+    # Datos de participantes
+    participantes_data = []
+    inscripciones = InscripcionPrograma.objects.filter(programa=programa).select_related('participante__usuario')
+    
+    for inscripcion in inscripciones:
+        try:
+            participante = inscripcion.participante
+            usuario = participante.usuario
+            
+            # Calcular edad si fechaNacimiento está disponible
+            edad = None
+            if hasattr(usuario, 'fechaNacimiento') and usuario.fechaNacimiento:
+                edad = (datetime.now().date() - usuario.fechaNacimiento).days // 365
+            
+            # Obtener valores display de los enums y convertir a string
+            genero_display = str(dict(Genero.choices).get(usuario.genero, usuario.genero)) if hasattr(usuario, 'genero') else 'No especificado'
+            nivel_educativo_display = str(dict(NivelEducativo.choices).get(usuario.nivelEducativo, usuario.nivelEducativo)) if hasattr(usuario, 'nivelEducativo') else 'No especificado'
+            experiencia_mindfulness_display = str(dict(ExperienciaMindfulness.choices).get(participante.experienciaMindfulness, participante.experienciaMindfulness)) if hasattr(participante, 'experienciaMindfulness') else 'No especificado'
+            
+            participantes_data.append({
+                'id_participante': f"P{participante.id}",
+                'genero': genero_display,
+                'edad': f"{edad} años" if edad is not None else 'No especificado',
+                'ocupacion': str(usuario.ocupacion) if hasattr(usuario, 'ocupacion') and usuario.ocupacion else 'No especificado',
+                'nivel_educativo': nivel_educativo_display,
+                'ubicacion': str(usuario.ubicacion) if hasattr(usuario, 'ubicacion') and usuario.ubicacion else 'No especificado',
+                'experiencia_mindfulness': experiencia_mindfulness_display,
+                'condiciones_salud': str(participante.condicionesSalud) if hasattr(participante, 'condicionesSalud') and participante.condicionesSalud else 'No especificado'
+            })
+        except Exception as e:
+            print(f"Error procesando participante {inscripcion.participante.id}: {str(e)}")
+            continue
+    
+    if formato == 'json':
+        return json.dumps(participantes_data, ensure_ascii=False).encode('utf-8')
+    
+    elif formato == 'csv':
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        # Escribir encabezados
+        writer.writerow([
+            'ID Participante',
+            'Género',
+            'Edad',
+            'Ocupación',
+            'Nivel Educativo',
+            'Ubicación',
+            'Experiencia Mindfulness',
+            'Condiciones de Salud'
+        ])
+        
+        # Escribir datos
+        for participante in participantes_data:
+            writer.writerow([
+                participante['id_participante'],
+                participante['genero'],
+                participante['edad'],
+                participante['ocupacion'],
+                participante['nivel_educativo'],
+                participante['ubicacion'],
+                participante['experiencia_mindfulness'],
+                participante['condiciones_salud']
+            ])
+        
+        return output.getvalue().encode('utf-8-sig')
+    
+    elif formato == 'excel':
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        
+        # Estilos
+        header_format = workbook.add_format({
+            'bold': True,
+            'bg_color': '#D9E1F2',
+            'border': 1
+        })
+        
+        # Crear hoja de participantes
+        ws_participantes = workbook.add_worksheet('Participantes')
+        headers = [
+            'ID Participante',
+            'Género',
+            'Edad',
+            'Ocupación',
+            'Nivel Educativo',
+            'Ubicación',
+            'Experiencia Mindfulness',
+            'Condiciones de Salud'
+        ]
+        
+        # Escribir encabezados
+        for col, header in enumerate(headers):
+            ws_participantes.write(0, col, header, header_format)
+        
+        # Escribir datos (asegurándonos de que todos los valores sean strings)
+        for row, participante in enumerate(participantes_data, start=1):
+            ws_participantes.write(row, 0, str(participante['id_participante']))
+            ws_participantes.write(row, 1, str(participante['genero']))
+            ws_participantes.write(row, 2, str(participante['edad']))
+            ws_participantes.write(row, 3, str(participante['ocupacion']))
+            ws_participantes.write(row, 4, str(participante['nivel_educativo']))
+            ws_participantes.write(row, 5, str(participante['ubicacion']))
+            ws_participantes.write(row, 6, str(participante['experiencia_mindfulness']))
+            ws_participantes.write(row, 7, str(participante['condiciones_salud']))
+        
+        workbook.close()
+        return output.getvalue()
+
+def generar_archivo_diarios(programa, formato):
+    """Genera el archivo de diarios en el formato especificado"""
+    # Obtener todas las sesiones del programa
+    sesiones = Sesion.objects.filter(programa=programa).order_by('semana', 'id')
+    diarios_data = []
+    
+    for sesion in sesiones:
+        # Obtener los diarios de esta sesión
+        diarios = DiarioSesion.objects.filter(
+            sesion=sesion
+        ).select_related('participante', 'sesion')
+        
+        for diario in diarios:
+            # Obtener valor display del tipo de práctica y convertir a string
+            tipo_practica_display = str(dict(EtiquetaPractica.choices).get(sesion.tipo_practica, sesion.tipo_practica))
+            
+            diarios_data.append({
+                'semana': sesion.semana,
+                'sesion': str(sesion.titulo),
+                'tipo_practica': tipo_practica_display,
+                'id_participante': f"P{diario.participante.id}",
+                'valoracion': diario.valoracion,
+                'comentario': str(diario.comentario) if diario.comentario else 'Sin comentario',
+                'fecha': diario.fecha_creacion.strftime('%d/%m/%Y')
+            })
+    
+    if formato == 'json':
+        return json.dumps(diarios_data, ensure_ascii=False).encode('utf-8')
+    
+    elif formato == 'csv':
+        output = StringIO()
+        writer = csv.writer(output)
+        
+        # Escribir encabezados
+        writer.writerow([
+            'Semana',
+            'Sesión',
+            'Tipo de Práctica',
+            'ID Participante',
+            'Valoración',
+            'Comentario',
+            'Fecha'
+        ])
+        
+        # Escribir datos
+        for diario in diarios_data:
+            writer.writerow([
+                diario['semana'],
+                diario['sesion'],
+                diario['tipo_practica'],
+                diario['id_participante'],
+                diario['valoracion'],
+                diario['comentario'],
+                diario['fecha']
+            ])
+        
+        return output.getvalue().encode('utf-8-sig')
+    
+    elif formato == 'excel':
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        
+        # Estilos
+        header_format = workbook.add_format({
+            'bold': True,
+            'bg_color': '#D9E1F2',
+            'border': 1
+        })
+        
+        # Crear hoja
+        ws_diarios = workbook.add_worksheet('Diarios')
+        headers = [
+            'Semana',
+            'Sesión',
+            'Tipo de Práctica',
+            'ID Participante',
+            'Valoración',
+            'Comentario',
+            'Fecha'
+        ]
+        
+        # Escribir encabezados
+        for col, header in enumerate(headers):
+            ws_diarios.write(0, col, header, header_format)
+        
+        # Escribir datos (asegurándonos de que todos los valores sean del tipo correcto)
+        for row, diario in enumerate(diarios_data, start=1):
+            ws_diarios.write(row, 0, diario['semana'])  # número
+            ws_diarios.write(row, 1, str(diario['sesion']))  # string
+            ws_diarios.write(row, 2, str(diario['tipo_practica']))  # string
+            ws_diarios.write(row, 3, str(diario['id_participante']))  # string
+            ws_diarios.write(row, 4, diario['valoracion'])  # número
+            ws_diarios.write(row, 5, str(diario['comentario']))  # string
+            ws_diarios.write(row, 6, str(diario['fecha']))  # string
+        
+        workbook.close()
+        return output.getvalue()
+
+def generar_archivo_cuestionario(programa, tipo_cuestionario, formato):
+    """Genera el archivo de cuestionario (pre o post) en el formato especificado"""
+    cuestionario = programa.cuestionario_pre if tipo_cuestionario == 'pre' else programa.cuestionario_post
+    
+    if not cuestionario:
+        return None
+    
+    # Preparar datos del cuestionario
+    preguntas = []
+    indices_preguntas = []
+    
+    for i, p in enumerate(cuestionario.preguntas):
+        if p['tipo'] not in ['likert', 'likert-5-puntos']:
+            preguntas.append(str(p['texto']))
+            indices_preguntas.append(i)
+    
+    respuestas = RespuestaCuestionario.objects.filter(
+        cuestionario=cuestionario
+    ).select_related('participante').order_by('participante__id', 'fecha_respuesta')
+
+    # Preparar datos para exportación
+    datos = []
+    for respuesta in respuestas:
+        fila = {'ID Participante': f"P{respuesta.participante.id}"}
+        for i, pregunta in enumerate(cuestionario.preguntas):
+            if i in indices_preguntas:
+                pregunta_id = str(pregunta['id'])
+                valor_respuesta = respuesta.respuestas.get(pregunta_id, 'N/A')
+                fila[str(pregunta['texto'])] = str(valor_respuesta) if valor_respuesta is not None else 'N/A'
+        datos.append(fila)
+
+    if formato == 'json':
+        return json.dumps(datos, ensure_ascii=False).encode('utf-8')
+
+    elif formato == 'csv':
+        output = StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['ID Participante'] + preguntas)
+
+        for respuesta in respuestas:
+            fila = [f"P{respuesta.participante.id}"]
+            for i, pregunta in enumerate(cuestionario.preguntas):
+                if i in indices_preguntas:
+                    pregunta_id = str(pregunta['id'])
+                    valor_respuesta = respuesta.respuestas.get(pregunta_id, 'N/A')
+                    fila.append(str(valor_respuesta) if valor_respuesta is not None else 'N/A')
+            writer.writerow(fila)
+
+        return output.getvalue().encode('utf-8-sig')
+
+    elif formato == 'excel':
+        output = BytesIO()
+        workbook = xlsxwriter.Workbook(output)
+        
+        # Estilos
+        header_format = workbook.add_format({
+            'bold': True,
+            'bg_color': '#D9E1F2',
+            'border': 1
+        })
+        
+        # Crear hoja
+        nombre_hoja = f'Cuestionario {tipo_cuestionario.title()}'
+        ws = workbook.add_worksheet(nombre_hoja)
+        
+        # Escribir encabezados
+        headers = ['ID Participante'] + preguntas
+        for col, header in enumerate(headers):
+            ws.write(0, col, str(header), header_format)
+        
+        # Escribir datos (asegurándonos de que todos los valores sean strings)
+        for row, respuesta in enumerate(respuestas, start=1):
+            ws.write(row, 0, f"P{respuesta.participante.id}")
+            col_index = 1
+            for i, pregunta in enumerate(cuestionario.preguntas):
+                if i in indices_preguntas:
+                    pregunta_id = str(pregunta['id'])
+                    valor_respuesta = respuesta.respuestas.get(pregunta_id, 'N/A')
+                    ws.write(row, col_index, str(valor_respuesta) if valor_respuesta is not None else 'N/A')
+                    col_index += 1
+        
+        workbook.close()
+        return output.getvalue()
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsInvestigador])
@@ -43,460 +337,135 @@ def exportar_datos_programa(request, pk):
         
         print(f"Iniciando exportación - Tipo: {tipo_exportacion}, Formato: {formato}, Programa ID: {pk}")
         
-        # Preparar datos según el tipo de exportación
-        datos = {}
+        # Obtener extensión del archivo
+        extension = 'csv' if formato == 'csv' else 'xlsx' if formato == 'excel' else 'json'
+        fecha = datetime.now().strftime('%Y-%m-%d')
         
-        if tipo_exportacion in ['todos', 'participantes']:
-            try:
-                # Datos de participantes
-                participantes_data = []
-                inscripciones = InscripcionPrograma.objects.filter(programa=programa).select_related('participante__usuario')
+        if tipo_exportacion == 'todos':
+            # Crear ZIP con todos los datos
+            zip_buffer = BytesIO()
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                # Agregar participantes
+                participantes_data = generar_archivo_participantes(programa, formato)
+                zip_file.writestr(f'participantes_programa_{programa.id}_{fecha}.{extension}', participantes_data)
                 
-                print(f"Procesando {inscripciones.count()} inscripciones")
+                # Agregar diarios
+                diarios_data = generar_archivo_diarios(programa, formato)
+                zip_file.writestr(f'diarios_programa_{programa.id}_{fecha}.{extension}', diarios_data)
                 
-                for inscripcion in inscripciones:
-                    try:
-                        participante = inscripcion.participante
-                        usuario = participante.usuario
-                        
-                        # Calcular edad si fechaNacimiento está disponible
-                        edad = None
-                        if hasattr(usuario, 'fechaNacimiento') and usuario.fechaNacimiento:
-                            edad = (datetime.now().date() - usuario.fechaNacimiento).days // 365
-                        
-                        # Obtener valores display de los enums
-                        genero_display = dict(Genero.choices).get(usuario.genero, usuario.genero) if hasattr(usuario, 'genero') else 'No especificado'
-                        nivel_educativo_display = dict(NivelEducativo.choices).get(usuario.nivelEducativo, usuario.nivelEducativo) if hasattr(usuario, 'nivelEducativo') else 'No especificado'
-                        experiencia_mindfulness_display = dict(ExperienciaMindfulness.choices).get(participante.experienciaMindfulness, participante.experienciaMindfulness) if hasattr(participante, 'experienciaMindfulness') else 'No especificado'
-                        
-                        participantes_data.append({
-                            'id_anonimo': f"P{participante.id}",
-                            'genero': genero_display,
-                            'edad': f"{edad} años" if edad is not None else 'No especificado',
-                            'ocupacion': usuario.ocupacion if hasattr(usuario, 'ocupacion') else 'No especificado',
-                            'nivel_educativo': nivel_educativo_display,
-                            'ubicacion': usuario.ubicacion if hasattr(usuario, 'ubicacion') else 'No especificado',
-                            'experiencia_mindfulness': experiencia_mindfulness_display,
-                            'condiciones_salud': participante.condicionesSalud if hasattr(participante, 'condicionesSalud') else 'No especificado'
-                        })
-                    except Exception as e:
-                        print(f"Error procesando participante {inscripcion.participante.id}: {str(e)}")
-                        print(traceback.format_exc())
-                        continue
+                # Agregar cuestionario pre si existe
+                if programa.cuestionario_pre:
+                    cuestionario_pre_data = generar_archivo_cuestionario(programa, 'pre', formato)
+                    if cuestionario_pre_data:
+                        zip_file.writestr(f'cuestionario_pre_programa_{programa.id}_{fecha}.{extension}', cuestionario_pre_data)
                 
-                datos['participantes'] = participantes_data
-            except Exception as e:
-                print(f"Error procesando datos de participantes: {str(e)}")
-                print(traceback.format_exc())
-                raise
-
-            # Crear respuesta HTTP para datos de participantes
-            if formato == 'json':
-                response = HttpResponse(
-                    json.dumps(participantes_data, ensure_ascii=False),
-                    content_type='application/json'
-                )
-                response['Content-Disposition'] = f'attachment; filename="participantes_programa_{programa.id}.json"'
-                return response
+                # Agregar cuestionario post si existe
+                if programa.cuestionario_post:
+                    cuestionario_post_data = generar_archivo_cuestionario(programa, 'post', formato)
+                    if cuestionario_post_data:
+                        zip_file.writestr(f'cuestionario_post_programa_{programa.id}_{fecha}.{extension}', cuestionario_post_data)
             
-            elif formato == 'csv':
-                output = StringIO()
-                writer = csv.writer(output)
-                
-                # Escribir encabezados
-                writer.writerow([
-                    'ID Participante',
-                    'Género',
-                    'Edad',
-                    'Ocupación',
-                    'Nivel Educativo',
-                    'Ubicación',
-                    'Experiencia Mindfulness',
-                    'Condiciones de Salud'
-                ])
-                
-                # Escribir datos
-                for participante in participantes_data:
-                    writer.writerow([
-                        participante['id_anonimo'],
-                        participante['genero'],
-                        participante['edad'],
-                        participante['ocupacion'],
-                        participante['nivel_educativo'],
-                        participante['ubicacion'],
-                        participante['experiencia_mindfulness'],
-                        participante['condiciones_salud']
-                    ])
-                
-                response = HttpResponse(
-                    output.getvalue().encode('utf-8-sig'),
-                    content_type='text/csv; charset=utf-8'
-                )
-                response['Content-Disposition'] = f'attachment; filename="participantes_programa_{programa.id}.csv"'
-                return response
-            
-            elif formato == 'excel':
-                output = BytesIO()
-                workbook = xlsxwriter.Workbook(output)
-                
-                # Estilos
-                header_format = workbook.add_format({
-                    'bold': True,
-                    'bg_color': '#D9E1F2',
-                    'border': 1
-                })
-                
-                # Crear hoja de participantes
-                ws_participantes = workbook.add_worksheet('Participantes')
-                headers = [
-                    'ID Participante',
-                    'Género',
-                    'Edad',
-                    'Ocupación',
-                    'Nivel Educativo',
-                    'Ubicación',
-                    'Experiencia Mindfulness',
-                    'Condiciones de Salud'
-                ]
-                
-                # Escribir encabezados
-                for col, header in enumerate(headers):
-                    ws_participantes.write(0, col, header, header_format)
-                
-                # Escribir datos
-                for row, participante in enumerate(participantes_data, start=1):
-                    ws_participantes.write(row, 0, participante['id_anonimo'])
-                    ws_participantes.write(row, 1, participante['genero'])
-                    ws_participantes.write(row, 2, participante['edad'])
-                    ws_participantes.write(row, 3, participante['ocupacion'])
-                    ws_participantes.write(row, 4, participante['nivel_educativo'])
-                    ws_participantes.write(row, 5, participante['ubicacion'])
-                    ws_participantes.write(row, 6, participante['experiencia_mindfulness'])
-                    ws_participantes.write(row, 7, participante['condiciones_salud'])
-                
-                workbook.close()
-                response = HttpResponse(
-                    output.getvalue(),
-                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                )
-                response['Content-Disposition'] = f'attachment; filename="participantes_programa_{programa.id}.xlsx"'
-                return response
-            
-            return Response(
-                {"error": "Formato no válido. Use 'csv', 'excel' o 'json'"},
-                status=status.HTTP_400_BAD_REQUEST
+            response = HttpResponse(
+                zip_buffer.getvalue(),
+                content_type='application/zip'
             )
+            response['Content-Disposition'] = f'attachment; filename="datos_completos_programa_{programa.id}_{fecha}.zip"'
+            return response
         
-        if tipo_exportacion in ['todos', 'diarios']:
-            # Obtener todas las sesiones del programa
-            sesiones = Sesion.objects.filter(programa=programa).order_by('semana', 'id')
-            diarios_data = []
-            
-            for sesion in sesiones:
-                # Obtener los diarios de esta sesión
-                diarios = DiarioSesion.objects.filter(
-                    sesion=sesion
-                ).select_related('participante', 'sesion')
+        elif tipo_exportacion == 'cuestionarios':
+            # Crear ZIP solo con cuestionarios
+            zip_buffer = BytesIO()
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                # Agregar cuestionario pre si existe
+                if programa.cuestionario_pre:
+                    cuestionario_pre_data = generar_archivo_cuestionario(programa, 'pre', formato)
+                    if cuestionario_pre_data:
+                        zip_file.writestr(f'cuestionario_pre_programa_{programa.id}_{fecha}.{extension}', cuestionario_pre_data)
                 
-                for diario in diarios:
-                    # Obtener valor display del tipo de práctica
-                    tipo_practica_display = dict(EtiquetaPractica.choices).get(sesion.tipo_practica, sesion.tipo_practica)
-                    
-                    diarios_data.append({
-                        'semana': sesion.semana,
-                        'sesion': sesion.titulo,
-                        'tipo_practica': tipo_practica_display,
-                        'participante_id': f"P{diario.participante.id}",
-                        'valoracion': diario.valoracion,
-                        'comentario': diario.comentario or 'Sin comentario',
-                        'fecha': diario.fecha_creacion.strftime('%d/%m/%Y')
-                    })
+                # Agregar cuestionario post si existe
+                if programa.cuestionario_post:
+                    cuestionario_post_data = generar_archivo_cuestionario(programa, 'post', formato)
+                    if cuestionario_post_data:
+                        zip_file.writestr(f'cuestionario_post_programa_{programa.id}_{fecha}.{extension}', cuestionario_post_data)
+            
+            response = HttpResponse(
+                zip_buffer.getvalue(),
+                content_type='application/zip'
+            )
+            response['Content-Disposition'] = f'attachment; filename="cuestionarios_programa_{programa.id}_{fecha}.zip"'
+            return response
+
+        elif tipo_exportacion == 'participantes':
+            # Exportar solo participantes (archivo individual)
+            participantes_data = generar_archivo_participantes(programa, formato)
             
             if formato == 'json':
                 response = HttpResponse(
-                    json.dumps(diarios_data, ensure_ascii=False),
+                    participantes_data,
                     content_type='application/json'
                 )
-                response['Content-Disposition'] = f'attachment; filename="diarios_programa_{programa.id}.json"'
+                response['Content-Disposition'] = f'attachment; filename="participantes_programa_{programa.id}_{fecha}.json"'
                 return response
             
             elif formato == 'csv':
-                output = StringIO()
-                writer = csv.writer(output)
-                
-                # Escribir encabezados
-                writer.writerow([
-                    'Semana',
-                    'Sesión',
-                    'Tipo de Práctica',
-                    'ID Participante',
-                    'Valoración',
-                    'Comentario',
-                    'Fecha'
-                ])
-                
-                # Escribir datos
-                for diario in diarios_data:
-                    writer.writerow([
-                        diario['semana'],
-                        diario['sesion'],
-                        diario['tipo_practica'],
-                        diario['participante_id'],
-                        diario['valoracion'],
-                        diario['comentario'],
-                        diario['fecha']
-                    ])
-                
                 response = HttpResponse(
-                    output.getvalue().encode('utf-8-sig'),
+                    participantes_data,
                     content_type='text/csv; charset=utf-8'
                 )
-                response['Content-Disposition'] = f'attachment; filename="diarios_programa_{programa.id}.csv"'
+                response['Content-Disposition'] = f'attachment; filename="participantes_programa_{programa.id}_{fecha}.csv"'
                 return response
             
             elif formato == 'excel':
-                output = BytesIO()
-                workbook = xlsxwriter.Workbook(output)
-                
-                # Estilos
-                header_format = workbook.add_format({
-                    'bold': True,
-                    'bg_color': '#D9E1F2',
-                    'border': 1
-                })
-                
-                # Crear hoja de diarios
-                ws_diarios = workbook.add_worksheet('Diarios')
-                headers = [
-                    'Semana',
-                    'Sesión',
-                    'Tipo de Práctica',
-                    'ID Participante',
-                    'Valoración',
-                    'Comentario',
-                    'Fecha'
-                ]
-                
-                # Escribir encabezados
-                for col, header in enumerate(headers):
-                    ws_diarios.write(0, col, header, header_format)
-                
-                # Escribir datos
-                for row, diario in enumerate(diarios_data, start=1):
-                    ws_diarios.write(row, 0, diario['semana'])
-                    ws_diarios.write(row, 1, diario['sesion'])
-                    ws_diarios.write(row, 2, diario['tipo_practica'])
-                    ws_diarios.write(row, 3, diario['participante_id'])
-                    ws_diarios.write(row, 4, diario['valoracion'])
-                    ws_diarios.write(row, 5, diario['comentario'])
-                    ws_diarios.write(row, 6, diario['fecha'])
-                
-                workbook.close()
                 response = HttpResponse(
-                    output.getvalue(),
+                    participantes_data,
                     content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                 )
-                response['Content-Disposition'] = f'attachment; filename="diarios_programa_{programa.id}.xlsx"'
+                response['Content-Disposition'] = f'attachment; filename="participantes_programa_{programa.id}_{fecha}.xlsx"'
+                return response
+
+        elif tipo_exportacion == 'diarios':
+            # Exportar solo diarios (archivo individual)
+            diarios_data = generar_archivo_diarios(programa, formato)
+            
+            if formato == 'json':
+                response = HttpResponse(
+                    diarios_data,
+                    content_type='application/json'
+                )
+                response['Content-Disposition'] = f'attachment; filename="diarios_programa_{programa.id}_{fecha}.json"'
                 return response
             
+            elif formato == 'csv':
+                response = HttpResponse(
+                    diarios_data,
+                    content_type='text/csv; charset=utf-8'
+                )
+                response['Content-Disposition'] = f'attachment; filename="diarios_programa_{programa.id}_{fecha}.csv"'
+                return response
+            
+            elif formato == 'excel':
+                response = HttpResponse(
+                    diarios_data,
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                )
+                response['Content-Disposition'] = f'attachment; filename="diarios_programa_{programa.id}_{fecha}.xlsx"'
+                return response
+
+        else:
             return Response(
-                {"error": "Formato no válido. Use 'csv', 'excel' o 'json'"},
+                {"error": "Tipo de exportación no válido. Use 'todos', 'cuestionarios', 'diarios' o 'participantes'"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        if tipo_exportacion in ['todos', 'cuestionarios']:
-            # Obtener el subtipo (pre o post)
-            subtipo = request.GET.get('subtipo', 'pre')
-            
-            if subtipo == 'pre' and programa.cuestionario_pre:
-                # Preparar datos del cuestionario pre
-                preguntas_pre = []
-                indices_preguntas_pre = []
-                
-                for i, p in enumerate(programa.cuestionario_pre.preguntas):
-                    if p['tipo'] not in ['likert', 'likert-5-puntos']:
-                        preguntas_pre.append(p['texto'])
-                        indices_preguntas_pre.append(i)
-                
-                respuestas_pre = RespuestaCuestionario.objects.filter(
-                    cuestionario=programa.cuestionario_pre
-                ).select_related('participante').order_by('participante__id', 'fecha_respuesta')
-
-                # Preparar datos para exportación
-                datos_pre = []
-                for respuesta in respuestas_pre:
-                    fila = {'ID Participante': f"P{respuesta.participante.id}"}
-                    for i, pregunta in enumerate(programa.cuestionario_pre.preguntas):
-                        if i in indices_preguntas_pre:
-                            pregunta_id = str(pregunta['id'])
-                            fila[pregunta['texto']] = respuesta.respuestas.get(pregunta_id, 'N/A')
-                    datos_pre.append(fila)
-
-                if formato == 'json':
-                    response_pre = HttpResponse(
-                        json.dumps(datos_pre, ensure_ascii=False),
-                        content_type='application/json'
-                    )
-                    response_pre['Content-Disposition'] = f'attachment; filename="cuestionario_pre_{programa.id}.json"'
-                    return response_pre
-
-                elif formato == 'csv':
-                    output_pre = StringIO()
-                    writer_pre = csv.writer(output_pre)
-                    writer_pre.writerow(['ID Participante'] + preguntas_pre)
-
-                    for respuesta in respuestas_pre:
-                        fila = [f"P{respuesta.participante.id}"]
-                        for i, pregunta in enumerate(programa.cuestionario_pre.preguntas):
-                            if i in indices_preguntas_pre:
-                                pregunta_id = str(pregunta['id'])
-                                fila.append(respuesta.respuestas.get(pregunta_id, 'N/A'))
-                        writer_pre.writerow(fila)
-
-                    response_pre = HttpResponse(
-                        output_pre.getvalue().encode('utf-8-sig'),
-                        content_type='text/csv'
-                    )
-                    response_pre['Content-Disposition'] = f'attachment; filename="cuestionario_pre_{programa.id}.csv"'
-                    return response_pre
-
-                elif formato == 'excel':
-                    output_pre = BytesIO()
-                    workbook = xlsxwriter.Workbook(output_pre)
-                    
-                    # Estilos
-                    header_format = workbook.add_format({
-                        'bold': True,
-                        'bg_color': '#D9E1F2',
-                        'border': 1
-                    })
-                    
-                    # Crear hoja
-                    ws_pre = workbook.add_worksheet('Cuestionario Pre')
-                    
-                    # Escribir encabezados
-                    headers = ['ID Participante'] + preguntas_pre
-                    for col, header in enumerate(headers):
-                        ws_pre.write(0, col, header, header_format)
-                    
-                    # Escribir datos
-                    for row, respuesta in enumerate(respuestas_pre, start=1):
-                        ws_pre.write(row, 0, f"P{respuesta.participante.id}")
-                        for i, pregunta in enumerate(programa.cuestionario_pre.preguntas):
-                            if i in indices_preguntas_pre:
-                                pregunta_id = str(pregunta['id'])
-                                ws_pre.write(row, i + 1, respuesta.respuestas.get(pregunta_id, 'N/A'))
-                    
-                    workbook.close()
-                    response_pre = HttpResponse(
-                        output_pre.getvalue(),
-                        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    )
-                    response_pre['Content-Disposition'] = f'attachment; filename="cuestionario_pre_{programa.id}.xlsx"'
-                    return response_pre
-
-            elif subtipo == 'post' and programa.cuestionario_post:
-                # Preparar datos del cuestionario post
-                preguntas_post = []
-                indices_preguntas_post = []
-                
-                for i, p in enumerate(programa.cuestionario_post.preguntas):
-                    if p['tipo'] not in ['likert', 'likert-5-puntos']:
-                        preguntas_post.append(p['texto'])
-                        indices_preguntas_post.append(i)
-                
-                respuestas_post = RespuestaCuestionario.objects.filter(
-                    cuestionario=programa.cuestionario_post
-                ).select_related('participante').order_by('participante__id', 'fecha_respuesta')
-
-                # Preparar datos para exportación
-                datos_post = []
-                for respuesta in respuestas_post:
-                    fila = {'ID Participante': f"P{respuesta.participante.id}"}
-                    for i, pregunta in enumerate(programa.cuestionario_post.preguntas):
-                        if i in indices_preguntas_post:
-                            pregunta_id = str(pregunta['id'])
-                            fila[pregunta['texto']] = respuesta.respuestas.get(pregunta_id, 'N/A')
-                    datos_post.append(fila)
-
-                if formato == 'json':
-                    response_post = HttpResponse(
-                        json.dumps(datos_post, ensure_ascii=False),
-                        content_type='application/json'
-                    )
-                    response_post['Content-Disposition'] = f'attachment; filename="cuestionario_post_{programa.id}.json"'
-                    return response_post
-
-                elif formato == 'csv':
-                    output_post = StringIO()
-                    writer_post = csv.writer(output_post)
-                    writer_post.writerow(['ID Participante'] + preguntas_post)
-
-                    for respuesta in respuestas_post:
-                        fila = [f"P{respuesta.participante.id}"]
-                        for i, pregunta in enumerate(programa.cuestionario_post.preguntas):
-                            if i in indices_preguntas_post:
-                                pregunta_id = str(pregunta['id'])
-                                fila.append(respuesta.respuestas.get(pregunta_id, 'N/A'))
-                        writer_post.writerow(fila)
-
-                    response_post = HttpResponse(
-                        output_post.getvalue().encode('utf-8-sig'),
-                        content_type='text/csv'
-                    )
-                    response_post['Content-Disposition'] = f'attachment; filename="cuestionario_post_{programa.id}.csv"'
-                    return response_post
-
-                elif formato == 'excel':
-                    output_post = BytesIO()
-                    workbook = xlsxwriter.Workbook(output_post)
-                    
-                    # Estilos
-                    header_format = workbook.add_format({
-                        'bold': True,
-                        'bg_color': '#D9E1F2',
-                        'border': 1
-                    })
-                    
-                    # Crear hoja
-                    ws_post = workbook.add_worksheet('Cuestionario Post')
-                    
-                    # Escribir encabezados
-                    headers = ['ID Participante'] + preguntas_post
-                    for col, header in enumerate(headers):
-                        ws_post.write(0, col, header, header_format)
-                    
-                    # Escribir datos
-                    for row, respuesta in enumerate(respuestas_post, start=1):
-                        ws_post.write(row, 0, f"P{respuesta.participante.id}")
-                        for i, pregunta in enumerate(programa.cuestionario_post.preguntas):
-                            if i in indices_preguntas_post:
-                                pregunta_id = str(pregunta['id'])
-                                ws_post.write(row, i + 1, respuesta.respuestas.get(pregunta_id, 'N/A'))
-                    
-                    workbook.close()
-                    response_post = HttpResponse(
-                        output_post.getvalue(),
-                        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                    )
-                    response_post['Content-Disposition'] = f'attachment; filename="cuestionario_post_{programa.id}.xlsx"'
-                    return response_post
-
-            else:
-                return Response(
-                    {"error": f"No se encontró el cuestionario {subtipo} para este programa"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-    except Programa.DoesNotExist:
         return Response(
-            {"error": "El programa no existe"},
-            status=status.HTTP_404_NOT_FOUND
+            {"error": "Formato no válido. Use 'csv', 'excel' o 'json'"},
+            status=status.HTTP_400_BAD_REQUEST
         )
+
     except Exception as e:
         print(f"Error al exportar datos: {str(e)}")
         print(traceback.format_exc())
         return Response(
-            {"error": f"Error al exportar datos: {str(e)}"},
+            {"error": "Error interno del servidor al exportar datos"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) 
