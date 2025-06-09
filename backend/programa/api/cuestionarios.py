@@ -11,8 +11,10 @@ from cuestionario.models import RespuestaCuestionario
 @permission_classes([IsAuthenticated])
 def programa_cuestionarios_y_respuestas(request, pk):
     """
-    Obtiene los cuestionarios pre y post de un programa con sus respuestas,
-    excluyendo las preguntas de tipo likert y likert_5_puntos
+    Obtiene los cuestionarios pre y post de un programa con sus respuestas.
+    El formato de respuesta varía según el tipo de cuestionario:
+    - Para cuestionarios Likert: devuelve las etiquetas, textos y respuestas como arrays
+    - Para otros cuestionarios: devuelve las preguntas y respuestas en formato clave-valor
     """
     try:
         programa = get_object_or_404(Programa, pk=pk)
@@ -31,67 +33,66 @@ def programa_cuestionarios_y_respuestas(request, pk):
             'post': None
         }
 
-        if cuestionario_pre:
-            preguntas_pre = []
-            indices_preguntas = []
-            
-            for i, p in enumerate(cuestionario_pre.preguntas):
-                if p['tipo'] not in ['likert', 'likert-5-puntos']:
-                    preguntas_pre.append(p['texto'])
-                    indices_preguntas.append(i)
-            
-            respuestas_pre = RespuestaCuestionario.objects.filter(
-                cuestionario=cuestionario_pre
+        def procesar_cuestionario(cuestionario):
+            if not cuestionario:
+                return None
+
+            # Obtener las respuestas
+            respuestas = RespuestaCuestionario.objects.filter(
+                cuestionario=cuestionario
             ).select_related('participante').order_by('participante__id', 'fecha_respuesta')
 
-            respuestas_por_participante = {}
-            for respuesta in respuestas_pre:
-                id_participante = f"P{respuesta.participante.id}"
-                respuestas_lista = []
-                for i, pregunta in enumerate(cuestionario_pre.preguntas):
-                    if i in indices_preguntas:
-                        pregunta_id = str(pregunta['id'])
-                        respuestas_lista.append(respuesta.respuestas.get(pregunta_id, 'N/A'))
+            # Si es un cuestionario tipo Likert
+            if cuestionario.tipo_cuestionario == 'likert':
+                etiquetas = cuestionario.preguntas[0]['etiquetas']
+                textos = cuestionario.preguntas[0]['textos']
                 
-                respuestas_por_participante[id_participante] = respuestas_lista
+                respuestas_por_participante = {}
+                for respuesta in respuestas:
+                    id_participante = f"P{respuesta.participante.id}"
+                    # Las respuestas ya vienen como lista para cuestionarios Likert
+                    respuestas_por_participante[id_participante] = respuesta.respuestas
 
-            resultado['pre'] = {
-                'id': cuestionario_pre.id,
-                'nombre': cuestionario_pre.titulo,
-                'preguntas': preguntas_pre,
-                'respuestas': respuestas_por_participante
-            }
-
-        if cuestionario_post:
-            preguntas_post = []
-            indices_preguntas = []
+                return {
+                    'id': cuestionario.id,
+                    'nombre': cuestionario.titulo,
+                    'tipo': 'likert',
+                    'etiquetas': etiquetas,
+                    'textos': textos,
+                    'respuestas': respuestas_por_participante
+                }
             
-            for i, p in enumerate(cuestionario_post.preguntas):
-                if p['tipo'] not in ['likert', 'likert-5-puntos']:
-                    preguntas_post.append(p['texto'])
+            # Para otros tipos de cuestionarios
+            else:
+                preguntas = []
+                indices_preguntas = []
+                
+                for i, p in enumerate(cuestionario.preguntas):
+                    preguntas.append(p['texto'])
                     indices_preguntas.append(i)
-            
-            respuestas_post = RespuestaCuestionario.objects.filter(
-                cuestionario=cuestionario_post
-            ).select_related('participante').order_by('participante__id', 'fecha_respuesta')
-
-            respuestas_por_participante = {}
-            for respuesta in respuestas_post:
-                id_participante = f"P{respuesta.participante.id}"
-                respuestas_lista = []
-                for i, pregunta in enumerate(cuestionario_post.preguntas):
-                    if i in indices_preguntas:
-                        pregunta_id = str(pregunta['id'])
-                        respuestas_lista.append(respuesta.respuestas.get(pregunta_id, 'N/A'))
                 
-                respuestas_por_participante[id_participante] = respuestas_lista
+                respuestas_por_participante = {}
+                for respuesta in respuestas:
+                    id_participante = f"P{respuesta.participante.id}"
+                    respuestas_lista = []
+                    for i, pregunta in enumerate(cuestionario.preguntas):
+                        if i in indices_preguntas:
+                            pregunta_id = str(pregunta['id'])
+                            valor_respuesta = respuesta.respuestas.get(pregunta_id, 'N/A')
+                            respuestas_lista.append(valor_respuesta)
+                    
+                    respuestas_por_participante[id_participante] = respuestas_lista
 
-            resultado['post'] = {
-                'id': cuestionario_post.id,
-                'nombre': cuestionario_post.titulo,
-                'preguntas': preguntas_post,
-                'respuestas': respuestas_por_participante
-            }
+                return {
+                    'id': cuestionario.id,
+                    'nombre': cuestionario.titulo,
+                    'tipo': 'regular',
+                    'preguntas': preguntas,
+                    'respuestas': respuestas_por_participante
+                }
+
+        resultado['pre'] = procesar_cuestionario(cuestionario_pre)
+        resultado['post'] = procesar_cuestionario(cuestionario_post)
 
         return Response(resultado)
 

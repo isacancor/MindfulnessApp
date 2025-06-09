@@ -101,9 +101,15 @@ export const Escala = {
 };
 
 // Enums de Cuestionario
+export const MomentoCuestionario = {
+    PRE: 'pre',
+    POST: 'post'
+};
+
 export const TipoCuestionario = {
-    PRE: { value: 'pre', label: 'Pre' },
-    POST: { value: 'post', label: 'Post' }
+    PERSONALIZADO: { value: 'personalizado', label: 'Personalizado' },
+    LIKERT: { value: 'likert', label: 'Escala Likert' },
+    PREDEFINIDO: { value: 'predefinido', label: 'Predefinido' }
 };
 
 export const TipoPregunta = {
@@ -111,8 +117,6 @@ export const TipoPregunta = {
     SELECT: { value: 'select', label: 'Selección Única' },
     CHECKBOX: { value: 'checkbox', label: 'Múltiple Opción' },
     CALIFICACION: { value: 'calificacion', label: 'Calificación' },
-    LIKERT: { value: 'likert', label: 'Escala Likert' },
-    LIKERT_5_PUNTOS: { value: 'likert_5_puntos', label: 'Escala Likert 5 Puntos' }
 };
 
 export const TipoEscala = {

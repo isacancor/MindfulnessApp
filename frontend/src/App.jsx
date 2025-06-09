@@ -67,8 +67,8 @@ function App() {
           <Route path="/programas/:id/sesiones/:sesionId/editar" element={<EditarSesion />} />
 
           {/* Cuestionarios */}
-          <Route path="/programas/:id/cuestionario-pre/nuevo" element={<CrearCuestionario tipo="pre" />} />
-          <Route path="/programas/:id/cuestionario-post/nuevo" element={<CrearCuestionario tipo="post" />} />
+          <Route path="/programas/:id/cuestionario-pre/nuevo" element={<CrearCuestionario momento="pre" />} />
+          <Route path="/programas/:id/cuestionario-post/nuevo" element={<CrearCuestionario momento="post" />} />
           <Route path="/programas/:id/cuestionarios/:cuestionarioId/editar" element={<EditarCuestionario />} />
           <Route path="/programas/:id/cuestionarios/:cuestionarioId" element={<VistaPreviaCuestionario />} />
         </Route>
@@ -90,14 +90,14 @@ function App() {
           {/* Proteger ruta de cuestionario pre */}
           <Route path="/miprograma/cuestionario-pre" element={
             <CuestionarioPreProtectedRoute>
-              <ResponderCuestionario tipo="pre" />
+              <ResponderCuestionario momento="pre" />
             </CuestionarioPreProtectedRoute>
           } />
 
           {/* Proteger ruta de cuestionario post */}
           <Route path="/miprograma/cuestionario-post" element={
             <CuestionarioPostProtectedRoute>
-              <ResponderCuestionario tipo="post" />
+              <ResponderCuestionario momento="post" />
             </CuestionarioPostProtectedRoute>
           } />
 
@@ -105,15 +105,6 @@ function App() {
           <Route path="/completados/:id" element={<ProgramaCompletado />} />
           <Route path="/completados/:programaId/sesion/:sesionId" element={<HacerSesion completado={true} />} />
         </Route>
-
-        {/* Rutas protegidas para admin */}
-        {/** 
-        <Route element={<PrivateRoute roles={[ROLES.ADMIN]} />}>
-          <Route path="/dashboard" element={<div>Panel Admin</div>} />
-          <Route path="/admin/usuarios" element={<div>Gestión de Usuarios</div>} />
-          <Route path="/admin/programas" element={<div>Gestión de Programas</div>} />
-        </Route>
-        */}
 
         {/* Ruta comodín para manejar rutas no existentes */}
         <Route path="*" element={<Navigate to="/unauthorized" replace />} />

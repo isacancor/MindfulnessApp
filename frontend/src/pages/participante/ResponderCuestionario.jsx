@@ -7,7 +7,7 @@ import ErrorAlert from '../../components/ErrorAlert';
 import MobileNavBar from '../../components/layout/MobileNavBar';
 import PageHeader from '../../components/layout/PageHeader';
 
-const ResponderCuestionario = ({ tipo }) => {
+const ResponderCuestionario = ({ momento }) => {
     const navigate = useNavigate();
     const [cuestionario, setCuestionario] = useState(null);
     const [respuestas, setRespuestas] = useState({});
@@ -20,13 +20,16 @@ const ResponderCuestionario = ({ tipo }) => {
     const validarRespuestas = () => {
         if (!cuestionario) return false;
 
+        if (cuestionario.tipo_cuestionario === 'likert') {
+            // Para cuestionarios Likert, verificamos que todas las filas tengan respuesta
+            return Object.keys(respuestas).length === cuestionario.preguntas[0].textos.length;
+        }
+
         return cuestionario.preguntas.every(pregunta => {
             const respuesta = respuestas[pregunta.id];
 
             if (pregunta.tipo === 'checkbox') {
                 return respuesta && respuesta.length > 0;
-            } else if (pregunta.tipo === 'likert-5-puntos') {
-                return respuesta && Object.keys(respuesta).length === pregunta.likert5Puntos.filas.length;
             } else {
                 return respuesta !== undefined && respuesta !== '';
             }
@@ -38,20 +41,28 @@ const ResponderCuestionario = ({ tipo }) => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await api.get(`/cuestionario/${tipo}/`);
+                const response = await api.get(`/cuestionario/${momento}/`);
                 setCuestionario(response.data);
-                const respuestasIniciales = {};
-                response.data.preguntas.forEach(pregunta => {
-                    if (pregunta.tipo === 'checkbox') {
-                        respuestasIniciales[pregunta.id] = [];
-                    } else {
-                        respuestasIniciales[pregunta.id] = '';
-                    }
-                });
-                setRespuestas(respuestasIniciales);
+
+                // Inicializar respuestas según el tipo de cuestionario
+                if (response.data.tipo_cuestionario === 'likert') {
+                    // Para Likert, inicializamos un objeto vacío
+                    setRespuestas({});
+                } else {
+                    // Para otros tipos, inicializamos como antes
+                    const respuestasIniciales = {};
+                    response.data.preguntas.forEach(pregunta => {
+                        if (pregunta.tipo === 'checkbox') {
+                            respuestasIniciales[pregunta.id] = [];
+                        } else {
+                            respuestasIniciales[pregunta.id] = '';
+                        }
+                    });
+                    setRespuestas(respuestasIniciales);
+                }
             } catch (err) {
-                console.error('Error al obtener cuestionario pre:', err);
-                if (err.response?.status === 400 && err.response?.data?.error === 'Ya has respondido este cuestionario pre') {
+                console.error('Error al obtener cuestionario:', err);
+                if (err.response?.status === 400 && err.response?.data?.error.includes('Ya has respondido este cuestionario')) {
                     setError('Ya has completado este cuestionario. ¡Gracias por tu participación!');
                 } else if (err.response?.data?.error) {
                     setError(err.response.data.error);
@@ -64,7 +75,7 @@ const ResponderCuestionario = ({ tipo }) => {
         };
 
         fetchCuestionario();
-    }, [tipo]);
+    }, [momento]);
 
     const handleRespuestaChange = (preguntaId, valor, tipo) => {
         if (tipo === 'checkbox') {
@@ -95,12 +106,21 @@ const ResponderCuestionario = ({ tipo }) => {
             setEnviando(true);
             setError(null);
 
-            const response = await api.post(`/cuestionario/responder/${tipo}/`, {
-                respuestas
-            });
+            let respuestasAEnviar;
+            if (cuestionario.tipo_cuestionario === 'likert') {
+                // Para cuestionarios Likert, convertimos el objeto de respuestas a un array
+                respuestasAEnviar = {
+                    respuestas: Array.from({ length: cuestionario.preguntas[0].textos.length },
+                        (_, i) => respuestas[i] || null)
+                };
+            } else {
+                respuestasAEnviar = { respuestas };
+            }
+
+            const response = await api.post(`/cuestionario/responder/${momento}/`, respuestasAEnviar);
 
             // Si es post, navegar a completados con el ID del programa
-            if (tipo === 'post') {
+            if (momento === 'post') {
                 navigate(`/completados/${response.data.id}`);
             } else {
                 navigate('/miprograma');
@@ -119,11 +139,55 @@ const ResponderCuestionario = ({ tipo }) => {
     };
 
     const renderPregunta = (pregunta) => {
+        // Si es un cuestionario Likert, renderizamos la tabla especial
+        if (cuestionario.tipo_cuestionario === 'likert') {
+            return (
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">
+                                    Pregunta
+                                </th>
+                                {pregunta.etiquetas.map((etiqueta, index) => (
+                                    <th key={index} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
+                                        {etiqueta}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {pregunta.textos.map((texto, index) => (
+                                <tr key={index}>
+                                    <td className="px-4 py-2">
+                                        <span className="text-gray-700">{texto}</span>
+                                    </td>
+                                    {Array.from({ length: 5 }, (_, i) => (
+                                        <td key={i} className="px-4 py-2 text-center">
+                                            <input
+                                                type="radio"
+                                                name={`likert-${index}`}
+                                                value={i + 1}
+                                                checked={respuestas[index] === i + 1}
+                                                onChange={(e) => handleRespuestaChange(index, parseInt(e.target.value))}
+                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                            />
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
+        // Para otros tipos de preguntas, mantenemos el renderizado original
         switch (pregunta.tipo) {
             case 'texto':
                 return (
                     <textarea
-                        value={respuestas[pregunta.id]}
+                        value={respuestas[pregunta.id] || ''}
                         onChange={(e) => handleRespuestaChange(pregunta.id, e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         rows="3"
@@ -134,7 +198,7 @@ const ResponderCuestionario = ({ tipo }) => {
             case 'select':
                 return (
                     <select
-                        value={respuestas[pregunta.id]}
+                        value={respuestas[pregunta.id] || ''}
                         onChange={(e) => handleRespuestaChange(pregunta.id, e.target.value)}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     >
@@ -154,7 +218,7 @@ const ResponderCuestionario = ({ tipo }) => {
                             <label key={index} className="flex items-center space-x-2">
                                 <input
                                     type="checkbox"
-                                    checked={respuestas[pregunta.id].includes(opcion)}
+                                    checked={respuestas[pregunta.id]?.includes(opcion) || false}
                                     onChange={() => handleRespuestaChange(pregunta.id, opcion, 'checkbox')}
                                     className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                 />
@@ -175,118 +239,18 @@ const ResponderCuestionario = ({ tipo }) => {
                                 className="text-3xl transition-all duration-200 hover:scale-110"
                             >
                                 {pregunta.estrellas.icono === 'star' && (
-                                    <Star className={`h-10 w-10 ${respuestas[pregunta.id] >= i + 1 ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 fill-gray-300'}`} />
+                                    <Star className={`h-10 w-10 ${(respuestas[pregunta.id] || 0) >= i + 1 ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300 fill-gray-300'}`} />
                                 )}
                                 {pregunta.estrellas.icono === 'heart' && (
                                     <Heart
-                                        className={`h-10 w-10 ${respuestas[pregunta.id] >= i + 1 ? 'text-red-500 fill-red-500' : 'text-gray-300 fill-gray-300'}`}
+                                        className={`h-10 w-10 ${(respuestas[pregunta.id] || 0) >= i + 1 ? 'text-red-500 fill-red-500' : 'text-gray-300 fill-gray-300'}`}
                                     />
                                 )}
                                 {pregunta.estrellas.icono === 'thumbsup' && (
-                                    <ThumbsUp className={`h-10 w-10 ${respuestas[pregunta.id] >= i + 1 ? 'text-blue-500 fill-blue-500' : 'text-gray-300 fill-gray-300'}`} />
+                                    <ThumbsUp className={`h-10 w-10 ${(respuestas[pregunta.id] || 0) >= i + 1 ? 'text-blue-500 fill-blue-500' : 'text-gray-300 fill-gray-300'}`} />
                                 )}
                             </button>
                         ))}
-                    </div>
-                );
-
-            case 'likert':
-                return (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    {Array.from({ length: pregunta.escala.fin - pregunta.escala.inicio + 1 }, (_, i) => (
-                                        <th key={i} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
-                                            {pregunta.escala.inicio + i}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    {pregunta.escala.etiquetas.map((etiqueta, index) => (
-                                        <td key={index} className="px-4 py-2 text-center">
-                                            <label className="flex flex-col items-center">
-                                                <input
-                                                    type="radio"
-                                                    name={`likert-${pregunta.id}`}
-                                                    value={pregunta.escala.inicio + index}
-                                                    checked={respuestas[pregunta.id] === pregunta.escala.inicio + index}
-                                                    onChange={(e) => handleRespuestaChange(pregunta.id, parseInt(e.target.value))}
-                                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                                                />
-                                                <span className="text-sm text-gray-500 mt-1">{etiqueta}</span>
-                                            </label>
-                                        </td>
-                                    ))}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                );
-
-            case 'likert-5-puntos':
-                return (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">
-                                        Pregunta
-                                    </th>
-                                    {(
-                                        pregunta.likert5Puntos.tipo === 'acuerdo'
-                                            ? [
-                                                "Totalmente en desacuerdo",
-                                                "En desacuerdo",
-                                                "Ni de acuerdo ni en desacuerdo",
-                                                "De acuerdo",
-                                                "Totalmente de acuerdo"
-                                            ]
-                                            : [
-                                                "Nunca",
-                                                "Rara vez",
-                                                "A veces",
-                                                "Frecuentemente",
-                                                "Siempre"
-                                            ]
-                                    ).map((opcion, index) => (
-                                        <th key={index} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
-                                            {opcion}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {pregunta.likert5Puntos.filas.map((fila, index) => (
-                                    <tr key={index}>
-                                        <td className="px-4 py-2">
-                                            <span className="text-gray-700">{fila}</span>
-                                        </td>
-                                        {Array.from({ length: 5 }, (_, i) => (
-                                            <td key={i} className="px-4 py-2 text-center">
-                                                <input
-                                                    type="radio"
-                                                    name={`likert-5-${pregunta.id}-${index}`}
-                                                    value={i + 1}
-                                                    checked={respuestas[pregunta.id]?.[index] === i + 1}
-                                                    onChange={(e) => {
-                                                        const nuevasRespuestas = { ...respuestas };
-                                                        if (!nuevasRespuestas[pregunta.id]) {
-                                                            nuevasRespuestas[pregunta.id] = {};
-                                                        }
-                                                        nuevasRespuestas[pregunta.id][index] = parseInt(e.target.value);
-                                                        setRespuestas(nuevasRespuestas);
-                                                    }}
-                                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                                                />
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
                     </div>
                 );
 
@@ -316,7 +280,7 @@ const ResponderCuestionario = ({ tipo }) => {
                         className="mb-8"
                     />
 
-                    {error && loading && (
+                    {error && (
                         <ErrorAlert
                             message={error}
                             onClose={() => setError(null)}
@@ -327,10 +291,14 @@ const ResponderCuestionario = ({ tipo }) => {
                         {/* Preguntas */}
                         <div className="space-y-8">
                             {cuestionario?.preguntas.map((pregunta, index) => (
-                                <div key={pregunta.id} className="bg-gradient-to-br from-white to-indigo-50/30 rounded-xl p-6 md:p-8 shadow-sm border border-indigo-100">
+                                <div key={pregunta.id || index} className="bg-gradient-to-br from-white to-indigo-50/30 rounded-xl p-6 md:p-8 shadow-sm border border-indigo-100">
                                     <div className="mb-6">
                                         <h3 className="text-xl font-semibold text-gray-900">
-                                            {index + 1}. {pregunta.texto}
+                                            {cuestionario.tipo_cuestionario === 'likert' ? (
+                                                'Completa la siguiente escala Likert'
+                                            ) : (
+                                                `${index + 1}. ${pregunta.texto}`
+                                            )}
                                         </h3>
                                     </div>
                                     <div className="mt-4">

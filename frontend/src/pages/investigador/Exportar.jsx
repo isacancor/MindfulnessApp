@@ -165,7 +165,7 @@ const Exportar = () => {
                                                     />
                                                     <div>
                                                         <p className="font-medium text-gray-800">Todos los datos</p>
-                                                        <p className="text-xs text-gray-500">Cuestionarios pre/post, diarios, participantes</p>
+                                                        <p className="text-xs text-gray-500">Cuestionarios pre/post, diarios, participantes y progreso</p>
                                                     </div>
                                                 </label>
                                                 <label className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors
@@ -210,7 +210,7 @@ const Exportar = () => {
                                                     />
                                                     <div>
                                                         <p className="font-medium text-gray-800">Solo participantes</p>
-                                                        <p className="text-xs text-gray-500">Datos demográficos y participación</p>
+                                                        <p className="text-xs text-gray-500">Datos demográficos, participación y progreso</p>
                                                     </div>
                                                 </label>
                                             </div>

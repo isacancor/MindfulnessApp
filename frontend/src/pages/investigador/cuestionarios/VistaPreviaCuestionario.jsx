@@ -21,15 +21,22 @@ const VistaPreviaCuestionario = () => {
             try {
                 const response = await api.get(`/cuestionario/${cuestionarioId}/`);
                 setCuestionario(response.data);
-                const respuestasIniciales = {};
-                response.data.preguntas.forEach(pregunta => {
-                    if (pregunta.tipo === 'checkbox') {
-                        respuestasIniciales[pregunta.id] = [];
-                    } else {
-                        respuestasIniciales[pregunta.id] = '';
-                    }
-                });
-                setRespuestas(respuestasIniciales);
+
+                // Solo inicializamos respuestas si no es un cuestionario Likert
+                if (response.data.tipo_cuestionario !== 'likert') {
+                    const respuestasIniciales = {};
+                    response.data.preguntas.forEach(pregunta => {
+                        if (pregunta.tipo === 'checkbox') {
+                            respuestasIniciales[pregunta.id] = [];
+                        } else {
+                            respuestasIniciales[pregunta.id] = '';
+                        }
+                    });
+                    setRespuestas(respuestasIniciales);
+                } else {
+                    // Para cuestionarios Likert, inicializamos un objeto vacío
+                    setRespuestas({});
+                }
             } catch (err) {
                 setError('Error al cargar el cuestionario');
                 console.error('Error:', err);
@@ -63,9 +70,12 @@ const VistaPreviaCuestionario = () => {
         setError('');
 
         try {
-            await api.post(`/cuestionario/${cuestionarioId}/respuestas/`, {
-                respuestas
-            });
+            // Si es un cuestionario Likert, enviamos las respuestas en el formato correcto
+            const respuestasAEnviar = cuestionario.tipo_cuestionario === 'likert'
+                ? { respuestas: Object.values(respuestas) }
+                : { respuestas };
+
+            await api.post(`/cuestionario/${cuestionarioId}/respuestas/`, respuestasAEnviar);
             navigate(`/programas/${id}`);
         } catch (err) {
             console.error('Error al enviar las respuestas:', err);
@@ -76,6 +86,50 @@ const VistaPreviaCuestionario = () => {
     };
 
     const renderPregunta = (pregunta) => {
+        // Si es un cuestionario Likert, renderizamos la tabla especial
+        if (cuestionario.tipo_cuestionario === 'likert') {
+            return (
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                            <tr>
+                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">
+                                    Pregunta
+                                </th>
+                                {pregunta.etiquetas.map((etiqueta, index) => (
+                                    <th key={index} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
+                                        {etiqueta}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {pregunta.textos.map((texto, index) => (
+                                <tr key={index}>
+                                    <td className="px-4 py-2">
+                                        <span className="text-gray-700">{texto}</span>
+                                    </td>
+                                    {Array.from({ length: 5 }, (_, i) => (
+                                        <td key={i} className="px-4 py-2 text-center">
+                                            <input
+                                                type="radio"
+                                                name={`likert-${index}`}
+                                                value={i + 1}
+                                                checked={respuestas[index] === i + 1}
+                                                onChange={(e) => handleRespuestaChange(index, parseInt(e.target.value))}
+                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                            />
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            );
+        }
+
+        // Para otros tipos de cuestionarios, mantenemos el renderizado original
         switch (pregunta.tipo) {
             case 'texto':
                 return (
@@ -147,42 +201,6 @@ const VistaPreviaCuestionario = () => {
                     </div>
                 );
 
-            case 'likert':
-                return (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    {Array.from({ length: pregunta.escala.fin - pregunta.escala.inicio + 1 }, (_, i) => (
-                                        <th key={i} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
-                                            {pregunta.escala.inicio + i}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    {pregunta.escala.etiquetas.map((etiqueta, index) => (
-                                        <td key={index} className="px-4 py-2 text-center">
-                                            <label className="flex flex-col items-center">
-                                                <input
-                                                    type="radio"
-                                                    name={`likert-${pregunta.id}`}
-                                                    value={pregunta.escala.inicio + index}
-                                                    checked={respuestas[pregunta.id] === pregunta.escala.inicio + index}
-                                                    onChange={(e) => handleRespuestaChange(pregunta.id, parseInt(e.target.value))}
-                                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                                                />
-                                                <span className="text-sm text-gray-500 mt-1">{etiqueta}</span>
-                                            </label>
-                                        </td>
-                                    ))}
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                );
-
             case 'likert-5-puntos':
                 return (
                     <div className="overflow-x-auto">
@@ -192,56 +210,31 @@ const VistaPreviaCuestionario = () => {
                                     <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">
                                         Pregunta
                                     </th>
-                                    {(
-                                        pregunta.likert5Puntos.tipo === 'acuerdo'
-                                            ? [
-                                                "Totalmente en desacuerdo",
-                                                "En desacuerdo",
-                                                "Ni de acuerdo ni en desacuerdo",
-                                                "De acuerdo",
-                                                "Totalmente de acuerdo"
-                                            ]
-                                            : [
-                                                "Nunca",
-                                                "Rara vez",
-                                                "A veces",
-                                                "Frecuentemente",
-                                                "Siempre"
-                                            ]
-                                    ).map((opcion, index) => (
+                                    {pregunta.etiquetas.map((etiqueta, index) => (
                                         <th key={index} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
-                                            {opcion}
+                                            {etiqueta}
                                         </th>
                                     ))}
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {pregunta.likert5Puntos.filas.map((fila, index) => (
-                                    <tr key={index}>
-                                        <td className="px-4 py-2">
-                                            <span className="text-gray-700">{fila}</span>
+                                <tr>
+                                    <td className="px-4 py-2">
+                                        <span className="text-gray-700">{pregunta.texto}</span>
+                                    </td>
+                                    {Array.from({ length: 5 }, (_, i) => (
+                                        <td key={i} className="px-4 py-2 text-center">
+                                            <input
+                                                type="radio"
+                                                name={`likert-${pregunta.id}`}
+                                                value={i + 1}
+                                                checked={respuestas[pregunta.id] === i + 1}
+                                                onChange={(e) => handleRespuestaChange(pregunta.id, parseInt(e.target.value))}
+                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                            />
                                         </td>
-                                        {Array.from({ length: 5 }, (_, i) => (
-                                            <td key={i} className="px-4 py-2 text-center">
-                                                <input
-                                                    type="radio"
-                                                    name={`likert-5-${pregunta.id}-${index}`}
-                                                    value={i + 1}
-                                                    checked={respuestas[pregunta.id]?.[index] === i + 1}
-                                                    onChange={(e) => {
-                                                        const nuevasRespuestas = { ...respuestas };
-                                                        if (!nuevasRespuestas[pregunta.id]) {
-                                                            nuevasRespuestas[pregunta.id] = {};
-                                                        }
-                                                        nuevasRespuestas[pregunta.id][index] = parseInt(e.target.value);
-                                                        setRespuestas(nuevasRespuestas);
-                                                    }}
-                                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
-                                                />
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))}
+                                    ))}
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -279,10 +272,14 @@ const VistaPreviaCuestionario = () => {
                         {/* Preguntas */}
                         <div className="space-y-8">
                             {cuestionario?.preguntas.map((pregunta, index) => (
-                                <div key={pregunta.id} className="border-2 border-indigo-100 rounded-lg p-6 bg-gradient-to-br from-white to-indigo-50">
+                                <div key={pregunta.id || index} className="border-2 border-indigo-100 rounded-lg p-6 bg-gradient-to-br from-white to-indigo-50">
                                     <div className="mb-4">
                                         <h3 className="text-lg font-medium text-gray-900">
-                                            {index + 1}. {pregunta.texto}
+                                            {cuestionario.tipo_cuestionario === 'likert' ? (
+                                                'Completa la siguiente escala Likert'
+                                            ) : (
+                                                `${index + 1}. ${pregunta.texto}`
+                                            )}
                                         </h3>
                                     </div>
                                     <div className="mt-4">

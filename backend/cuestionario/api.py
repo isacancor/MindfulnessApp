@@ -8,6 +8,7 @@ from .serializers import CuestionarioSerializer, RespuestaCuestionarioSerializer
 from programa.models import Programa
 from usuario.models import Participante
 from programa.models import InscripcionPrograma, EstadoInscripcion
+from config.enums import TipoCuestionario, MomentoCuestionario
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
@@ -34,17 +35,26 @@ def cuestionario_list(request, pk):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Verificar que no existe un cuestionario del mismo tipo
-        tipo = request.data.get('tipo')
-        if not tipo or tipo not in ['pre', 'post']:
+        # Verificar que no existe un cuestionario del mismo momento
+        momento = request.data.get('momento')
+
+        if not momento or momento not in [choice[0] for choice in MomentoCuestionario.choices]:
             return Response(
-                {'error': 'El tipo de cuestionario debe ser "pre" o "post"'},
+                {'error': 'El momento del cuestionario debe ser "pre" o "post"'},
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-        if Cuestionario.objects.filter(programa=programa, tipo=tipo).exists():
+        if Cuestionario.objects.filter(programa=programa, momento=momento).exists():
             return Response(
-                {'error': f'Ya existe un cuestionario {tipo} para este programa'},
+                {'error': f'Ya existe un cuestionario {momento} para este programa'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validar el tipo de cuestionario
+        tipo_cuestionario = request.data.get('tipo_cuestionario')
+        if not tipo_cuestionario or tipo_cuestionario not in [choice[0] for choice in TipoCuestionario.choices]:
+            return Response(
+                {'error': 'Tipo de cuestionario no válido'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -57,7 +67,7 @@ def cuestionario_list(request, pk):
             cuestionario = serializer.save()
             
             # Actualizar el programa con el cuestionario correspondiente
-            if tipo == 'pre':
+            if momento == 'pre':
                 programa.cuestionario_pre = cuestionario
             else:
                 programa.cuestionario_post = cuestionario
@@ -90,10 +100,11 @@ def cuestionario_detail(request, cuestionario_id):
                 status=status.HTTP_403_FORBIDDEN
             )
         
-        # Asegurarnos de que el programa no cambie
+        # Asegurarnos de que el programa y momento no cambien
         data = request.data.copy()
         data['programa'] = cuestionario.programa.id
-        data['tipo'] = cuestionario.tipo  # Mantener el tipo original
+        data['momento'] = cuestionario.momento
+        data['tipo_cuestionario'] = cuestionario.tipo_cuestionario
         
         serializer = CuestionarioSerializer(cuestionario, data=data)
         if serializer.is_valid():
@@ -276,11 +287,28 @@ def responder_cuestionario_pre(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Procesar las respuestas según el tipo de cuestionario
+        respuestas = request.data.get('respuestas', {})
+        
+        if cuestionario.tipo_cuestionario == 'likert':
+            # Para cuestionarios Likert, las respuestas vienen como un array
+            if not isinstance(respuestas, list) or len(respuestas) != len(cuestionario.preguntas[0]['textos']):
+                return Response(
+                    {'error': 'Formato de respuestas inválido para cuestionario Likert'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            # Validar que cada respuesta sea un número entre 1 y 5
+            if not all(isinstance(r, int) and 1 <= r <= 5 for r in respuestas):
+                return Response(
+                    {'error': 'Las respuestas deben ser números entre 1 y 5'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
         # Crear la respuesta
         data = {
             'cuestionario': cuestionario.id,
             'participante': request.user.perfil_participante.id,
-            'respuestas': request.data.get('respuestas', {})
+            'respuestas': respuestas
         }
 
         serializer = RespuestaCuestionarioSerializer(data=data)
@@ -341,11 +369,28 @@ def responder_cuestionario_post(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # Procesar las respuestas según el tipo de cuestionario
+        respuestas = request.data.get('respuestas', {})
+        
+        if cuestionario.tipo_cuestionario == 'likert':
+            # Para cuestionarios Likert, las respuestas vienen como un array
+            if not isinstance(respuestas, list) or len(respuestas) != len(cuestionario.preguntas[0]['textos']):
+                return Response(
+                    {'error': 'Formato de respuestas inválido para cuestionario Likert'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            # Validar que cada respuesta sea un número entre 1 y 5
+            if not all(isinstance(r, int) and 1 <= r <= 5 for r in respuestas):
+                return Response(
+                    {'error': 'Las respuestas deben ser números entre 1 y 5'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
         # Crear la respuesta
         data = {
             'cuestionario': cuestionario.id,
             'participante': request.user.perfil_participante.id,
-            'respuestas': request.data.get('respuestas', {})
+            'respuestas': respuestas
         }
 
         serializer = RespuestaCuestionarioSerializer(data=data)

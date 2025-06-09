@@ -199,7 +199,7 @@ class InscripcionPrograma(models.Model):
             elif self.programa.tiene_cuestionarios and sesiones_completadas == total_sesiones:
                 from cuestionario.models import RespuestaCuestionario
                 cuestionario_post_respondido = RespuestaCuestionario.objects.filter(
-                    usuario=usuario.usuario,
+                    participante=usuario,
                     cuestionario=self.programa.cuestionario_post
                 ).exists()
                 if cuestionario_post_respondido:

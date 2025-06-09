@@ -92,14 +92,17 @@ class Escala(models.TextChoices):
     BIENESTAR = 'bienestar', 'VAS (bienestar general) [0–10]'
 
 # Enums de Cuestionario
-class TipoCuestionario(models.TextChoices):
+class MomentoCuestionario(models.TextChoices):
     PRE = 'pre', 'Pre'
     POST = 'post', 'Post'
+
+class TipoCuestionario(models.TextChoices):
+    PERSONALIZADO = 'personalizado', 'Personalizado'
+    LIKERT = 'likert', 'Escala Likert'
+    PREDEFINIDO = 'predefinido', 'Predefinido'
 
 class TipoPregunta(models.TextChoices):
     TEXTO = 'texto', 'Texto Libre'
     SELECT = 'select', 'Selección Única'
     CHECKBOX = 'checkbox', 'Múltiple Opción'
     CALIFICACION = 'calificacion', 'Calificación'
-    LIKERT = 'likert', 'Escala Likert'
-    LIKERT_5_PUNTOS = 'likert_5_puntos', 'Escala Likert 5 Puntos'

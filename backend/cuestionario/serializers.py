@@ -1,61 +1,90 @@
 from rest_framework import serializers
 from .models import Cuestionario, RespuestaCuestionario
-from usuario.models import Participante
-from config.enums import TipoCuestionario, TipoPregunta
+from config.enums import TipoPregunta, TipoCuestionario
 
 class CuestionarioSerializer(serializers.ModelSerializer):
-    tipo_display = serializers.CharField(source='get_tipo_display', read_only=True)
+    momento_display = serializers.CharField(source='get_momento_display', read_only=True)
+    tipo_cuestionario_display = serializers.CharField(source='get_tipo_cuestionario_display', read_only=True)
 
     class Meta:
         model = Cuestionario
-        fields = ['id', 'programa', 'tipo', 'tipo_display', 'titulo', 'descripcion', 'preguntas', 'fecha_creacion', 'fecha_actualizacion']
+        fields = ['id', 'programa', 'momento', 'momento_display', 'tipo_cuestionario', 'tipo_cuestionario_display', 
+                 'titulo', 'descripcion', 'preguntas', 'fecha_creacion', 'fecha_actualizacion']
         read_only_fields = ['fecha_creacion', 'fecha_actualizacion']
 
-    def validate_preguntas(self, value):
-        if not isinstance(value, list):
+    def validate_preguntas(self, preguntas):
+        if not isinstance(preguntas, list):
             raise serializers.ValidationError("Las preguntas deben ser una lista")
-        
-        for pregunta in value:
+
+        tipo_cuestionario = self.context.get('tipo_cuestionario', self.initial_data.get('tipo_cuestionario'))
+
+        # Si es un cuestionario Likert, validamos el nuevo formato
+        if tipo_cuestionario == 'likert':
+            if len(preguntas) != 1:
+                raise serializers.ValidationError("Los cuestionarios Likert deben tener una sola pregunta con etiquetas y textos")
+            
+            pregunta = preguntas[0]
+            if not isinstance(pregunta, dict):
+                raise serializers.ValidationError("La pregunta Likert debe ser un objeto")
+            
+            if 'etiquetas' not in pregunta or 'textos' not in pregunta:
+                raise serializers.ValidationError("La pregunta Likert debe contener etiquetas y textos")
+            
+            if not isinstance(pregunta['etiquetas'], list) or len(pregunta['etiquetas']) != 5:
+                raise serializers.ValidationError("Las etiquetas deben ser una lista de 5 elementos")
+            
+            if not isinstance(pregunta['textos'], list) or len(pregunta['textos']) == 0:
+                raise serializers.ValidationError("Los textos deben ser una lista no vacía")
+            
+            return preguntas
+
+        # Para otros tipos de cuestionarios, mantenemos la validación original
+        for pregunta in preguntas:
             if not isinstance(pregunta, dict):
                 raise serializers.ValidationError("Cada pregunta debe ser un objeto")
             
-            required_fields = ['id', 'tipo', 'texto']
-            for field in required_fields:
-                if field not in pregunta:
-                    raise serializers.ValidationError(f"Falta el campo requerido: {field}")
+            if 'id' not in pregunta:
+                raise serializers.ValidationError("Falta el campo requerido: id")
             
-            # Validar que el tipo de pregunta sea válido
-            tipo = pregunta['tipo']
-            if tipo not in [choice[0] for choice in TipoPregunta.choices]:
-                raise serializers.ValidationError(f"Tipo de pregunta no válido: {tipo}")
+            if 'tipo' not in pregunta:
+                raise serializers.ValidationError("Falta el campo requerido: tipo")
             
-            # Validaciones específicas según el tipo de pregunta
-            if tipo in [TipoPregunta.SELECT, TipoPregunta.CHECKBOX]:
-                if 'opciones' not in pregunta or not isinstance(pregunta['opciones'], list):
-                    raise serializers.ValidationError(f"Las preguntas de tipo {tipo} deben tener opciones")
-            
-            elif tipo == TipoPregunta.LIKERT:
-                if 'escala' not in pregunta:
-                    raise serializers.ValidationError("Las preguntas Likert deben tener una escala")
-                escala = pregunta['escala']
-                if not all(k in escala for k in ['inicio', 'fin', 'etiquetas']):
-                    raise serializers.ValidationError("La escala Likert debe tener inicio, fin y etiquetas")
-            
-            elif tipo == TipoPregunta.LIKERT_5_PUNTOS:
-                if 'likert5Puntos' not in pregunta:
-                    raise serializers.ValidationError("Las preguntas Likert 5 puntos deben tener configuración")
-                likert5 = pregunta['likert5Puntos']
-                if not all(k in likert5 for k in ['tipo', 'filas']):
-                    raise serializers.ValidationError("La configuración Likert 5 puntos debe tener tipo y filas")
-            
-            elif tipo == TipoPregunta.CALIFICACION:
+            if 'texto' not in pregunta:
+                raise serializers.ValidationError("Falta el campo requerido: texto")
+
+            if pregunta['tipo'] not in [choice[0] for choice in TipoPregunta.choices]:
+                raise serializers.ValidationError(f"Tipo de pregunta inválido: {pregunta['tipo']}")
+
+            if pregunta['tipo'] in ['SELECT', 'CHECKBOX']:
+                if 'opciones' not in pregunta:
+                    raise serializers.ValidationError("Las preguntas de selección deben incluir opciones")
+                if not isinstance(pregunta['opciones'], list) or len(pregunta['opciones']) < 2:
+                    raise serializers.ValidationError("Debe haber al menos 2 opciones")
+
+            if pregunta['tipo'] == 'CALIFICACION':
                 if 'estrellas' not in pregunta:
-                    raise serializers.ValidationError("Las preguntas de calificación deben tener configuración de estrellas")
-                estrellas = pregunta['estrellas']
-                if not all(k in estrellas for k in ['cantidad', 'icono']):
-                    raise serializers.ValidationError("La configuración de calificación debe tener cantidad e icono")
-        
-        return value
+                    raise serializers.ValidationError("Las preguntas de calificación deben incluir configuración de estrellas")
+                if not isinstance(pregunta['estrellas'], dict):
+                    raise serializers.ValidationError("La configuración de estrellas debe ser un objeto")
+                if 'cantidad' not in pregunta['estrellas'] or 'icono' not in pregunta['estrellas']:
+                    raise serializers.ValidationError("La configuración de estrellas debe incluir cantidad e icono")
+
+        return preguntas
+
+    def validate(self, data):
+        tipo_cuestionario = data.get('tipo_cuestionario')
+        preguntas = data.get('preguntas', [])
+
+        if tipo_cuestionario == 'likert':
+            if len(preguntas) == 0:
+                raise serializers.ValidationError("El cuestionario Likert debe tener al menos una pregunta")
+            return data
+
+        # Para otros tipos de cuestionarios, mantenemos la validación original
+        if not preguntas:
+            raise serializers.ValidationError("El cuestionario debe tener al menos una pregunta")
+
+        return data
 
 class RespuestaCuestionarioSerializer(serializers.ModelSerializer):
     participante_nombre = serializers.SerializerMethodField()
@@ -82,4 +111,72 @@ class RespuestaCuestionarioSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "Este participante ya ha respondido este cuestionario"
             )
+
+        # Validar que las respuestas coincidan con las preguntas del cuestionario
+        cuestionario = data['cuestionario']
+        respuestas = data['respuestas']
+
+        # Si es un cuestionario Likert, validamos el formato especial
+        if cuestionario.tipo_cuestionario == 'likert':
+            if not isinstance(respuestas, list):
+                raise serializers.ValidationError("Las respuestas deben ser una lista para cuestionarios Likert")
+            
+            if len(respuestas) != len(cuestionario.preguntas[0]['textos']):
+                raise serializers.ValidationError(
+                    f"El número de respuestas ({len(respuestas)}) no coincide con el número de preguntas ({len(cuestionario.preguntas[0]['textos'])})"
+                )
+            
+            if not all(isinstance(r, int) and 1 <= r <= 5 for r in respuestas):
+                raise serializers.ValidationError("Todas las respuestas deben ser números entre 1 y 5")
+            
+            return data
+
+        # Para otros tipos de cuestionarios, mantenemos la validación original
+        preguntas = cuestionario.preguntas
+
+        for pregunta in preguntas:
+            pregunta_id = str(pregunta['id'])
+            if pregunta_id not in respuestas:
+                raise serializers.ValidationError(
+                    f"Falta la respuesta para la pregunta {pregunta_id}"
+                )
+
+            respuesta = respuestas[pregunta_id]
+            tipo = pregunta['tipo']
+
+            # Validar el tipo de respuesta según el tipo de pregunta
+            if tipo == TipoPregunta.TEXTO:
+                if not isinstance(respuesta, str):
+                    raise serializers.ValidationError(
+                        f"La respuesta para la pregunta {pregunta_id} debe ser texto"
+                    )
+            elif tipo in [TipoPregunta.SELECT, TipoPregunta.CHECKBOX]:
+                if tipo == TipoPregunta.SELECT:
+                    if not isinstance(respuesta, str):
+                        raise serializers.ValidationError(
+                            f"La respuesta para la pregunta {pregunta_id} debe ser una opción válida"
+                        )
+                    if respuesta not in pregunta['opciones']:
+                        raise serializers.ValidationError(
+                            f"La respuesta para la pregunta {pregunta_id} no es una opción válida"
+                        )
+                else:  # CHECKBOX
+                    if not isinstance(respuesta, list):
+                        raise serializers.ValidationError(
+                            f"La respuesta para la pregunta {pregunta_id} debe ser una lista de opciones"
+                        )
+                    if not all(opcion in pregunta['opciones'] for opcion in respuesta):
+                        raise serializers.ValidationError(
+                            f"La respuesta para la pregunta {pregunta_id} contiene opciones no válidas"
+                        )
+            elif tipo == TipoPregunta.CALIFICACION:
+                if not isinstance(respuesta, (int, float)):
+                    raise serializers.ValidationError(
+                        f"La respuesta para la pregunta {pregunta_id} debe ser un número"
+                    )
+                if not 1 <= respuesta <= pregunta['estrellas']['cantidad']:
+                    raise serializers.ValidationError(
+                        f"La respuesta para la pregunta {pregunta_id} debe estar entre 1 y {pregunta['estrellas']['cantidad']}"
+                    )
+
         return data

@@ -17,7 +17,7 @@ export const renderDiariosPorSesion = (diarios) => (
                     <thead className="bg-gray-50">
                         <tr>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Participante
+                                ID Participante
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Valoración
@@ -87,7 +87,7 @@ export const renderTodosLosDiarios = (diarios) => {
                                 Tipo de Práctica
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Participante
+                                ID Participante
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Valoración
@@ -184,7 +184,7 @@ export const renderDiariosPorParticipante = (diarios) => {
                     <thead className="bg-gray-50">
                         <tr>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Participante
+                                ID Participante
                             </th>
                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Valoración Promedio

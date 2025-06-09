@@ -14,7 +14,7 @@ const Analisis = () => {
     const [pre, setPre] = useState(null);
     const [post, setPost] = useState(null);
     const [diarios, setDiarios] = useState(null);
-    const [vistaDiarios, setVistaDiarios] = useState('por_sesion'); // 'por_sesion', 'todos', o 'por_participante'
+    const [vistaDiarios, setVistaDiarios] = useState('todos'); // 'por_sesion', 'todos', o 'por_participante'
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     //const [tipoGrafico, setTipoGrafico] = useState('barras');
@@ -127,7 +127,7 @@ const Analisis = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-xl shadow-md p-6">
-                                <h2 className="text-lg font-semibold text-gray-800 mb-4">Programas</h2>
+                                <h2 className="text-lg font-semibold text-gray-800 mb-4">Selecciona un programa</h2>
                                 <div className="space-y-2">
                                     {programas.map((programa) => (
                                         <button
@@ -381,7 +381,7 @@ const Analisis = () => {
                                                                             ? 'bg-yellow-100 text-yellow-800'
                                                                             : 'bg-red-100 text-red-800'
                                                                         }`}>
-                                                                        {progreso.estado}
+                                                                        {progreso.estado_inscripcion_display}
                                                                     </span>
                                                                 </td>
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -509,16 +509,6 @@ const Analisis = () => {
                         <h2 className="text-xl font-bold text-gray-800">Diarios de Sesión</h2>
                         <div className="flex space-x-2">
                             <button
-                                onClick={() => setVistaDiarios('por_sesion')}
-                                className={`p-2 rounded-lg flex items-center space-x-2 ${vistaDiarios === 'por_sesion'
-                                    ? 'bg-indigo-100 text-indigo-700'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                    }`}
-                            >
-                                <List className="h-5 w-5" />
-                                <span>Agrupar por Semana</span>
-                            </button>
-                            <button
                                 onClick={() => setVistaDiarios('todos')}
                                 className={`p-2 rounded-lg flex items-center space-x-2 ${vistaDiarios === 'todos'
                                     ? 'bg-indigo-100 text-indigo-700'
@@ -527,6 +517,16 @@ const Analisis = () => {
                             >
                                 <Table className="h-5 w-5" />
                                 <span>Todos</span>
+                            </button>
+                            <button
+                                onClick={() => setVistaDiarios('por_sesion')}
+                                className={`p-2 rounded-lg flex items-center space-x-2 ${vistaDiarios === 'por_sesion'
+                                    ? 'bg-indigo-100 text-indigo-700'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    }`}
+                            >
+                                <List className="h-5 w-5" />
+                                <span>Por Semana</span>
                             </button>
                             <button
                                 onClick={() => setVistaDiarios('por_participante')}

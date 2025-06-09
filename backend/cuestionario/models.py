@@ -3,7 +3,7 @@ from programa.models import Programa
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from usuario.models import Participante
-from config.enums import TipoCuestionario
+from config.enums import MomentoCuestionario, TipoCuestionario
 
 class Cuestionario(models.Model):
     programa = models.ForeignKey(
@@ -12,10 +12,15 @@ class Cuestionario(models.Model):
         related_name='cuestionarios',
         db_column='programa_id'
     )
-    tipo = models.CharField(
-        max_length=10, 
+    momento = models.CharField(
+        max_length=50,
+        choices=MomentoCuestionario.choices,
+        default=MomentoCuestionario.PRE
+    )
+    tipo_cuestionario = models.CharField(
+        max_length=50,
         choices=TipoCuestionario.choices,
-        default=TipoCuestionario.PRE
+        default=TipoCuestionario.PERSONALIZADO
     )
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField(default='Sin descripción')
@@ -24,10 +29,10 @@ class Cuestionario(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     def clean(self):
-        # Verificar que no exista otro cuestionario del mismo tipo para este programa
-        if Cuestionario.objects.filter(programa=self.programa, tipo=self.tipo).exclude(pk=self.pk).exists():
+        # Verificar que no exista otro cuestionario del mismo momento para este programa
+        if Cuestionario.objects.filter(programa=self.programa, momento=self.momento).exclude(pk=self.pk).exists():
             raise ValidationError(
-                f'Ya existe un cuestionario del tipo {self.get_tipo_display()} para este programa'
+                f'Ya existe un cuestionario del momento {self.get_momento_display()} para este programa'
             )
 
     def save(self, *args, **kwargs):
@@ -35,16 +40,19 @@ class Cuestionario(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
-        unique_together = ['programa', 'tipo']
+        unique_together = ['programa', 'momento']
         verbose_name = 'Cuestionario'
         verbose_name_plural = 'Cuestionarios'
         db_table = 'cuestionario_cuestionario'
 
     def __str__(self):
-        return f"{self.titulo} - {self.get_tipo_display()}"
+        return f"{self.titulo} - {self.get_momento_display()}"
 
-    def get_tipo_display(self):
-        return dict(TipoCuestionario.choices).get(self.tipo, self.tipo)
+    def get_momento_display(self):
+        return dict(MomentoCuestionario.choices).get(self.momento, self.momento)
+
+    def get_tipo_cuestionario_display(self):
+        return dict(TipoCuestionario.choices).get(self.tipo_cuestionario, self.tipo_cuestionario)
 
 class RespuestaCuestionario(models.Model):
     cuestionario = models.ForeignKey(

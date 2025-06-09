@@ -712,7 +712,8 @@ def run():
     # Cuestionario Pre para programa5
     cuestionario_pre_programa5 = Cuestionario.objects.create(
         programa=programa5,
-        tipo='pre',
+        momento='pre',
+        tipo_cuestionario='personalizado',
         titulo=f'Evaluación Inicial - {programa5.nombre}',
         descripcion='Cuestionario para evaluar el estado inicial antes de comenzar el programa',
         preguntas=preguntas_programa5_pre
@@ -721,7 +722,8 @@ def run():
     # Cuestionario Post para programa5
     cuestionario_post_programa5 = Cuestionario.objects.create(
         programa=programa5,
-        tipo='post',
+        momento='post',
+        tipo_cuestionario='personalizado',
         titulo=f'Evaluación Final - {programa5.nombre}',
         descripcion='Cuestionario para evaluar la experiencia con el programa',
         preguntas=preguntas_programa5_post
@@ -773,7 +775,8 @@ def run():
         # Cuestionario Pre
         cuestionario_pre = Cuestionario.objects.create(
             programa=programa,
-            tipo='pre',
+            momento='pre',
+            tipo_cuestionario='personalizado',
             titulo=f'Evaluación Inicial - {programa.nombre}',
             descripcion='Cuestionario para evaluar el estado inicial antes de comenzar el programa',
             preguntas=preguntas_base
@@ -782,7 +785,8 @@ def run():
         # Cuestionario Post
         cuestionario_post = Cuestionario.objects.create(
             programa=programa,
-            tipo='post',
+            momento='post',
+            tipo_cuestionario='personalizado',
             titulo=f'Evaluación Final - {programa.nombre}',
             descripcion='Cuestionario para evaluar el progreso después de completar el programa',
             preguntas=preguntas_base

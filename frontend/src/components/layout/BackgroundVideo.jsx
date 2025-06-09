@@ -6,7 +6,7 @@ const BackgroundVideo = ({ videoSrc, children }) => {
     useEffect(() => {
         if (videoRef.current) {
             videoRef.current.play().catch(error => {
-                console.log("Error al reproducir el video:", error);
+                console.error("Error al reproducir el video:", error);
             });
         }
     }, []);

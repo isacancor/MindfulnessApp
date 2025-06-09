@@ -3,8 +3,8 @@ from .models import Cuestionario, RespuestaCuestionario
 
 @admin.register(Cuestionario)
 class CuestionarioAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'programa', 'tipo', 'fecha_creacion')
-    list_filter = ('tipo', 'programa')
+    list_display = ('titulo', 'programa', 'momento', 'fecha_creacion')
+    list_filter = ('momento', 'programa')
     search_fields = ('titulo', 'descripcion')
     readonly_fields = ('fecha_creacion', 'fecha_actualizacion')
 

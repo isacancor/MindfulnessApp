@@ -54,8 +54,8 @@ def programa_detail(request, pk):
             )
         
         if request.data.get('estado') == 'publicado':
-            tiene_pre = Cuestionario.objects.filter(programa=programa, tipo='pre').exists()
-            tiene_post = Cuestionario.objects.filter(programa=programa, tipo='post').exists()
+            tiene_pre = Cuestionario.objects.filter(programa=programa, momento='pre').exists()
+            tiene_post = Cuestionario.objects.filter(programa=programa, momento='post').exists()
             
             if not (tiene_pre and tiene_post):
                 return Response(

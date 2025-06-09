@@ -8,6 +8,7 @@ from django.db.models import Count, Q
 from ..models import Programa, InscripcionPrograma
 from sesion.models import DiarioSesion
 from cuestionario.models import RespuestaCuestionario
+from config.enums import EstadoInscripcion
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsInvestigador])
@@ -248,6 +249,7 @@ def programa_estadisticas_progreso(request, pk):
                         cuestionarios_completados += 1
                 
                 estado = inscripcion.estado_inscripcion
+                estado_inscripcion_display = str(dict(EstadoInscripcion.choices).get(estado, estado))
                 
                 ultima_actividad = None
                 ultimo_diario = DiarioSesion.objects.filter(
@@ -269,6 +271,7 @@ def programa_estadisticas_progreso(request, pk):
                 
                 progreso_participantes[id_anonimo] = {
                     'estado': estado,
+                    'estado_inscripcion_display': estado_inscripcion_display,
                     'sesiones_completadas': sesiones_completadas,
                     'total_sesiones': total_sesiones,
                     'cuestionarios_completados': cuestionarios_completados,
