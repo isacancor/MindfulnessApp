@@ -94,7 +94,7 @@ const ExplorarProgramas = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
             <div className="max-w-7xl mx-auto">
                 <PageHeader
                     title="Explora nuestros programas"
@@ -142,8 +142,8 @@ const ExplorarProgramas = () => {
                                                 Por {programa.creado_por.nombre_completo_investigador}
                                             </p>
                                         </div>
-                                        <span className="inline-flex items-center px-2 py-1 md:px-3 md:py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            {programa.tipo_contexto}
+                                        <span className="inline-flex items-center px-2 py-1 md:px-3 md:py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {programa.tipo_contexto_display}
                                         </span>
                                     </div>
 

@@ -97,6 +97,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         required=False,
         allow_blank=True
     )
+    aceptaTerminos = serializers.BooleanField(required=True)
     
     # Campos específicos de investigador
     experienciaInvestigacion = serializers.ChoiceField(
@@ -120,7 +121,7 @@ class RegisterSerializer(serializers.ModelSerializer):
                  'telefono', 'genero', 'fechaNacimiento', 'ubicacion', 
                  'experienciaInvestigacion', 'experienciaMindfulness',
                  'ocupacion', 'nivelEducativo',  
-                 'areasInteres', 'condicionesSalud', 'role')
+                 'areasInteres', 'condicionesSalud', 'role', 'aceptaTerminos')
 
     def validate(self, attrs):
         try:
@@ -128,6 +129,8 @@ class RegisterSerializer(serializers.ModelSerializer):
         except ValidationError as e:
             raise serializers.ValidationError({"password": list(e.messages)})
         
+        if not attrs.get('aceptaTerminos'):
+            raise serializers.ValidationError({"aceptaTerminos": ["Debes aceptar los términos y condiciones para registrarte."]})
 
         return attrs
 

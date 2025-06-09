@@ -48,6 +48,7 @@ class Usuario(AbstractUser):
         choices=RoleUsuario.choices,
         default=RoleUsuario.PARTICIPANTE
     )
+    aceptaTerminos = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now, editable=False)
     first_name = None
     last_name = None

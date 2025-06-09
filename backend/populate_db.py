@@ -347,7 +347,7 @@ def run():
     programa_jon = Programa.objects.create(
         nombre="MBSR Avanzado",
         descripcion="Programa avanzado de Reducción del Estrés Basado en Mindfulness (MBSR) para practicantes experimentados.",
-        tipo_contexto="clínico/terapéutico",
+        tipo_contexto="clínico",
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Practicantes de mindfulness con experiencia previa",
         duracion_semanas=12,
@@ -475,7 +475,7 @@ def run():
     programa3 = Programa.objects.create(
         nombre="MBSR Clásico",
         descripcion="Programa original de Reducción del Estrés Basado en Mindfulness (MBSR) de 8 semanas.",
-        tipo_contexto="clínico/terapéutico",
+        tipo_contexto="clínico",
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Personas con estrés crónico o ansiedad",
         duracion_semanas=8,
@@ -568,7 +568,7 @@ def run():
     programa4 = Programa.objects.create(
         nombre="Mindfulness para la Salud",
         descripcion="Programa de 2 semanas para mejorar la salud física y mental",
-        tipo_contexto="clínico/terapéutico",
+        tipo_contexto="clínico",
         enfoque_metodologico="MBSR",
         poblacion_objetivo="Personas con problemas de salud crónicos",
         duracion_semanas=2,

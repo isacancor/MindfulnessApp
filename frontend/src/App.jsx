@@ -32,6 +32,8 @@ import ProgramaCompletado from './pages/participante/programas/completados/PDeta
 import Analisis from './pages/investigador/Analisis';
 import Exportar from './pages/investigador/Exportar';
 import TerminosPrograma from './pages/TerminosPrograma';
+import TerminosServicio from './pages/TerminosServicio';
+import About from './pages/About';
 
 function App() {
   return (
@@ -45,7 +47,8 @@ function App() {
         <Route path="/register/participante" element={<RegisterParticipante />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/terminos-programa" element={<TerminosPrograma />} />
-
+        <Route path="/terminos-servicio" element={<TerminosServicio />} />
+        <Route path="/about" element={<About />} />
         <Route path="/perfil" element={<Perfil />} />
 
         {/* Rutas protegidas para investigadores */}

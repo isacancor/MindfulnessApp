@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft, Users, LinkIcon } from 'lucide-react';
 import ErrorAlert from '../../components/ErrorAlert';
 import { Genero, NivelEducativo, ExperienciaMindfulness } from '../../constants/enums';
 import BackgroundVideo from '../../components/layout/BackgroundVideo';
@@ -23,10 +23,12 @@ const RegisterParticipante = () => {
         condicionesSalud: '',
         telefono: '',
         ubicacion: '',
-        role: 'PARTICIPANTE'
+        role: 'PARTICIPANTE',
+        aceptaTerminos: false
     });
 
     const [errorEdad, setErrorEdad] = useState('');
+    const [errorTerminos, setErrorTerminos] = useState('');
 
     const validarEdad = (fechaNacimiento) => {
         const hoy = new Date();
@@ -61,6 +63,10 @@ const RegisterParticipante = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (errorEdad) {
+            return;
+        }
+        if (!formData.aceptaTerminos) {
+            setErrorTerminos('Debes aceptar los términos y condiciones para continuar');
             return;
         }
         await register(formData);
@@ -374,24 +380,57 @@ const RegisterParticipante = () => {
                                             disabled={loading}
                                         />
                                     </div>
-                                </div>
 
-                                <div className="pt-4">
-                                    <button
-                                        type="submit"
-                                        disabled={loading}
-                                        className={`w-full py-3 px-4 rounded-lg font-medium text-white shadow-md transition duration-200 ${loading ? 'bg-emerald-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'}`}
-                                    >
-                                        {loading ? (
-                                            <span className="flex items-center justify-center">
-                                                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                                Registrando...
-                                            </span>
-                                        ) : 'Registrarme como Participante'}
-                                    </button>
+                                    <div className="md:col-span-2 mt-6">
+                                        <div className="flex items-start space-x-3">
+                                            <input
+                                                type="checkbox"
+                                                id="aceptaTerminos"
+                                                name="aceptaTerminos"
+                                                checked={formData.aceptaTerminos}
+                                                onChange={(e) => {
+                                                    setFormData({
+                                                        ...formData,
+                                                        aceptaTerminos: e.target.checked
+                                                    });
+                                                    if (e.target.checked) {
+                                                        setErrorTerminos('');
+                                                    }
+                                                }}
+                                                className="mt-1 h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                                            />
+                                            <div>
+                                                <label htmlFor="aceptaTerminos" className="text-sm text-gray-900 font-medium">
+                                                    Acepto los términos, condiciones y el consentimiento informado *
+                                                </label>
+                                                <p className="text-sm text-gray-500 mt-1">
+                                                    Al registrarme, confirmo que he leído y acepto los términos y condiciones, y doy mi consentimiento informado para participar en la plataforma.
+                                                </p>
+                                                <Link
+                                                    to="/terminos-servicio"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center text-sm text-emerald-600 hover:text-emerald-500 mt-2"
+                                                >
+                                                    <LinkIcon className="h-4 w-4 mr-1" />
+                                                    Ver términos y condiciones completos
+                                                </Link>
+                                                {errorTerminos && (
+                                                    <p className="mt-1 text-sm text-red-600">{errorTerminos}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="md:col-span-2 mt-6">
+                                        <button
+                                            type="submit"
+                                            disabled={loading}
+                                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:bg-emerald-400"
+                                        >
+                                            {loading ? 'Registrando...' : 'Registrarse'}
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
 

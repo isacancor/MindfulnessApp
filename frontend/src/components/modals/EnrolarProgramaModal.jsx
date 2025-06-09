@@ -32,7 +32,7 @@ const EnrolarProgramaModal = ({ isOpen, onClose, onConfirm, programa }) => {
                     <Calendar className="h-5 w-5 text-indigo-600 mt-1 mr-3" />
                     <div>
                         <p className="text-sm text-gray-500">Tipo de Contexto</p>
-                        <p className="text-gray-900">{programa.tipo_contexto}</p>
+                        <p className="text-gray-900">{programa.tipo_contexto_display}</p>
                     </div>
                 </div>
 
