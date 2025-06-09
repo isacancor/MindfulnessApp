@@ -26,6 +26,27 @@ const getFileExtension = (formato) => {
 };
 
 /**
+ * Obtiene el nombre del archivo según el tipo de datos y formato
+ * @param {number} programaId - ID del programa
+ * @param {string} tipo - Tipo de datos
+ * @param {string} formato - Formato del archivo
+ * @returns {string} Nombre del archivo
+ */
+const getFileName = (programaId, tipo, formato) => {
+    const extension = getFileExtension(formato);
+    const fecha = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    const nombresArchivo = {
+        'participantes': `participantes_programa_${programaId}_${fecha}`,
+        'diarios': `diarios_sesiones_programa_${programaId}_${fecha}`,
+        'cuestionario_pre': `cuestionario_previo_programa_${programaId}_${fecha}`,
+        'cuestionario_post': `cuestionario_posterior_programa_${programaId}_${fecha}`
+    };
+
+    return `${nombresArchivo[tipo]}.${extension}`;
+};
+
+/**
  * Exporta los cuestionarios de un programa
  * @param {number} programaId - ID del programa
  * @param {string} formato - Formato de exportación
@@ -37,14 +58,14 @@ const exportarCuestionarios = async (programaId, formato) => {
         {
             params: {
                 tipo: 'cuestionarios',
+                subtipo: 'pre',
                 formato: formato
             },
             responseType: 'blob'
         }
     );
 
-    const extension = getFileExtension(formato);
-    downloadFile(responsePre.data, `cuestionario_pre_${programaId}.${extension}`);
+    downloadFile(responsePre.data, getFileName(programaId, 'cuestionario_pre', formato));
 
     // Descargar cuestionario post
     const responsePost = await api.get(
@@ -52,13 +73,14 @@ const exportarCuestionarios = async (programaId, formato) => {
         {
             params: {
                 tipo: 'cuestionarios',
+                subtipo: 'post',
                 formato: formato
             },
             responseType: 'blob'
         }
     );
 
-    downloadFile(responsePost.data, `cuestionario_post_${programaId}.${extension}`);
+    downloadFile(responsePost.data, getFileName(programaId, 'cuestionario_post', formato));
 };
 
 /**
@@ -78,8 +100,23 @@ const exportarDiarios = async (programaId, formato) => {
         }
     );
 
-    const extension = getFileExtension(formato);
-    downloadFile(response.data, `diarios_programa_${programaId}.${extension}`);
+    downloadFile(response.data, getFileName(programaId, 'diarios', formato));
+};
+
+/**
+ * Exporta todos los datos de un programa
+ * @param {number} programaId - ID del programa
+ * @param {string} formato - Formato de exportación
+ */
+const exportarTodosLosDatos = async (programaId, formato) => {
+    // Exportar participantes
+    await exportarDatosGenerales(programaId, 'participantes', formato);
+
+    // Exportar diarios
+    await exportarDiarios(programaId, formato);
+
+    // Exportar cuestionarios
+    await exportarCuestionarios(programaId, formato);
 };
 
 /**
@@ -89,6 +126,11 @@ const exportarDiarios = async (programaId, formato) => {
  * @param {string} formato - Formato de exportación
  */
 const exportarDatosGenerales = async (programaId, tipoExportacion, formato) => {
+    if (tipoExportacion === 'todos') {
+        await exportarTodosLosDatos(programaId, formato);
+        return;
+    }
+
     const response = await api.get(
         `/programas/${programaId}/exportar/`,
         {
@@ -100,12 +142,12 @@ const exportarDatosGenerales = async (programaId, tipoExportacion, formato) => {
         }
     );
 
-    const extension = getFileExtension(formato);
-    downloadFile(response.data, `programa_${programaId}_datos.${extension}`);
+    downloadFile(response.data, getFileName(programaId, tipoExportacion, formato));
 };
 
 export {
     exportarCuestionarios,
     exportarDiarios,
-    exportarDatosGenerales
+    exportarDatosGenerales,
+    exportarTodosLosDatos
 }; 

@@ -31,6 +31,7 @@ class Sesion(models.Model):
     contenido_url = models.URLField(blank=True, null=True, help_text="URL para contenido externo o cargado")
     contenido_audio = models.FileField(upload_to='audio/', blank=True, null=True, help_text="Archivo de audio")
     contenido_video = models.FileField(upload_to='video/', blank=True, null=True, help_text="Archivo de video")
+    video_fondo = models.CharField(max_length=100, blank=True, null=True, help_text="Nombre del video de fondo para el temporizador")
     
     class Meta:
         ordering = ['programa', 'semana']

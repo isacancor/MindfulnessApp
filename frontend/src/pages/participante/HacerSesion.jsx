@@ -6,6 +6,7 @@ import DiarioForm from '../../components/DiarioForm';
 import ErrorAlert from '../../components/ErrorAlert';
 import MobileNavBar from '../../components/layout/MobileNavBar';
 import PageHeader from '../../components/layout/PageHeader';
+import BackgroundVideo from '../../components/layout/BackgroundVideo';
 
 const HacerSesion = ({ completado }) => {
     const navigate = useNavigate();
@@ -115,6 +116,12 @@ const HacerSesion = ({ completado }) => {
         await handleDiarioCompletado();
     };
 
+    const reiniciarSesion = () => {
+        setTiempoRestante(tiempoOriginal);
+        setCompletada(false);
+        setTemporizadorActivo(false);
+    };
+
     const handleDiarioCompletado = async () => {
         setDiarioCompletado(true);
         setMostrarDiario(false);
@@ -165,102 +172,238 @@ const HacerSesion = ({ completado }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
-            <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100">
-                    <PageHeader
-                        title={sesion.titulo}
-                        subtitle={sesion.descripcion}
-                        className="mb-6"
-                    />
+        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10 flex items-center justify-center">
+            {sesion?.tipo_contenido === 'temporizador' && sesion?.video_fondo ? (
+                <BackgroundVideo videoSrc={`/videos/${sesion.video_fondo}`}>
+                    <div className="w-full max-w-4xl mx-auto flex items-center justify-center min-h-[calc(100vh-4rem)]">
+                        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100 w-full">
+                            <PageHeader
+                                title={sesion.titulo}
+                                subtitle={sesion.descripcion}
+                                className="mb-6"
+                            />
 
-                    {sesion.tipo_contenido === 'temporizador' && !esSesionCompletada && (
-                        <div className="flex items-center justify-center text-gray-600 mb-8">
-                            <Clock className="h-6 w-6 mr-2 text-indigo-600" />
-                            <span className="font-medium text-lg">{formatTime(tiempoOriginal)}</span>
-                        </div>
-                    )}
-
-                    <ErrorAlert
-                        message={error}
-                        onClose={() => setError(null)}
-                    />
-
-                    <div className="space-y-8">
-                        {sesion.tipo_contenido === 'temporizador' && (
-                            <div className="text-center p-8 rounded-xl">
-                                <div className="text-6xl font-bold text-indigo-600 mb-6 font-mono">
-                                    {formatTime(tiempoRestante)}
+                            {sesion.tipo_contenido === 'temporizador' && !esSesionCompletada && (
+                                <div className="flex items-center justify-center text-gray-600 mb-8">
+                                    <Clock className="h-6 w-6 mr-2 text-indigo-600" />
+                                    <span className="font-medium text-lg">{formatTime(tiempoOriginal)}</span>
                                 </div>
-                                <button
-                                    onClick={() => setTemporizadorActivo(!temporizadorActivo)}
-                                    disabled={completada}
-                                    className={`px-8 py-4 rounded-xl text-white font-medium text-lg transition-all duration-300 transform hover:scale-105 ${temporizadorActivo
-                                        ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
-                                        : completada
-                                            ? 'bg-gray-400 cursor-not-allowed'
-                                            : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600'
-                                        } shadow-lg hover:shadow-xl`}
-                                >
-                                    {temporizadorActivo ? 'Pausar' : completada ? 'Completado' : 'Iniciar'}
-                                </button>
-                            </div>
-                        )}
+                            )}
 
-                        {sesion.tipo_contenido === 'enlace' && (
-                            <div className="text-center p-8 rounded-xl">
-                                <a
-                                    href={sesion.contenido_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-white bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                                >
-                                    Abrir enlace
-                                    <ExternalLink className="ml-2 h-5 w-5" />
-                                </a>
-                            </div>
-                        )}
+                            <ErrorAlert
+                                message={error}
+                                onClose={() => setError(null)}
+                            />
 
-                        {sesion.tipo_contenido === 'video' && (
-                            <div className="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-lg">
-                                <video
-                                    src={getMediaUrl(sesion.contenido_video)}
-                                    controls
-                                    className="w-full h-full object-contain"
-                                />
-                            </div>
-                        )}
+                            <div className="space-y-8">
+                                {sesion.tipo_contenido === 'temporizador' && (
+                                    <div className="text-center p-8 rounded-xl">
+                                        <div className="text-6xl font-bold text-indigo-600 mb-6 font-mono">
+                                            {formatTime(tiempoRestante)}
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                            <button
+                                                onClick={() => setTemporizadorActivo(!temporizadorActivo)}
+                                                disabled={completada}
+                                                className={`px-8 py-4 rounded-xl text-white font-medium text-lg transition-all duration-300 transform hover:scale-105 ${temporizadorActivo
+                                                    ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
+                                                    : completada
+                                                        ? 'bg-gray-400 cursor-not-allowed'
+                                                        : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600'
+                                                    } shadow-lg hover:shadow-xl`}
+                                            >
+                                                {temporizadorActivo ? 'Pausar' : completada ? 'Completado' : 'Iniciar'}
+                                            </button>
+                                            {!completada && !temporizadorActivo && (
+                                                <button
+                                                    onClick={() => setCompletada(true)}
+                                                    className="px-8 py-4 rounded-xl text-white font-medium text-lg transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 shadow-lg hover:shadow-xl"
+                                                >
+                                                    Saltar
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
 
-                        {sesion.tipo_contenido === 'audio' && (
-                            <div className="p-8 rounded-xl">
-                                <audio
-                                    src={getMediaUrl(sesion.contenido_audio)}
-                                    controls
-                                    className="w-full"
-                                />
+                                {sesion.tipo_contenido === 'enlace' && (
+                                    <div className="text-center p-8 rounded-xl">
+                                        <a
+                                            href={sesion.contenido_url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-white bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                                        >
+                                            Abrir enlace
+                                            <ExternalLink className="ml-2 h-5 w-5" />
+                                        </a>
+                                    </div>
+                                )}
+
+                                {sesion.tipo_contenido === 'video' && (
+                                    <div className="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-lg">
+                                        <video
+                                            src={getMediaUrl(sesion.contenido_video)}
+                                            controls
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                )}
+
+                                {sesion.tipo_contenido === 'audio' && (
+                                    <div className="p-8 rounded-xl">
+                                        <audio
+                                            src={getMediaUrl(sesion.contenido_audio)}
+                                            controls
+                                            className="w-full"
+                                        />
+                                    </div>
+                                )}
                             </div>
-                        )}
+
+                            <div className="flex justify-center mt-12">
+                                {!esSesionCompletada && (
+                                    <button
+                                        onClick={marcarComoCompletada}
+                                        disabled={sesion.tipo_contenido === 'temporizador' && !completada}
+                                        className={`inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl transition-all duration-300 transform hover:scale-105 ${sesion.tipo_contenido === 'temporizador' && !completada
+                                            ? 'bg-gray-400 cursor-not-allowed text-white'
+                                            : diarioCompletado
+                                                ? 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white shadow-lg hover:shadow-xl'
+                                                : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 text-white shadow-lg hover:shadow-xl'
+                                            }`}
+                                    >
+                                        <CheckCircle2 className="h-6 w-6 mr-2" />
+                                        {diarioCompletado ? 'Volver al programa' : 'Marcar como completada'}
+                                    </button>
+                                )}
+                                {esSesionCompletada && sesion.tipo_contenido === 'temporizador' && (
+                                    <button
+                                        onClick={reiniciarSesion}
+                                        className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                                    >
+                                        Repetir sesión
+                                    </button>
+                                )}
+                            </div>
+                        </div>
                     </div>
+                </BackgroundVideo>
+            ) : (
+                <div className="w-full max-w-4xl mx-auto flex items-center justify-center min-h-[calc(100vh-4rem)]">
+                    <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100 w-full">
+                        <PageHeader
+                            title={sesion.titulo}
+                            subtitle={sesion.descripcion}
+                            className="mb-6"
+                        />
 
-                    <div className="flex justify-center mt-12">
-                        {!esSesionCompletada && (
-                            <button
-                                onClick={marcarComoCompletada}
-                                disabled={sesion.tipo_contenido === 'temporizador' && !completada}
-                                className={`inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl transition-all duration-300 transform hover:scale-105 ${sesion.tipo_contenido === 'temporizador' && !completada
-                                    ? 'bg-gray-400 cursor-not-allowed text-white'
-                                    : diarioCompletado
-                                        ? 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white shadow-lg hover:shadow-xl'
-                                        : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 text-white shadow-lg hover:shadow-xl'
-                                    }`}
-                            >
-                                <CheckCircle2 className="h-6 w-6 mr-2" />
-                                {diarioCompletado ? 'Volver al programa' : 'Marcar como completada'}
-                            </button>
+                        {sesion.tipo_contenido === 'temporizador' && !esSesionCompletada && (
+                            <div className="flex items-center justify-center text-gray-600 mb-8">
+                                <Clock className="h-6 w-6 mr-2 text-indigo-600" />
+                                <span className="font-medium text-lg">{formatTime(tiempoOriginal)}</span>
+                            </div>
                         )}
+
+                        <ErrorAlert
+                            message={error}
+                            onClose={() => setError(null)}
+                        />
+
+                        <div className="space-y-8">
+                            {sesion.tipo_contenido === 'temporizador' && (
+                                <div className="text-center p-8 rounded-xl">
+                                    <div className="text-6xl font-bold text-indigo-600 mb-6 font-mono">
+                                        {formatTime(tiempoRestante)}
+                                    </div>
+                                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                        <button
+                                            onClick={() => setTemporizadorActivo(!temporizadorActivo)}
+                                            disabled={completada}
+                                            className={`px-8 py-4 rounded-xl text-white font-medium text-lg transition-all duration-300 transform hover:scale-105 ${temporizadorActivo
+                                                ? 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600'
+                                                : completada
+                                                    ? 'bg-gray-400 cursor-not-allowed'
+                                                    : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600'
+                                                } shadow-lg hover:shadow-xl`}
+                                        >
+                                            {temporizadorActivo ? 'Pausar' : completada ? 'Completado' : 'Iniciar'}
+                                        </button>
+                                        {!completada && !temporizadorActivo && (
+                                            <button
+                                                onClick={() => setCompletada(true)}
+                                                className="px-8 py-4 rounded-xl text-white font-medium text-lg transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600 shadow-lg hover:shadow-xl"
+                                            >
+                                                Saltar
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {sesion.tipo_contenido === 'enlace' && (
+                                <div className="text-center p-8 rounded-xl">
+                                    <a
+                                        href={sesion.contenido_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl text-white bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                                    >
+                                        Abrir enlace
+                                        <ExternalLink className="ml-2 h-5 w-5" />
+                                    </a>
+                                </div>
+                            )}
+
+                            {sesion.tipo_contenido === 'video' && (
+                                <div className="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-lg">
+                                    <video
+                                        src={getMediaUrl(sesion.contenido_video)}
+                                        controls
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            )}
+
+                            {sesion.tipo_contenido === 'audio' && (
+                                <div className="p-8 rounded-xl">
+                                    <audio
+                                        src={getMediaUrl(sesion.contenido_audio)}
+                                        controls
+                                        className="w-full"
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="flex justify-center mt-12">
+                            {!esSesionCompletada && (
+                                <button
+                                    onClick={marcarComoCompletada}
+                                    disabled={sesion.tipo_contenido === 'temporizador' && !completada}
+                                    className={`inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl transition-all duration-300 transform hover:scale-105 ${sesion.tipo_contenido === 'temporizador' && !completada
+                                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                                        : diarioCompletado
+                                            ? 'bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white shadow-lg hover:shadow-xl'
+                                            : 'bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 text-white shadow-lg hover:shadow-xl'
+                                        }`}
+                                >
+                                    <CheckCircle2 className="h-6 w-6 mr-2" />
+                                    {diarioCompletado ? 'Volver al programa' : 'Marcar como completada'}
+                                </button>
+                            )}
+                            {esSesionCompletada && sesion.tipo_contenido === 'temporizador' && (
+                                <button
+                                    onClick={reiniciarSesion}
+                                    className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-xl bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                                >
+                                    Repetir sesión
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {mostrarDiario && !diarioCompletado && !esSesionCompletada && (
                 <DiarioForm

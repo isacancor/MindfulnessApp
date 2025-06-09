@@ -103,7 +103,7 @@ const InvestigadorDashboard = () => {
 
                     <Link
                         to="/programas/crear"
-                        className="flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-full hover:bg-blue-50 transition-all shadow-md hover:shadow-lg"
+                        className="flex items-center space-x-2 px-6 py-3 bg-white text-indigo-700 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                     >
                         <PlusCircle size={20} />
                         <span className="font-medium">Nuevo Programa</span>
@@ -200,7 +200,7 @@ const InvestigadorDashboard = () => {
                             <div className="flex justify-between items-center">
                                 <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                                     <Award className="h-5 w-5 text-blue-600" />
-                                    Programas destacados
+                                    Mis programas destacados
                                 </h2>
                                 <Link
                                     to="/programas"

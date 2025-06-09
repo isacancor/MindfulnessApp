@@ -6,6 +6,7 @@ import api from '../../../config/axios';
 import { prepareSessionFormData } from '../../../utils/formData';
 import ErrorAlert from '../../../components/ErrorAlert';
 import { EtiquetaPractica, TipoContenido, Escala, getEnumArray } from '../../../constants/enums';
+import VideoFondoSelector from '../../../components/sesiones/VideoFondoSelector';
 
 const CrearSesion = () => {
     const navigate = useNavigate();
@@ -26,7 +27,8 @@ const CrearSesion = () => {
         contenido_temporizador: 0,
         contenido_url: '',
         contenido_audio: null,
-        contenido_video: null
+        contenido_video: null,
+        video_fondo: ''
     });
 
     // TODO: Eliminar este método
@@ -43,7 +45,8 @@ const CrearSesion = () => {
             contenido_temporizador: null,
             contenido_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
             contenido_audio: null,
-            contenido_video: null
+            contenido_video: null,
+            video_fondo: ''
         });
     };
 
@@ -299,23 +302,31 @@ const CrearSesion = () => {
                         )}
 
                         {formData.tipo_contenido === 'temporizador' && (
-                            <div>
-                                <label htmlFor="contenido_temporizador" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Duración del Temporizador (minutos) *
-                                </label>
-                                <input
-                                    id="contenido_temporizador"
-                                    name="contenido_temporizador"
-                                    type="number"
-                                    min="1"
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    placeholder="Ej. 15"
-                                    value={formData.contenido_temporizador}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                />
-                            </div>
+                            <>
+                                <div>
+                                    <label htmlFor="contenido_temporizador" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Duración del Temporizador (minutos) *
+                                    </label>
+                                    <input
+                                        id="contenido_temporizador"
+                                        name="contenido_temporizador"
+                                        type="number"
+                                        min="1"
+                                        required
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                        placeholder="Ej. 15"
+                                        value={formData.contenido_temporizador}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    />
+                                </div>
+                                <div className="mt-4">
+                                    <VideoFondoSelector
+                                        value={formData.video_fondo}
+                                        onChange={(e) => handleChange({ target: { name: 'video_fondo', value: e.target.value } })}
+                                    />
+                                </div>
+                            </>
                         )}
 
                         {formData.tipo_contenido === 'enlace' && (

@@ -28,7 +28,8 @@ class SesionSerializer(serializers.ModelSerializer):
             'id', 'programa', 'programa_nombre', 'titulo', 'descripcion', 'semana',
             'duracion_estimada', 'tipo_practica', 'tipo_practica_display',
             'tipo_contenido', 'tipo_contenido_display', 'tipo_escala', 'tipo_escala_display',
-            'contenido_temporizador', 'contenido_url', 'contenido_audio', 'contenido_video'
+            'contenido_temporizador', 'contenido_url', 'contenido_audio', 'contenido_video',
+            'video_fondo'
         ]
 
     contenido_temporizador = serializers.IntegerField(required=False, allow_null=True)
