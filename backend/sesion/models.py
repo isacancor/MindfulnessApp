@@ -23,7 +23,7 @@ class Sesion(models.Model):
     tipo_escala = models.CharField(
         max_length=50,
         choices=Escala.choices,
-        default=Escala.EMOCIONAL,
+        default=Escala.ESTADO_EMOCIONAL,
         null=True,
         blank=True
     )

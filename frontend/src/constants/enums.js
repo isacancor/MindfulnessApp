@@ -94,10 +94,12 @@ export const TipoContenido = {
 };
 
 export const Escala = {
-    EMOCIONAL: { value: 'emocional', label: 'Estado emocional [1–5]' },
-    UTILIDAD: { value: 'utilidad', label: 'Utilidad de la sesión [1–5]' },
-    ESTRES: { value: 'estres', label: 'PSS (estrés) [0–4]' },
-    BIENESTAR: { value: 'bienestar', label: 'VAS (bienestar general) [0–10]' }
+    ESTADO_EMOCIONAL: { value: 'estado_emocional', label: '¿Cómo te sientes emocionalmente en este momento? [1–5]' },
+    ESTRES_ACTUAL: { value: 'estres_actual', label: '¿Cuánto estrés sientes ahora mismo? [0–10]' },
+    BIENESTAR_GENERAL: { value: 'bienestar_general', label: '¿Cómo valoras tu bienestar general ahora mismo? [0–10]' },
+    UTILIDAD_SESION: { value: 'utilidad_sesion', label: '¿Cuánto te ha servido esta sesión de mindfulness? [1–5]' },
+    CLARIDAD_MENTAL: { value: 'claridad_mental', label: '¿Qué tanta claridad mental sientes ahora mismo? [1–5]' },
+    PRESENCIA: { value: 'presencia', label: '¿Qué tan presente te sientes en este momento? [1–5]' }
 };
 
 // Enums de Cuestionario

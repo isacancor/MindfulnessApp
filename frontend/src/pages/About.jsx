@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, BookOpen, Heart, Shield, Users, GitFork, LineChart, BrainCircuit } from 'lucide-react';
+import Footer from '../components/layout/Footer';
 
 const About = () => {
     return (
@@ -132,7 +133,7 @@ const About = () => {
             </section>
 
             {/* Open Source Section */}
-            <section className="py-20 px-6 bg-gradient-to-r from-slate-800 to-slate-900 text-white">
+            <section className="py-20 px-6 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="flex justify-center mb-6">
                         <GitFork className="h-12 w-12" />
@@ -156,20 +157,7 @@ const About = () => {
                 </div>
             </section>
 
-            {/* Contact Section */}
-            <section className="py-20 px-6">
-                <div className="max-w-4xl mx-auto text-center">
-                    <h2 className="text-3xl font-bold text-slate-800 mb-6">
-                        ¿Tienes alguna pregunta?
-                    </h2>
-                    <p className="text-lg text-slate-600 mb-8">
-                        Puedes escribir a:
-                    </p>
-                    <p className="text-xl font-medium text-indigo-600">
-                        mindfluenceresearch@gmail.com
-                    </p>
-                </div>
-            </section>
+            <Footer />
         </div>
     );
 };

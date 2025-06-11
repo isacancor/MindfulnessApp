@@ -24,7 +24,7 @@ const EditarSesion = () => {
         duracion_estimada: '',
         tipo_practica: EtiquetaPractica.BREATH.value,
         tipo_contenido: TipoContenido.TEMPORIZADOR.value,
-        tipo_escala: Escala.EMOCIONAL.value,
+        tipo_escala: Escala.ESTADO_EMOCIONAL.value,
         contenido_temporizador: 0,
         contenido_url: '',
         contenido_audio: null,

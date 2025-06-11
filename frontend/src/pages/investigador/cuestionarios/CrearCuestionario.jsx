@@ -23,17 +23,14 @@ const CrearCuestionario = ({ momento }) => {
     ];
 
     const cuestionariosPredefinidos = [
-        { id: 'FMI', nombre: 'FMI (Freiburg Mindfulness Inventory)', descripcion: 'Mide la capacidad de estar presente en el momento.' },
+        { id: 'FFMQ', nombre: 'FFMQ (Five Facet Mindfulness Questionnaire)', descripcion: 'Mide cinco dimensiones clave del mindfulness: observar, describir, actuar con conciencia, no juzgar y no reaccionar ante la experiencia interna.' },
         { id: 'PSS', nombre: 'PSS (Perceived Stress Scale)', descripcion: 'Evalúa el nivel de estrés en la vida cotidiana.' },
-        { id: 'HADS', nombre: 'HADS (Hospital Anxiety and Depression Scale)', descripcion: 'Mide los niveles de ansiedad y depresión.' },
-        { id: 'PWB', nombre: 'PWB (Perceived Wellbeing Scale)', descripcion: 'Evalúa aspectos del bienestar psicológico, como la autoaceptación y la autonomía.' },
         { id: 'MAAS', nombre: 'MAAS (Mindfulness Attention Awareness Scale)', descripcion: 'Mide el nivel de atención y conciencia plena durante el día.' },
-        { id: 'BAI', nombre: 'BAI (Beck Anxiety Inventory)', descripcion: 'Mide el nivel de ansiedad experimentado por los participantes.' },
         { id: 'MBI', nombre: 'MBI (Maslach Burnout Inventory)', descripcion: 'Evalúa el agotamiento laboral, el cinismo y la eficacia personal.' },
-        { id: 'MH-5', nombre: 'MH-5 (Mental Health)', descripcion: 'Herramienta para medir la salud mental general de los participantes.' },
-        { id: 'APSS', nombre: 'APSS (Auto-Perceived Stress Scale)', descripcion: 'Evalúa el estrés percibido por los participantes.' },
         { id: 'MAIA', nombre: 'MAIA (Multidimensional Assessment of Interoceptive Awareness)', descripcion: 'Mide la conciencia de las señales corporales.' },
-        { id: 'DASS', nombre: 'DASS (Depression Anxiety Stress Scales)', descripcion: 'Mide los niveles de depresión, ansiedad y estrés.' }
+        { id: 'DASS', nombre: 'DASS (Depression Anxiety Stress Scales)', descripcion: 'Mide los niveles de depresión, ansiedad y estrés.' },
+        { id: 'PANAS', nombre: 'PANAS (Positive and Negative Affect Schedule)', descripcion: 'Evalúa los estados afectivos positivos y negativos que experimenta una persona en un momento dado.' },
+        { id: 'Ryff’s', nombre: 'Ryff’s Psychological Well-Being Scales', descripcion: 'Evalúan el bienestar psicológico a través de seis dimensiones: autonomía, dominio ambiental, crecimiento personal, propósito en la vida, aceptación positiva del yo y relaciones positivas con otros.' }
     ];
 
     const tiposPregunta = [

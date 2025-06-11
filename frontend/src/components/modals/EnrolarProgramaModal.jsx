@@ -59,7 +59,7 @@ const EnrolarProgramaModal = ({ isOpen, onClose, onConfirm, programa }) => {
                             Acepto los términos y condiciones del programa
                         </label>
                         <p className="text-sm text-gray-500 mt-1">
-                            Al unirme a este programa, me comprometo a participar activamente y seguir las recomendaciones proporcionadas.
+                            Al unirme a este programa, me comprometo a participar activamente y seguir las recomendaciones proporcionadas. Confirmo que he leído, entendido y aceptado estos términos y condiciones
                         </p>
                         <a
                             href="/terminos-programa"

@@ -12,14 +12,18 @@ const DiarioForm = ({ programa, sesion, onClose, isLastSession }) => {
 
     const getEscalaInfo = () => {
         switch (sesion.tipo_escala) {
-            case Escala.EMOCIONAL.value:
-                return { min: 1, max: 5, label: 'Estado emocional' };
-            case Escala.UTILIDAD.value:
-                return { min: 1, max: 5, label: 'Utilidad de la sesión' };
-            case Escala.ESTRES.value:
-                return { min: 0, max: 4, label: 'PSS (estrés)' };
-            case Escala.BIENESTAR.value:
-                return { min: 0, max: 10, label: 'VAS (bienestar general)' };
+            case Escala.ESTADO_EMOCIONAL.value:
+                return { min: 1, max: 5, label: '¿Cómo te sientes emocionalmente en este momento?' };
+            case Escala.ESTRES_ACTUAL.value:
+                return { min: 0, max: 10, label: '¿Cuánto estrés sientes ahora mismo?' };
+            case Escala.BIENESTAR_GENERAL.value:
+                return { min: 0, max: 10, label: '¿Cómo valoras tu bienestar general ahora mismo?' };
+            case Escala.UTILIDAD_SESION.value:
+                return { min: 1, max: 5, label: '¿Cuánto te ha servido esta sesión de mindfulness?' };
+            case Escala.CLARIDAD_MENTAL.value:
+                return { min: 1, max: 5, label: '¿Qué tanta claridad mental sientes ahora mismo?' };
+            case Escala.PRESENCIA.value:
+                return { min: 1, max: 5, label: '¿Qué tan presente te sientes en este momento?' };
             default:
                 return { min: 1, max: 5, label: 'Valoración' };
         }
