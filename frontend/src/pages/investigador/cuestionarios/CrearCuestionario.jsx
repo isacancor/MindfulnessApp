@@ -30,7 +30,8 @@ const CrearCuestionario = ({ momento }) => {
         { id: 'MAIA', nombre: 'MAIA (Multidimensional Assessment of Interoceptive Awareness)', descripcion: 'Mide la conciencia de las señales corporales.' },
         { id: 'DASS', nombre: 'DASS (Depression Anxiety Stress Scales)', descripcion: 'Mide los niveles de depresión, ansiedad y estrés.' },
         { id: 'PANAS', nombre: 'PANAS (Positive and Negative Affect Schedule)', descripcion: 'Evalúa los estados afectivos positivos y negativos que experimenta una persona en un momento dado.' },
-        { id: 'Ryff’s', nombre: 'Ryff’s Psychological Well-Being Scales', descripcion: 'Evalúan el bienestar psicológico a través de seis dimensiones: autonomía, dominio ambiental, crecimiento personal, propósito en la vida, aceptación positiva del yo y relaciones positivas con otros.' }
+        { id: 'Ryff’s', nombre: 'Ryff’s Psychological Well-Being Scales', descripcion: 'Evalúan el bienestar psicológico a través de seis dimensiones: autonomía, dominio ambiental, crecimiento personal, propósito en la vida, aceptación positiva del yo y relaciones positivas con otros.' },
+        { id: 'SCS', nombre: 'SCS (Self-Compassion Scale)', descripcion: 'Mide la autocompasión a través de seis componentes: autocrítica, autocompasión, humanidad común, aislamiento, mindfulness y sobreidentificación.' }
     ];
 
     const tiposPregunta = [

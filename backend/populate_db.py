@@ -673,7 +673,7 @@ def run():
         {
             "id": 3,
             "texto": "Valora tu nivel actual de estrés",
-            "tipo": "likert",
+            "tipo": "calificacion",
             "escala": {
                 "inicio": 1,
                 "fin": 5,
@@ -696,15 +696,6 @@ def run():
             "estrellas": {
                 "cantidad": 5,
                 "icono": "heart"
-            }
-        },
-        {
-            "id": 2,
-            "texto": "Rellena esta escala likert",
-            "tipo": "likert-5-puntos",
-            "likert5Puntos": {
-                "tipo": "acuerdo",
-                "filas": ["f1", "f2"]
             }
         }
     ]

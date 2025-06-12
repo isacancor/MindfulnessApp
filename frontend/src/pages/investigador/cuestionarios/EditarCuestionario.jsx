@@ -30,7 +30,8 @@ const EditarCuestionario = () => {
         { id: 'MAIA', nombre: 'MAIA (Multidimensional Assessment of Interoceptive Awareness)', descripcion: 'Mide la conciencia de las señales corporales.' },
         { id: 'DASS', nombre: 'DASS (Depression Anxiety Stress Scales)', descripcion: 'Mide los niveles de depresión, ansiedad y estrés.' },
         { id: 'PANAS', nombre: 'PANAS (Positive and Negative Affect Schedule)', descripcion: 'Evalúa los estados afectivos positivos y negativos que experimenta una persona en un momento dado.' },
-        { id: 'Ryff’s', nombre: 'Ryff’s Psychological Well-Being Scales', descripcion: 'Evalúan el bienestar psicológico a través de seis dimensiones: autonomía, dominio ambiental, crecimiento personal, propósito en la vida, aceptación positiva del yo y relaciones positivas con otros.' }
+        { id: 'Ryff’s', nombre: 'Ryff’s Psychological Well-Being Scales', descripcion: 'Evalúan el bienestar psicológico a través de seis dimensiones: autonomía, dominio ambiental, crecimiento personal, propósito en la vida, aceptación positiva del yo y relaciones positivas con otros.' },
+        { id: 'SCS', nombre: 'SCS (Self-Compassion Scale)', descripcion: 'Mide la autocompasión a través de seis componentes: autocrítica, autocompasión, humanidad común, aislamiento, mindfulness y sobreidentificación.' }
     ];
 
     const tiposPregunta = [
@@ -422,7 +423,7 @@ const EditarCuestionario = () => {
                             <div className="absolute inset-0 flex items-center" aria-hidden="true">
                                 <div className="w-full border-t border-gray-200"></div>
                             </div>
-                            <div className="relative flex justify-center py-6">
+                            <div className="relative flex justify-center">
                                 <div className="bg-white px-4">
                                     <div className="flex space-x-8">
                                         {tiposCuestionario.map((tipo) => (

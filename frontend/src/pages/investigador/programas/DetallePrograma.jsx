@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { ArrowLeft, BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion, CheckCircle, UserCheck, Copy, Info, ClipboardList } from 'lucide-react';
+import { BookOpen, Calendar, Users, Clock, Link, Edit, Trash2, Plus, Timer, Music, Video, FileQuestion, CheckCircle, UserCheck, Copy, Info, ClipboardList } from 'lucide-react';
 import api from '../../../config/axios';
 import ErrorAlert from '../../../components/ErrorAlert';
 import { EstadoPublicacion } from '../../../constants/enums';
 import PageHeader from '../../../components/layout/PageHeader';
+import { TipoContenido, getEnumLabelByValue } from '../../../constants/enums';
 
 const DetallePrograma = () => {
     const { id } = useParams();
@@ -296,28 +297,42 @@ const DetallePrograma = () => {
                                                                         <span>{sesion.duracion_estimada} min</span>
                                                                     </div>
                                                                     <div className="flex items-center">
-                                                                        {sesion.tipo_contenido === 'temporizador' && <Timer className="h-4 w-4 mr-1 text-blue-500" />}
-                                                                        {sesion.tipo_contenido === 'enlace' && <Link className="h-4 w-4 mr-1 text-green-500" />}
-                                                                        {sesion.tipo_contenido === 'audio' && <Music className="h-4 w-4 mr-1 text-purple-500" />}
-                                                                        {sesion.tipo_contenido === 'video' && <Video className="h-4 w-4 mr-1 text-red-500" />}
-                                                                        <span>{sesion.tipo_contenido}</span>
+                                                                        {sesion.tipo_contenido === TipoContenido.TEMPORIZADOR.value &&
+                                                                            <Timer className="h-4 w-4 mr-1 text-blue-500" />}
+                                                                        {sesion.tipo_contenido === TipoContenido.ENLACE.value &&
+                                                                            <Link className="h-4 w-4 mr-1 text-green-500" />}
+                                                                        {sesion.tipo_contenido === TipoContenido.AUDIO.value &&
+                                                                            <Music className="h-4 w-4 mr-1 text-purple-500" />}
+                                                                        {sesion.tipo_contenido === TipoContenido.VIDEO.value &&
+                                                                            <Video className="h-4 w-4 mr-1 text-red-500" />}
+                                                                        <span>{getEnumLabelByValue(TipoContenido, sesion.tipo_contenido)}</span>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div className="flex items-center space-x-2">
-                                                            <span className={`px-2.5 py-1 rounded-full text-base font-medium ${(sesion.tipo_practica === 'breath' || sesion.tipo_practica === 'sounds' ||
-                                                                sesion.tipo_practica === 'visual_object' || sesion.tipo_practica === 'senses' ||
-                                                                sesion.tipo_practica === 'open_awareness') ? 'bg-blue-100 text-blue-800' :
-                                                                sesion.tipo_practica === 'open_monitoring' ? 'bg-green-100 text-green-800' :
-                                                                    sesion.tipo_practica === 'loving_kindness' ? 'bg-purple-100 text-purple-800' :
-                                                                        sesion.tipo_practica === 'body_scan' ? 'bg-yellow-100 text-yellow-800' :
-                                                                            sesion.tipo_practica === 'mindful_movement' ? 'bg-red-100 text-red-800' :
-                                                                                sesion.tipo_practica === 'self_compassion' ? 'bg-pink-100 text-pink-800' :
-                                                                                    'bg-gray-100 text-gray-800'
-                                                                }`}>
-                                                                {sesion.tipo_practica_display}
-                                                            </span>
+                                                            <div className="flex justify-center">
+                                                                <span
+                                                                    className={`px-2.5 py-1 rounded-full text-sm font-medium text-center
+      ${['breath', 'sounds', 'visual_object', 'senses', 'open_awareness'].includes(sesion.tipo_practica)
+                                                                            ? 'bg-blue-100 text-blue-800'
+                                                                            : sesion.tipo_practica === 'open_monitoring'
+                                                                                ? 'bg-green-100 text-green-800'
+                                                                                : sesion.tipo_practica === 'loving_kindness'
+                                                                                    ? 'bg-purple-100 text-purple-800'
+                                                                                    : sesion.tipo_practica === 'body_scan'
+                                                                                        ? 'bg-yellow-100 text-yellow-800'
+                                                                                        : sesion.tipo_practica === 'mindful_movement'
+                                                                                            ? 'bg-red-100 text-red-800'
+                                                                                            : sesion.tipo_practica === 'self_compassion'
+                                                                                                ? 'bg-pink-100 text-pink-800'
+                                                                                                : 'bg-gray-100 text-gray-800'
+                                                                        }`}
+                                                                >
+                                                                    {sesion.tipo_practica_display}
+                                                                </span>
+                                                            </div>
+
                                                             {isInvestigador() && programa?.estado_publicacion === 'borrador' && (
                                                                 <div className="flex space-x-1">
                                                                     <button

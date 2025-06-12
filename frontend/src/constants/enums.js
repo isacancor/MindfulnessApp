@@ -133,4 +133,8 @@ export const TipoIcono = {
 };
 
 // Funciones auxiliares para convertir los enums a arrays para los selectores
-export const getEnumArray = (enumArray) => Object.values(enumArray); 
+export const getEnumArray = (enumArray) => Object.values(enumArray);
+
+// Función para obtener el label de un enum por su value
+export const getEnumLabelByValue = (enumArray, value) =>
+    getEnumArray(enumArray).find(item => item.value === value)?.label;
