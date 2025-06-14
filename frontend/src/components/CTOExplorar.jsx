@@ -9,25 +9,25 @@ const CTOExplorar = ({
 }) => {
     return (
         <div className={`max-w-2xl mx-auto ${className}`}>
-            <div className="bg-white rounded-2xl shadow-xl border border-indigo-100 p-6 md:p-8">
+            <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 p-6 md:p-8">
                 <div className="flex flex-col items-center text-center">
                     {/* Ícono decorativo */}
-                    <div className="w-16 h-16 md:w-20 md:h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
-                        <Search className="w-8 h-8 md:w-10 md:h-10 text-indigo-600" />
+                    <div className="w-16 h-16 md:w-20 md:h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mb-6">
+                        <Search className="w-8 h-8 md:w-10 md:h-10 text-indigo-300" />
                     </div>
 
                     {/* Contenido */}
-                    <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
+                    <h2 className="text-xl md:text-2xl font-bold text-white mb-3">
                         {titulo}
                     </h2>
-                    <p className="text-gray-600 mb-8 max-w-md">
+                    <p className="text-indigo-200 mb-8 max-w-md">
                         {descripcion}
                     </p>
 
                     {/* Botón CTA */}
                     <Link
                         to="/explorar"
-                        className="group inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                        className="group inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-500 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                     >
                         <span className="flex items-center">
                             {buttonText}

@@ -81,13 +81,15 @@ const ProgramaCompletado = () => {
     }, [id, navigate]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-20 md:pb-10">
+        <div className="min-h-screen bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 pb-20 md:pb-10">
             <div className="max-w-7xl mx-auto">
                 <div className="relative">
                     <PageHeader
                         title="Programa Completado"
                         subtitle="Revisa el contenido y tus logros en este programa"
                         backUrl="/completados"
+                        titleClassName="bg-gradient-to-r from-white via-indigo-200 to-indigo-400"
+                        subtitleClassName="text-indigo-200"
                     />
                 </div>
 

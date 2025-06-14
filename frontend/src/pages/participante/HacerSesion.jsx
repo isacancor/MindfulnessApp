@@ -145,9 +145,9 @@ const HacerSesion = ({ completado }) => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 pb-16 md:pb-0">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p className="mt-4 text-gray-600">Cargando sesión...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 pb-16 md:pb-0">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-300"></div>
+                <p className="mt-4 text-indigo-200">Cargando sesión...</p>
                 <MobileNavBar />
             </div>
         );
@@ -172,20 +172,22 @@ const HacerSesion = ({ completado }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10 flex items-center justify-center">
             {sesion?.tipo_contenido === 'temporizador' && sesion?.video_fondo ? (
                 <BackgroundVideo videoSrc={`/videos/${sesion.video_fondo}`}>
                     <div className="w-full max-w-4xl mx-auto flex items-center justify-center min-h-[calc(100vh-4rem)]">
-                        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100 w-full">
+                        <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-lg p-6 md:p-8 border border-white/10 w-full">
                             <PageHeader
                                 title={sesion.titulo}
                                 subtitle={sesion.descripcion}
                                 className="mb-6"
+                                titleClassName="bg-gradient-to-r from-white via-indigo-200 to-indigo-400"
+                                subtitleClassName="text-indigo-200"
                             />
 
                             {sesion.tipo_contenido === 'temporizador' && !esSesionCompletada && (
-                                <div className="flex items-center justify-center text-gray-600 mb-8">
-                                    <Clock className="h-6 w-6 mr-2 text-indigo-600" />
+                                <div className="flex items-center justify-center text-indigo-200 mb-8">
+                                    <Clock className="h-6 w-6 mr-2 text-indigo-300" />
                                     <span className="font-medium text-lg">{formatTime(tiempoOriginal)}</span>
                                 </div>
                             )}
@@ -198,7 +200,7 @@ const HacerSesion = ({ completado }) => {
                             <div className="space-y-8">
                                 {sesion.tipo_contenido === 'temporizador' && (
                                     <div className="text-center p-8 rounded-xl">
-                                        <div className="text-6xl font-bold text-indigo-600 mb-6 font-mono">
+                                        <div className="text-6xl font-bold text-indigo-300 mb-6 font-mono">
                                             {formatTime(tiempoRestante)}
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -241,7 +243,7 @@ const HacerSesion = ({ completado }) => {
                                 )}
 
                                 {sesion.tipo_contenido === 'video' && (
-                                    <div className="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-lg">
+                                    <div className="aspect-w-16 aspect-h-9 bg-black/50 rounded-xl overflow-hidden shadow-lg">
                                         <video
                                             src={getMediaUrl(sesion.contenido_video)}
                                             controls
@@ -291,16 +293,18 @@ const HacerSesion = ({ completado }) => {
                 </BackgroundVideo>
             ) : (
                 <div className="w-full max-w-4xl mx-auto flex items-center justify-center min-h-[calc(100vh-4rem)]">
-                    <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100 w-full">
+                    <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-lg p-6 md:p-8 border border-white/10 w-full">
                         <PageHeader
                             title={sesion.titulo}
                             subtitle={sesion.descripcion}
                             className="mb-6"
+                            titleClassName="bg-gradient-to-r from-white via-indigo-200 to-indigo-400"
+                            subtitleClassName="text-indigo-200"
                         />
 
                         {sesion.tipo_contenido === 'temporizador' && !esSesionCompletada && (
-                            <div className="flex items-center justify-center text-gray-600 mb-8">
-                                <Clock className="h-6 w-6 mr-2 text-indigo-600" />
+                            <div className="flex items-center justify-center text-indigo-200 mb-8">
+                                <Clock className="h-6 w-6 mr-2 text-indigo-300" />
                                 <span className="font-medium text-lg">{formatTime(tiempoOriginal)}</span>
                             </div>
                         )}
@@ -313,7 +317,7 @@ const HacerSesion = ({ completado }) => {
                         <div className="space-y-8">
                             {sesion.tipo_contenido === 'temporizador' && (
                                 <div className="text-center p-8 rounded-xl">
-                                    <div className="text-6xl font-bold text-indigo-600 mb-6 font-mono">
+                                    <div className="text-6xl font-bold text-indigo-300 mb-6 font-mono">
                                         {formatTime(tiempoRestante)}
                                     </div>
                                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -356,7 +360,7 @@ const HacerSesion = ({ completado }) => {
                             )}
 
                             {sesion.tipo_contenido === 'video' && (
-                                <div className="aspect-w-16 aspect-h-9 bg-black rounded-xl overflow-hidden shadow-lg">
+                                <div className="aspect-w-16 aspect-h-9 bg-black/50 rounded-xl overflow-hidden shadow-lg">
                                     <video
                                         src={getMediaUrl(sesion.contenido_video)}
                                         controls

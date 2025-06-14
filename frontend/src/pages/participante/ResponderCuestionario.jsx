@@ -143,24 +143,24 @@ const ResponderCuestionario = ({ momento }) => {
         if (cuestionario.tipo_cuestionario === 'likert') {
             return (
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-white/10">
+                        <thead className="bg-indigo-500/20">
                             <tr>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">
+                                <th className="px-4 py-2 text-left text-sm font-medium text-indigo-200">
                                     Pregunta
                                 </th>
                                 {pregunta.etiquetas.map((etiqueta, index) => (
-                                    <th key={index} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
+                                    <th key={index} className="px-4 py-2 text-center text-sm font-medium text-indigo-200">
                                         {etiqueta}
                                     </th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-indigo-500/10 divide-y divide-white/10">
                             {pregunta.textos.map((texto, index) => (
                                 <tr key={index}>
                                     <td className="px-4 py-2">
-                                        <span className="text-gray-700">{texto}</span>
+                                        <span className="text-indigo-200">{texto}</span>
                                     </td>
                                     {Array.from({ length: 5 }, (_, i) => (
                                         <td key={i} className="px-4 py-2 text-center">
@@ -170,7 +170,7 @@ const ResponderCuestionario = ({ momento }) => {
                                                 value={i + 1}
                                                 checked={respuestas[index] === i + 1}
                                                 onChange={(e) => handleRespuestaChange(index, parseInt(e.target.value))}
-                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-indigo-300"
                                             />
                                         </td>
                                     ))}
@@ -189,7 +189,7 @@ const ResponderCuestionario = ({ momento }) => {
                     <textarea
                         value={respuestas[pregunta.id] || ''}
                         onChange={(e) => handleRespuestaChange(pregunta.id, e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-indigo-300"
                         rows="3"
                         placeholder="Escribe tu respuesta aquí..."
                     />
@@ -200,11 +200,11 @@ const ResponderCuestionario = ({ momento }) => {
                     <select
                         value={respuestas[pregunta.id] || ''}
                         onChange={(e) => handleRespuestaChange(pregunta.id, e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white"
                     >
-                        <option value="">Selecciona una opción</option>
+                        <option value="" className="bg-indigo-900 text-white">Selecciona una opción</option>
                         {pregunta.opciones.map((opcion, index) => (
-                            <option key={index} value={opcion}>
+                            <option key={index} value={opcion} className="bg-indigo-900 text-white">
                                 {opcion}
                             </option>
                         ))}
@@ -220,9 +220,9 @@ const ResponderCuestionario = ({ momento }) => {
                                     type="checkbox"
                                     checked={respuestas[pregunta.id]?.includes(opcion) || false}
                                     onChange={() => handleRespuestaChange(pregunta.id, opcion, 'checkbox')}
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-indigo-300 rounded"
                                 />
-                                <span className="text-gray-700">{opcion}</span>
+                                <span className="text-white">{opcion}</span>
                             </label>
                         ))}
                     </div>
@@ -261,23 +261,25 @@ const ResponderCuestionario = ({ momento }) => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center pb-16 md:pb-0">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p className="mt-4 text-gray-600">Cargando cuestionario...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 pb-16 md:pb-0">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-300"></div>
+                <p className="mt-4 text-indigo-200">Cargando cuestionario...</p>
                 <MobileNavBar />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+        <div className="min-h-screen bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
             <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-indigo-100">
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-lg p-6 md:p-8 border border-white/10">
                     <PageHeader
                         title={cuestionario?.titulo}
                         subtitle={cuestionario?.descripcion}
                         backUrl="/miprograma"
                         className="mb-8"
+                        titleClassName="bg-gradient-to-r from-white via-indigo-200 to-indigo-400"
+                        subtitleClassName="text-indigo-200"
                     />
 
                     {error && (
@@ -291,9 +293,9 @@ const ResponderCuestionario = ({ momento }) => {
                         {/* Preguntas */}
                         <div className="space-y-8">
                             {cuestionario?.preguntas.map((pregunta, index) => (
-                                <div key={pregunta.id || index} className="bg-gradient-to-br from-white to-indigo-50/30 rounded-xl p-6 md:p-8 shadow-sm border border-indigo-100">
+                                <div key={pregunta.id || index} className="bg-indigo-500/10 backdrop-blur-xl rounded-xl p-6 md:p-8 shadow-sm border border-white/10">
                                     <div className="mb-6">
-                                        <h3 className="text-xl font-semibold text-gray-900">
+                                        <h3 className="text-xl font-semibold text-white">
                                             {cuestionario.tipo_cuestionario === 'likert' ? (
                                                 'Completa la siguiente escala Likert'
                                             ) : (
@@ -311,12 +313,12 @@ const ResponderCuestionario = ({ momento }) => {
                         {/* Error más visible */}
                         <div ref={formEndRef} className="mt-8">
                             {error && !loading && (
-                                <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-xl">
+                                <div className="bg-red-500/20 backdrop-blur-xl border-l-4 border-red-500 p-4 mb-6 rounded-xl">
                                     <div className="flex items-start">
-                                        <AlertCircle className="h-6 w-6 text-red-500 mt-0.5 mr-2" />
+                                        <AlertCircle className="h-6 w-6 text-red-300 mt-0.5 mr-2" />
                                         <div>
-                                            <h3 className="text-lg font-semibold text-red-800">Error</h3>
-                                            <p className="text-red-700">{error}</p>
+                                            <h3 className="text-lg font-semibold text-red-200">Error</h3>
+                                            <p className="text-red-100">{error}</p>
                                         </div>
                                     </div>
                                 </div>

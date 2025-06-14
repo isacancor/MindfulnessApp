@@ -77,36 +77,36 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
     return (
         <div
             className={`flex flex-col md:flex-row md:items-center md:justify-between p-4 rounded-lg transition-colors ${isCompleted
-                ? 'bg-green-50 hover:bg-green-100'
+                ? 'bg-emerald-500/20 hover:bg-emerald-500/30'
                 : isAvailable
-                    ? 'bg-blue-50 hover:bg-blue-100'
-                    : 'bg-gray-50 hover:bg-gray-100'
-                }`}
+                    ? 'bg-indigo-500/20 hover:bg-indigo-500/30'
+                    : 'bg-white/5 hover:bg-white/10'
+                } backdrop-blur-xl border border-white/10`}
         >
             <div className="flex items-start space-x-4">
                 <div className={`flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full font-semibold ${isCompleted
-                    ? 'bg-green-100 text-green-600'
+                    ? 'bg-emerald-500/30 text-emerald-200'
                     : isAvailable
-                        ? 'bg-blue-100 text-blue-600'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'bg-indigo-500/30 text-indigo-200'
+                        : 'bg-white/10 text-indigo-300'
                     }`}>
                     {sesion.semana}
                 </div>
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-medium text-gray-900 truncate">{sesion.titulo}</h3>
+                        <h3 className="text-lg font-medium text-white truncate">{sesion.titulo}</h3>
                         {isCompleted ? (
-                            <CheckCircle2 className="flex-shrink-0 h-5 w-5 text-green-600" />
+                            <CheckCircle2 className="flex-shrink-0 h-5 w-5 text-emerald-300" />
                         ) : isAvailable ? (
-                            <AlertCircle className="flex-shrink-0 h-5 w-5 text-blue-600" />
+                            <AlertCircle className="flex-shrink-0 h-5 w-5 text-indigo-300" />
                         ) : (
-                            <AlertCircle className="flex-shrink-0 h-5 w-5 text-gray-400" />
+                            <AlertCircle className="flex-shrink-0 h-5 w-5 text-indigo-300/50" />
                         )}
                     </div>
-                    <p className="text-gray-600 mt-1 text-sm md:text-base line-clamp-2 md:line-clamp-1">{sesion.descripcion}</p>
-                    <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-500">
+                    <p className="text-indigo-200 mt-1 text-sm md:text-base line-clamp-2 md:line-clamp-1">{sesion.descripcion}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-indigo-200">
                         <div className="flex items-center">
-                            <Clock className="h-4 w-4 mr-1" />
+                            <Clock className="h-4 w-4 mr-1 text-indigo-300" />
                             <span>{sesion.duracion_estimada} minutos</span>
                         </div>
                         <span className="hidden md:inline mx-2">•</span>
@@ -120,8 +120,8 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                         </span>
                     </div>
                     {/* Fechas de inicio y fin */}
-                    <div className="flex items-center mt-2 text-sm text-gray-500">
-                        <Calendar className="h-4 w-4 mr-1 text-indigo-500" />
+                    <div className="flex items-center mt-2 text-sm text-indigo-200">
+                        <Calendar className="h-4 w-4 mr-1 text-indigo-300" />
                         <span className="text-xs md:text-sm">Semana del {fechas.inicio} al {fechas.fin}</span>
                     </div>
                 </div>
@@ -130,7 +130,7 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                 {programaCompletado ? (
                     <button
                         onClick={() => navigate(`/completados/${sesion.programa}/sesion/${sesion.id}`)}
-                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
                     >
                         <Repeat className="h-4 w-4 mr-2" />
                         Repetir
@@ -138,7 +138,7 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                 ) : isCompleted ? (
                     <button
                         onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
-                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-700 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
                     >
                         <Repeat className="h-4 w-4 mr-2" />
                         Repetir
@@ -146,12 +146,12 @@ const SesionCard = ({ sesion, index, sesiones, cuestionarioPreRespondido, progra
                 ) : isAvailable ? (
                     <button
                         onClick={() => navigate(`/miprograma/sesion/${sesion.id}`)}
-                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-indigo-600 to-blue-500 hover:from-indigo-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                     >
                         Comenzar
                     </button>
                 ) : (
-                    <span className="w-full md:w-auto inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 text-center">
+                    <span className="w-full md:w-auto inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium bg-white/5 text-indigo-300 text-center">
                         {tieneCuestionarios && !cuestionarioPreRespondido ? 'Completa el cuestionario pre' :
                             (index > 0 && !sesiones[index - 1]?.completada) ? 'Completa la sesión anterior' : 'Bloqueada'}
                     </span>

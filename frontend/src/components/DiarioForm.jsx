@@ -61,12 +61,12 @@ const DiarioForm = ({ programa, sesion, onClose, isLastSession }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="bg-white/10 backdrop-blur-xl rounded-lg p-6 max-w-md w-full border border-white/10">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">Diario de Sesión</h2>
+                    <h2 className="text-xl font-semibold text-white">Diario de Sesión</h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700"
+                        className="text-indigo-200 hover:text-white"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -74,7 +74,7 @@ const DiarioForm = ({ programa, sesion, onClose, isLastSession }) => {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium text-indigo-200 mb-1">
                             {escalaInfo.label} [{escalaInfo.min}-{escalaInfo.max}]
                         </label>
                         <div className="flex flex-wrap gap-2">
@@ -85,7 +85,7 @@ const DiarioForm = ({ programa, sesion, onClose, isLastSession }) => {
                                     onClick={() => setValoracion(valor.toString())}
                                     className={`flex-1 py-2 px-4 rounded-lg border transition-colors ${valoracion === valor.toString()
                                         ? 'bg-indigo-600 text-white border-indigo-600'
-                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                        : 'bg-white/5 text-indigo-200 border-white/10 hover:bg-white/10'
                                         }`}
                                 >
                                     {valor}
@@ -95,34 +95,34 @@ const DiarioForm = ({ programa, sesion, onClose, isLastSession }) => {
                     </div>
 
                     <div>
-                        <label htmlFor="comentario" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="comentario" className="block text-sm font-medium text-indigo-200 mb-1">
                             Comentarios (opcional)
                         </label>
                         <textarea
                             id="comentario"
                             value={comentario}
                             onChange={(e) => setComentario(e.target.value)}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                            className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200"
                             rows="4"
                             placeholder="¿Cómo te ha ido la sesión?"
                         />
                     </div>
 
                     {error && (
-                        <p className="text-red-600 text-sm">{error}</p>
+                        <p className="text-red-300 text-sm">{error}</p>
                     )}
 
                     <div className="flex justify-end gap-4">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="px-4 py-2 text-sm font-medium text-indigo-200 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-500 border border-transparent rounded-lg hover:from-indigo-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                         >
                             Guardar y completar sesión
                         </button>

@@ -31,7 +31,7 @@ const CrearSesion = () => {
         video_fondo: ''
     });
 
-    // TODO: Eliminar este método
+    // TODO: Eliminar este método + boton debajo
     const fillTestData = () => {
         setFormData({
             programa: id,

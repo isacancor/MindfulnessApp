@@ -76,10 +76,10 @@ const MiPrograma = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-indigo-50 to-white pb-16 md:pb-0">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 pb-16 md:pb-0">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600"></div>
-                    <p className="mt-4 text-lg text-indigo-600 font-medium">Cargando tu programa...</p>
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-300"></div>
+                    <p className="mt-4 text-lg text-indigo-200 font-medium">Cargando tu programa...</p>
                 </div>
                 <MobileNavBar />
             </div>
@@ -88,12 +88,14 @@ const MiPrograma = () => {
 
     if (!programa?.sesiones?.length) {
         return (
-            <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+            <div className="min-h-screen bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
                 <div className="max-w-7xl mx-auto">
                     <PageHeader
                         title="Mi Programa"
                         subtitle="Gestiona y sigue tu progreso en el programa actual"
                         backUrl="/home"
+                        titleClassName="bg-gradient-to-r from-white via-indigo-200 to-indigo-400"
+                        subtitleClassName="text-indigo-200"
                     />
 
                     <CTOExplorar
@@ -108,12 +110,14 @@ const MiPrograma = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white pb-20 md:pb-10">
+        <div className="min-h-screen bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 pb-20 md:pb-10">
             <div className="max-w-7xl mx-auto">
                 <PageHeader
                     title="Mi Programa"
                     subtitle="Gestiona y sigue tu progreso en el programa actual"
                     backUrl="/home"
+                    titleClassName="bg-gradient-to-r from-white via-indigo-200 to-indigo-400"
+                    subtitleClassName="text-indigo-200"
                 />
 
                 <ProgramaDetalle

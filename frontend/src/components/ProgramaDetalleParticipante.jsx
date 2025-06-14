@@ -38,22 +38,22 @@ const ProgramaDetalle = ({
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                <p className="mt-4 text-gray-600">Cargando programa...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-300"></div>
+                <p className="mt-4 text-indigo-200">Cargando programa...</p>
             </div>
         );
     }
 
     if (!programa?.sesiones?.length) {
         return (
-            <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+            <div className="min-h-screen bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-10">
-                        <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                        <h1 className="text-3xl font-extrabold text-white sm:text-4xl">
                             {esCompletado ? "Programa no encontrado" : "Mi Programa"}
                         </h1>
-                        <p className="mt-3 text-xl text-gray-500 max-w-2xl mx-auto">
+                        <p className="mt-3 text-xl text-indigo-200 max-w-2xl mx-auto">
                             {esCompletado
                                 ? "No se ha encontrado el programa que buscas"
                                 : "Gestiona y sigue tu progreso en el programa actual"}
@@ -74,7 +74,7 @@ const ProgramaDetalle = ({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
                 <ErrorAlert
                     message={error}
@@ -82,11 +82,11 @@ const ProgramaDetalle = ({
                 />
 
                 {/* Encabezado del Programa */}
-                <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+                <div className="bg-white/10 backdrop-blur-xl rounded-xl shadow-sm p-6 mb-8 border border-white/10">
                     <div className="flex items-start justify-between">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">{programa.nombre}</h1>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <h1 className="text-2xl font-bold text-white">{programa.nombre}</h1>
+                            <p className="text-sm text-indigo-200 mt-1">
                                 Por {programa.creado_por.nombre_completo_investigador}
                             </p>
                         </div>
@@ -105,19 +105,19 @@ const ProgramaDetalle = ({
                         </div>
                     </div>
 
-                    <p className="mt-4 text-gray-600">{programa.descripcion}</p>
+                    <p className="mt-4 text-indigo-200">{programa.descripcion}</p>
 
                     {/* Información de inscripción - Solo para programa activo */}
                     {programa.inscripcion_info && !esCompletado && (
-                        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <div className="mt-6 p-4 bg-indigo-500/20 backdrop-blur-xl rounded-lg border border-white/10">
                             <div className="flex items-start">
-                                <Lock className="h-5 w-5 text-blue-600 mt-0.5 mr-3" />
+                                <Lock className="h-5 w-5 text-indigo-300 mt-0.5 mr-3" />
                                 <div>
-                                    <h3 className="text-sm font-medium text-blue-900">Período de dedicación exclusiva</h3>
-                                    <p className="mt-1 text-sm text-blue-700">
+                                    <h3 className="text-sm font-medium text-white">Período de dedicación exclusiva</h3>
+                                    <p className="mt-1 text-sm text-indigo-200">
                                         Estás inscrito en este programa desde el {formatDate(programa.inscripcion_info.fecha_inicio)} hasta el {formatDate(programa.inscripcion_info.fecha_fin)}.
                                     </p>
-                                    <p className="mt-1 text-sm text-blue-700">
+                                    <p className="mt-1 text-sm text-indigo-200">
                                         Durante este período, te recomendamos dedicarte exclusivamente a este programa para obtener los mejores resultados.
                                     </p>
                                 </div>
@@ -126,35 +126,35 @@ const ProgramaDetalle = ({
                     )}
 
                     <div className="mt-6 grid grid-cols-2 md:grid-cols-2 gap-4">
-                        <div className="flex items-center text-gray-600">
-                            <Calendar className="mr-2 text-gray-400" size={16} />
+                        <div className="flex items-center text-indigo-200">
+                            <Calendar className="mr-2 text-indigo-300" size={16} />
                             <span>{programa.duracion_semanas} semanas</span>
                         </div>
-                        <div className="flex items-center text-gray-600">
-                            <FileText className="mr-2 text-gray-400" size={16} />
+                        <div className="flex items-center text-indigo-200">
+                            <FileText className="mr-2 text-indigo-300" size={16} />
                             <span className="capitalize">{programa.enfoque_metodologico}</span>
                         </div>
-                        <div className="flex items-center text-gray-600">
-                            <Users className="mr-2 text-gray-400" size={16} />
+                        <div className="flex items-center text-indigo-200">
+                            <Users className="mr-2 text-indigo-300" size={16} />
                             <span className="capitalize">{programa.tipo_contexto}</span>
                         </div>
-                        <div className="flex items-center text-gray-600">
-                            <FileQuestion className="mr-2 text-gray-400" size={16} />
+                        <div className="flex items-center text-indigo-200">
+                            <FileQuestion className="mr-2 text-indigo-300" size={16} />
                             <div className="flex flex-wrap gap-2">
                                 {programa.tiene_cuestionarios && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-s font-medium bg-indigo-100 text-indigo-800">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-s font-medium bg-indigo-500/20 text-indigo-200">
                                         <CheckCircle className="h-3 w-3 mr-1" />
                                         Cuestionarios
                                     </span>
                                 )}
                                 {programa.tiene_diarios && (
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-s font-medium bg-emerald-100 text-emerald-800">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-s font-medium bg-emerald-500/20 text-emerald-200">
                                         <CheckCircle className="h-3 w-3 mr-1" />
                                         Diarios
                                     </span>
                                 )}
                                 {!programa.tiene_cuestionarios && !programa.tiene_diarios && (
-                                    <span className="text-gray-500">Sin evaluación</span>
+                                    <span className="text-indigo-200">Sin evaluación</span>
                                 )}
                             </div>
                         </div>
@@ -172,21 +172,21 @@ const ProgramaDetalle = ({
 
                 {/* Cuestionarios - Solo para programa activo */}
                 {!esCompletado && permitirNavegacionCuestionarios && (programa.tiene_cuestionarios) && (
-                    <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
-                        <h2 className="text-xl font-bold text-gray-900 mb-4">Cuestionarios</h2>
-                        <p className="text-gray-600 mb-4">
+                    <div className="bg-white/10 backdrop-blur-xl rounded-xl shadow-sm p-6 mb-8 border border-white/10">
+                        <h2 className="text-xl font-bold text-white mb-4">Cuestionarios</h2>
+                        <p className="text-indigo-200 mb-4">
                             Completa estos cuestionarios para avanzar en el programa:
                         </p>
                         <div className="flex space-x-4">
                             <div className="w-1/2">
                                 {cuestionarioPreRespondido ? (
-                                    <div className="flex items-center justify-center px-6 py-3 rounded-md text-lg font-medium bg-green-100 text-green-800">
+                                    <div className="flex items-center justify-center px-6 py-3 rounded-md text-lg font-medium bg-green-500/20 text-green-200">
                                         <CheckCircle2 className="mr-2 h-5 w-5" /> Cuestionario Pre Completado
                                     </div>
                                 ) : (
                                     <button
                                         onClick={() => navigate('/miprograma/cuestionario-pre')}
-                                        className="w-full px-6 py-3 rounded-md text-lg font-medium bg-blue-600 text-white border-2 border-blue-400 shadow-md ring-2 ring-blue-200 hover:bg-blue-700"
+                                        className="w-full px-6 py-3 rounded-md text-lg font-medium bg-gradient-to-r from-indigo-600 to-blue-500 text-white border-2 border-indigo-400 shadow-md hover:from-indigo-700 hover:to-blue-600"
                                     >
                                         Cuestionario Pre
                                     </button>
@@ -194,14 +194,14 @@ const ProgramaDetalle = ({
                             </div>
                             <div className="w-1/2">
                                 {cuestionarioPostRespondido ? (
-                                    <div className="flex items-center justify-center px-6 py-3 rounded-md text-lg font-medium bg-green-100 text-green-800">
+                                    <div className="flex items-center justify-center px-6 py-3 rounded-md text-lg font-medium bg-green-500/20 text-green-200">
                                         <CheckCircle2 className="mr-2 h-5 w-5" /> Cuestionario Post Completado
                                     </div>
                                 ) : (
                                     <button
                                         onClick={() => navigate('/miprograma/cuestionario-post')}
                                         disabled={progreso.sesionesCompletadas < progreso.totalSesiones}
-                                        className={`w-full px-6 py-3 rounded-md text-lg font-medium ${progreso.sesionesCompletadas < progreso.totalSesiones ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-600 text-white border-2 border-blue-400 shadow-md ring-2 ring-blue-200 hover:bg-blue-700'}`}
+                                        className={`w-full px-6 py-3 rounded-md text-lg font-medium ${progreso.sesionesCompletadas < progreso.totalSesiones ? 'bg-gray-500/20 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white border-2 border-indigo-400 shadow-md hover:from-indigo-700 hover:to-blue-600'}`}
                                     >
                                         Cuestionario Post
                                     </button>
@@ -212,8 +212,8 @@ const ProgramaDetalle = ({
                 )}
 
                 {/* Sesiones */}
-                <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-4">Sesiones del programa</h2>
+                <div className="bg-white/10 backdrop-blur-xl rounded-xl shadow-sm p-6 border border-white/10">
+                    <h2 className="text-xl font-semibold text-white mb-4">Sesiones del programa</h2>
                     <div className="space-y-4">
                         {programa.sesiones?.map((sesion, index) => (
                             <SesionCard

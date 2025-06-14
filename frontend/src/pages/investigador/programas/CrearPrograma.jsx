@@ -24,7 +24,7 @@ const CrearPrograma = () => {
         estado_publicacion: EstadoPublicacion.BORRADOR.value
     });
 
-    // TODO: Eliminar este método
+    // TODO: Eliminar este método + boton debajo
     const fillTestData = () => {
         setFormData({
             nombre: 'Programa de Prueba',

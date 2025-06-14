@@ -31,21 +31,23 @@ const ProgramasCompletados = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 pb-16 md:pb-0">
-                <Loader2 className="animate-spin h-12 w-12 text-blue-600" />
-                <p className="mt-4 text-gray-600">Cargando programas completados...</p>
+            <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 pb-16 md:pb-0">
+                <Loader2 className="animate-spin h-12 w-12 text-indigo-300" />
+                <p className="mt-4 text-indigo-200">Cargando programas completados...</p>
                 <MobileNavBar />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
+        <div className="min-h-screen bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 py-8 px-4 sm:px-6 lg:px-8 pb-20 md:pb-10">
             <div className="max-w-7xl mx-auto">
                 <PageHeader
                     title="Mis Programas Completados"
                     subtitle="Revisa tus programas completados y accede a su contenido"
                     backUrl="/home"
+                    titleClassName="bg-gradient-to-r from-white via-indigo-200 to-indigo-400"
+                    subtitleClassName="text-indigo-200"
                 />
 
                 <ErrorAlert
@@ -67,35 +69,35 @@ const ProgramasCompletados = () => {
                         {programas.map((programa) => (
                             <div
                                 key={programa.id}
-                                className="bg-white rounded-xl md:rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border border-indigo-100"
+                                className="bg-white/10 backdrop-blur-xl rounded-xl md:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-white/10"
                             >
                                 <div className="p-4 md:p-6 lg:p-8 flex flex-col h-full">
                                     <div className="flex items-start justify-between mb-3 md:mb-6">
                                         <div>
-                                            <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-1 md:mb-2">{programa.nombre}</h3>
-                                            <p className="text-xs md:text-sm text-gray-500">
+                                            <h3 className="text-lg md:text-xl font-bold text-white mb-1 md:mb-2">{programa.nombre}</h3>
+                                            <p className="text-xs md:text-sm text-indigo-200">
                                                 Por {programa.creado_por.nombre_completo_investigador}
                                             </p>
                                         </div>
-                                        <span className="inline-flex items-center px-2 py-1 md:px-3 md:py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <span className="inline-flex items-center px-2 py-1 md:px-3 md:py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-300">
                                             <Star className="h-3 w-3 md:h-4 md:w-4 mr-1" />
                                             Completado
                                         </span>
                                     </div>
 
-                                    <p className="text-sm md:text-base text-gray-600 line-clamp-2 md:line-clamp-3 mb-4 md:mb-6">{programa.descripcion}</p>
+                                    <p className="text-sm md:text-base text-indigo-200 line-clamp-2 md:line-clamp-3 mb-4 md:mb-6">{programa.descripcion}</p>
 
                                     <div className="grid grid-cols-2 gap-2 md:space-y-4 md:grid-cols-1 mb-4 md:mb-8">
-                                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
-                                            <Calendar className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
+                                        <div className="flex items-center text-indigo-200 bg-indigo-500/10 p-2 md:p-3 rounded-lg text-sm md:text-base">
+                                            <Calendar className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-300" />
                                             <span>{programa.duracion_semanas} semanas</span>
                                         </div>
-                                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
-                                            <Users className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
+                                        <div className="flex items-center text-indigo-200 bg-indigo-500/10 p-2 md:p-3 rounded-lg text-sm md:text-base">
+                                            <Users className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-300" />
                                             <span>{programa.participantes?.length || 0} participantes</span>
                                         </div>
-                                        <div className="flex items-center text-gray-600 bg-gray-50 p-2 md:p-3 rounded-lg text-sm md:text-base">
-                                            <FileText className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-600" />
+                                        <div className="flex items-center text-indigo-200 bg-indigo-500/10 p-2 md:p-3 rounded-lg text-sm md:text-base">
+                                            <FileText className="mr-2 md:mr-3 h-4 w-4 md:h-5 md:w-5 text-indigo-300" />
                                             <span className="capitalize">{programa.enfoque_metodologico}</span>
                                         </div>
                                     </div>

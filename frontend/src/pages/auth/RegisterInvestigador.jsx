@@ -135,7 +135,7 @@ const RegisterInvestigador = () => {
                                 <ArrowLeft className="h-5 w-5" />
                             </button>
 
-
+                            {/* TODO: Eliminar este código */}
                             <button
                                 type="button"
                                 onClick={fillTestData}
