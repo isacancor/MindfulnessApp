@@ -72,26 +72,6 @@ const RegisterParticipante = () => {
         await register(formData);
     };
 
-    // TODO: Eliminar este código
-    const fillTestData = () => {
-        setFormData({
-            nombre: 'Test',
-            apellidos: 'Participante',
-            email: 'test' + Math.floor(Math.random() * 1000) + '@test.com',
-            username: 'testparticipante' + Math.floor(Math.random() * 1000),
-            password: 'Test12345!',
-            fechaNacimiento: '1990-01-01',
-            genero: 'Femenino',
-            ocupacion: 'Estudiante',
-            nivelEducativo: 'GRADO',
-            experienciaMindfulness: 'PRINCIPIANTE',
-            condicionesSalud: 'Ninguna condición relevante',
-            telefono: '123456789',
-            ubicacion: 'Barcelona',
-            role: 'PARTICIPANTE'
-        });
-    };
-
     useEffect(() => {
         if (isAuthenticated()) {
             if (user.role === 'INVESTIGADOR') {
@@ -114,15 +94,6 @@ const RegisterParticipante = () => {
                                 aria-label="Volver atrás"
                             >
                                 <ArrowLeft className="h-5 w-5" />
-                            </button>
-
-                            {/* TODO: Eliminar este código */}
-                            <button
-                                type="button"
-                                onClick={fillTestData}
-                                className="absolute top-6 right-6 px-3 py-2 text-sm rounded-lg transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
-                            >
-                                Rellenar datos de prueba
                             </button>
 
                             <div className="text-center mt-2">

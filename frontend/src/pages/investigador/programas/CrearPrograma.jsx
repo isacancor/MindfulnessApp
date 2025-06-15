@@ -24,22 +24,6 @@ const CrearPrograma = () => {
         estado_publicacion: EstadoPublicacion.BORRADOR.value
     });
 
-    // TODO: Eliminar este método + boton debajo
-    const fillTestData = () => {
-        setFormData({
-            nombre: 'Programa de Prueba',
-            descripcion: 'Este es un programa de prueba para mindfulness enfocado en reducir el estrés y mejorar el bienestar general.',
-            tipo_contexto: 'otro',
-            enfoque_metodologico: 'MBSR',
-            duracion_semanas: '1',
-            poblacion_objetivo: 'Estudiantes universitarios',
-            tiene_cuestionarios: true,
-            tiene_diarios: true,
-            creado_por: user.id,
-            estado_publicacion: EstadoPublicacion.BORRADOR.value
-        });
-    };
-
     const tiposContexto = getEnumArray(TipoContexto);
     const enfoquesMetodologicos = getEnumArray(EnfoqueMetodologico);
 
@@ -106,14 +90,6 @@ const CrearPrograma = () => {
                         aria-label="Volver atrás"
                     >
                         <ArrowLeft className="h-5 w-5" />
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={fillTestData}
-                        className="absolute top-6 right-6 px-3 py-2 text-sm rounded-lg transition-all duration-200 text-gray-500 hover:text-indigo-600 border border-gray-300/30 hover:border-indigo-300 bg-white/90 hover:bg-indigo-100 focus:outline-none shadow-sm"
-                    >
-                        Rellenar datos de prueba
                     </button>
 
                     <div className="text-center mt-2">

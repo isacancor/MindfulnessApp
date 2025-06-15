@@ -31,25 +31,6 @@ const CrearSesion = () => {
         video_fondo: ''
     });
 
-    // TODO: Eliminar este método + boton debajo
-    const fillTestData = () => {
-        setFormData({
-            programa: id,
-            titulo: 'Sesión de Prueba',
-            descripcion: 'Esta es una sesión de prueba que incluye ejercicios de respiración y meditación guiada.',
-            semana: '1',
-            duracion_estimada: '45',
-            tipo_practica: 'otro',
-            tipo_contenido: 'enlace',
-            tipo_escala: programa?.tiene_diarios ? 'EMOCIONAL' : '',
-            contenido_temporizador: null,
-            contenido_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-            contenido_audio: null,
-            contenido_video: null,
-            video_fondo: ''
-        });
-    };
-
     const tiposPractica = getEnumArray(EtiquetaPractica);
     const tiposContenido = getEnumArray(TipoContenido);
     const tiposEscala = getEnumArray(Escala);
@@ -131,14 +112,6 @@ const CrearSesion = () => {
                         aria-label="Volver atrás"
                     >
                         <ArrowLeft className="h-5 w-5" />
-                    </button>
-
-                    <button
-                        type="button"
-                        onClick={fillTestData}
-                        className="absolute top-6 right-6 px-3 py-2 text-sm rounded-lg transition-all duration-200 text-gray-500 hover:text-indigo-600 border border-gray-300/30 hover:border-indigo-300 bg-white/90 hover:bg-indigo-100 focus:outline-none shadow-sm"
-                    >
-                        Rellenar datos de prueba
                     </button>
 
                     <div className="text-center mt-2">
