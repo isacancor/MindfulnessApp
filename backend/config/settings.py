@@ -55,7 +55,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,7 +62,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'autenticacion.middleware.JWTAuthenticationMiddleware',  # JWT middleware
+    'corsheaders.middleware.CorsMiddleware',
+    'autenticacion.middleware.JWTAuthenticationMiddleware',
+    'autenticacion.middleware.DataSanitizationMiddleware',  # Nuevo middleware de sanitización
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -125,6 +126,16 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',  # límite general para usuarios anónimos
+        'user': '1000/day',  # límite general para usuarios autenticados
+        'auth_anon': '5/minute',  # límite específico para autenticación de anónimos
+        'auth_user': '20/minute',  # límite específico para autenticación de usuarios
+    }
 }
 
 # JWT settings
@@ -225,5 +236,11 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # File upload settings
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+FILE_UPLOAD_HANDLERS = [
+    'django.core.files.uploadhandler.MemoryFileUploadHandler',
+    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+]
+
+# Tamaño máximo de archivo (10MB)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760

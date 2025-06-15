@@ -4,8 +4,9 @@ from django.utils import timezone
 from datetime import timedelta
 from config.enums import (
     TipoContexto, EnfoqueMetodologico,
-    EstadoPublicacion, EstadoInscripcion
+    EstadoPublicacion, EstadoInscripcion, TipoRecurso
 )
+from django.core.exceptions import ValidationError
 
 class Programa(models.Model):
     # Identificación y Metadatos Generales
@@ -209,3 +210,25 @@ class InscripcionPrograma(models.Model):
 
     def get_estado_inscripcion_display(self):
         return dict(EstadoInscripcion.choices).get(self.estado_inscripcion, self.estado_inscripcion)
+
+class Recurso(models.Model):
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField(blank=True)
+    tipo = models.CharField(max_length=20, choices=TipoRecurso.choices)
+    archivo = models.FileField(
+        upload_to='recursos/',
+        null=True,
+        blank=True
+    )
+    url = models.URLField(max_length=500, null=True, blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        if not self.archivo and not self.url:
+            raise ValidationError('Debe proporcionar un archivo o una URL')
+        if self.archivo and self.url:
+            raise ValidationError('No puede proporcionar tanto un archivo como una URL')
+
+    def __str__(self):
+        return self.titulo

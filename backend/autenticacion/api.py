@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate, get_user_model
@@ -14,10 +15,17 @@ from usuario.serializers import (
 from programa.models import Programa
 from config.enums import EstadoPublicacion
 
+class AuthAnonRateThrottle(AnonRateThrottle):
+    rate = '5/minute'  # 5 intentos por minuto para usuarios anónimos
+
+class AuthUserRateThrottle(UserRateThrottle):
+    rate = '20/minute'  # 20 intentos por minuto para usuarios autenticados
+
 Usuario = get_user_model()
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthAnonRateThrottle])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
 
@@ -37,6 +45,7 @@ def register(request):
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
+@throttle_classes([AuthAnonRateThrottle])
 def login(request):
     username = request.data.get('username')
     password = request.data.get('password')
@@ -83,6 +92,7 @@ def update_profile(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+@throttle_classes([AuthUserRateThrottle])
 def change_password(request):
     serializer = ChangePasswordSerializer(data=request.data)
     
