@@ -79,7 +79,8 @@ class ProgramaSerializer(serializers.ModelSerializer):
 
     def validate_estado_publicacion(self, value):
         if value == EstadoPublicacion.PUBLICADO:
-            if not self.instance.puede_ser_publicado():
+            # Solo validar si estamos actualizando un programa existente
+            if self.instance and not self.instance.puede_ser_publicado():
                 raise serializers.ValidationError(
                     "No se puede publicar el programa porque faltan campos requeridos, sesiones o cuestionarios"
                 )

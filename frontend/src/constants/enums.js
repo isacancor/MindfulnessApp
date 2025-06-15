@@ -98,7 +98,7 @@ export const Escala = {
     ESTRES_ACTUAL: { value: 'estres_actual', label: '¿Cuánto estrés sientes ahora mismo? [0–10]' },
     BIENESTAR_GENERAL: { value: 'bienestar_general', label: '¿Cómo valoras tu bienestar general ahora mismo? [0–10]' },
     UTILIDAD_SESION: { value: 'utilidad_sesion', label: '¿Cuánto te ha servido esta sesión de mindfulness? [1–5]' },
-    CLARIDAD_MENTAL: { value: 'claridad_mental', label: '¿Qué tanta claridad mental sientes ahora mismo? [1–5]' },
+    CLARIDAD_MENTAL: { value: 'claridad_mental', label: '¿Cuánta claridad mental sientes ahora mismo? [1–5]' },
     PRESENCIA: { value: 'presencia', label: '¿Qué tan presente te sientes en este momento? [1–5]' }
 };
 

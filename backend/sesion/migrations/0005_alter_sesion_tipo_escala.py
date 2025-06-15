@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='sesion',
             name='tipo_escala',
-            field=models.CharField(blank=True, choices=[('estado_emocional', '¿Cómo te sientes emocionalmente en este momento? [1–5]'), ('estres_actual', '¿Cuánto estrés sientes ahora mismo? [0–10]'), ('bienestar_general', '¿Cómo valoras tu bienestar general ahora mismo? [0–10]'), ('utilidad_sesion', '¿Cuánto te ha servido esta sesión de mindfulness? [1–5]'), ('claridad_mental', '¿Qué tanta claridad mental sientes ahora mismo? [1–5]'), ('presencia', '¿Qué tan presente te sientes en este momento? [1–5]')], default='estado_emocional', max_length=50, null=True),
+            field=models.CharField(blank=True, choices=[('estado_emocional', '¿Cómo te sientes emocionalmente en este momento? [1–5]'), ('estres_actual', '¿Cuánto estrés sientes ahora mismo? [0–10]'), ('bienestar_general', '¿Cómo valoras tu bienestar general ahora mismo? [0–10]'), ('utilidad_sesion', '¿Cuánto te ha servido esta sesión de mindfulness? [1–5]'), ('claridad_mental', '¿Cuánta claridad mental sientes ahora mismo? [1–5]'), ('presencia', '¿Qué tan presente te sientes en este momento? [1–5]')], default='estado_emocional', max_length=50, null=True),
         ),
     ]

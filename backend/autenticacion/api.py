@@ -11,7 +11,8 @@ from usuario.serializers import (
     RegisterSerializer,
     ChangePasswordSerializer
 )
-from programa.models import Programa, EstadoPublicacion
+from programa.models import Programa
+from config.enums import EstadoPublicacion
 
 Usuario = get_user_model()
 
@@ -20,8 +21,8 @@ Usuario = get_user_model()
 def register(request):
     serializer = RegisterSerializer(data=request.data)
 
-    try:
-        if serializer.is_valid():
+    if serializer.is_valid():
+        try:
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -29,9 +30,10 @@ def register(request):
                 'refresh': str(refresh),
                 'user': UsuarioSerializer(user).data
             }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors.get('password')[-1], status=status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return Response({'error': e.detail}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -110,7 +112,7 @@ def change_password(request):
             'user': UsuarioSerializer(user).data
         }, status=status.HTTP_200_OK)
     
-    return Response(serializer.errors.get('new_password')[-1], status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])

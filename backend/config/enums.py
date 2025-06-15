@@ -90,7 +90,7 @@ class Escala(models.TextChoices):
     ESTRES_ACTUAL = 'estres_actual', '¿Cuánto estrés sientes ahora mismo? [0–10]'
     BIENESTAR_GENERAL = 'bienestar_general', '¿Cómo valoras tu bienestar general ahora mismo? [0–10]'
     UTILIDAD_SESION = 'utilidad_sesion', '¿Cuánto te ha servido esta sesión de mindfulness? [1–5]'
-    CLARIDAD_MENTAL = 'claridad_mental', '¿Qué tanta claridad mental sientes ahora mismo? [1–5]'
+    CLARIDAD_MENTAL = 'claridad_mental', '¿Cuánta claridad mental sientes ahora mismo? [1–5]'
     PRESENCIA = 'presencia', '¿Qué tan presente te sientes en este momento? [1–5]'
 
 # Enums de Cuestionario

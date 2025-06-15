@@ -34,7 +34,7 @@ def programa_list_create(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])
 def programa_detail(request, pk):
     try:
@@ -46,7 +46,7 @@ def programa_detail(request, pk):
         serializer = ProgramaSerializer(programa)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
+    elif request.method in ['PUT', 'PATCH']:
         if programa.creado_por != request.user.perfil_investigador:
             return Response(
                 {'error': 'Solo el investigador puede modificar el programa'},
@@ -69,7 +69,9 @@ def programa_detail(request, pk):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        serializer = ProgramaSerializer(programa, data=request.data)
+        # Usar partial=True para PATCH
+        partial = request.method == 'PATCH'
+        serializer = ProgramaSerializer(programa, data=request.data, partial=partial)
         if serializer.is_valid():
             programa_actualizado = serializer.save()
             return Response(serializer.data)
@@ -406,8 +408,8 @@ def programa_inscripciones(request, pk):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsInvestigador])
-def obtener_participantes_programa(request, programa_id):
-    programa = get_object_or_404(Programa, id=programa_id)
+def obtener_participantes_programa(request, pk):
+    programa = get_object_or_404(Programa, id=pk)
     
     # Verificar que el investigador tiene permiso para ver este programa
     if programa.creado_por.usuario != request.user:

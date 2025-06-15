@@ -20,20 +20,24 @@ class InvestigadorSerializer(serializers.ModelSerializer):
 
 class ParticipanteSerializer(serializers.ModelSerializer):
     id_anonimo = serializers.SerializerMethodField()
-    genero = serializers.CharField(source='usuario.genero')
+    genero = serializers.CharField(source='usuario.genero', read_only=True)
     genero_display = serializers.CharField(source='usuario.get_genero_display', read_only=True)
-    fecha_nacimiento = serializers.DateField(source='usuario.fechaNacimiento')
-    ocupacion = serializers.CharField(source='usuario.ocupacion')
-    nivel_educativo = serializers.CharField(source='usuario.nivelEducativo')
+    fecha_nacimiento = serializers.DateField(source='usuario.fechaNacimiento', read_only=True)
+    ocupacion = serializers.CharField(source='usuario.ocupacion', read_only=True)
+    nivel_educativo = serializers.CharField(source='usuario.nivelEducativo', read_only=True)
     nivel_educativo_display = serializers.CharField(source='usuario.get_nivel_educativo_display', read_only=True)
-    ubicacion = serializers.CharField(source='usuario.ubicacion')
-    experiencia_mindfulness = serializers.CharField(source='experienciaMindfulness')
+    ubicacion = serializers.CharField(source='usuario.ubicacion', read_only=True)
+    experiencia_mindfulness = serializers.CharField(source='experienciaMindfulness', read_only=True)
     experiencia_mindfulness_display = serializers.CharField(source='get_experiencia_mindfulness_display', read_only=True)
-    condiciones_salud = serializers.CharField(source='condicionesSalud')
+    condiciones_salud = serializers.CharField(source='condicionesSalud', read_only=True)
 
     class Meta:
         model = Participante
         fields = [
+            'id',
+            'usuario',
+            'experienciaMindfulness',
+            'condicionesSalud',
             'id_anonimo',
             'genero',
             'genero_display',
@@ -210,3 +214,11 @@ class ChangePasswordSerializer(serializers.Serializer):
         except ValidationError as e:
             raise serializers.ValidationError(list(e.messages))
         return value
+
+class ParticipanteViewSetSerializer(serializers.ModelSerializer):
+    """Serializer simple para el ViewSet de Participante que permite actualizaciones."""
+    
+    class Meta:
+        model = Participante
+        fields = ['id', 'usuario', 'experienciaMindfulness', 'condicionesSalud']
+        read_only_fields = ['id', 'usuario']

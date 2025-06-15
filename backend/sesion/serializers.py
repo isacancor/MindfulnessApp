@@ -4,16 +4,16 @@ from usuario.serializers import ParticipanteSerializer
 from config.enums import EtiquetaPractica, TipoContenido, Escala
 
 class EtiquetaPracticaSerializer(serializers.Serializer):
-    value = serializers.CharField(source='value')
-    label = serializers.CharField(source='label')
+    value = serializers.CharField()
+    label = serializers.CharField()
 
 class TipoContenidoSerializer(serializers.Serializer):
-    value = serializers.CharField(source='value')
-    label = serializers.CharField(source='label')
+    value = serializers.CharField()
+    label = serializers.CharField()
 
 class EscalaSerializer(serializers.Serializer):
-    value = serializers.CharField(source='value')
-    label = serializers.CharField(source='label')
+    value = serializers.CharField()
+    label = serializers.CharField()
 
 class SesionSerializer(serializers.ModelSerializer):
     programa_nombre = serializers.CharField(source='programa.nombre', read_only=True)
@@ -63,7 +63,8 @@ class DiarioSesionSerializer(serializers.ModelSerializer):
     sesion_id = serializers.PrimaryKeyRelatedField(
         queryset=Sesion.objects.all(),
         source='sesion',
-        write_only=True
+        write_only=True,
+        required=False
     )
 
     class Meta:

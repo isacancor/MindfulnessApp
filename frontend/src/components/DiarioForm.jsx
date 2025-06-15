@@ -21,7 +21,7 @@ const DiarioForm = ({ programa, sesion, onClose, isLastSession }) => {
             case Escala.UTILIDAD_SESION.value:
                 return { min: 1, max: 5, label: '¿Cuánto te ha servido esta sesión de mindfulness?' };
             case Escala.CLARIDAD_MENTAL.value:
-                return { min: 1, max: 5, label: '¿Qué tanta claridad mental sientes ahora mismo?' };
+                return { min: 1, max: 5, label: '¿Cuánta claridad mental sientes ahora mismo?' };
             case Escala.PRESENCIA.value:
                 return { min: 1, max: 5, label: '¿Qué tan presente te sientes en este momento?' };
             default:

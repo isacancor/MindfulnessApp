@@ -1,21 +1,24 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from .models import Usuario, Investigador, Participante
-from .serializers import UsuarioSerializer, InvestigadorSerializer, ParticipanteSerializer
+from .serializers import UsuarioSerializer, InvestigadorSerializer, ParticipanteSerializer, ParticipanteViewSetSerializer
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
 
 class InvestigadorViewSet(viewsets.ModelViewSet):
     queryset = Investigador.objects.all()
     serializer_class = InvestigadorSerializer
+    permission_classes = [IsAuthenticated]
 
 class ParticipanteViewSet(viewsets.ModelViewSet):
     queryset = Participante.objects.all()
-    serializer_class = ParticipanteSerializer
+    serializer_class = ParticipanteViewSetSerializer
+    permission_classes = [IsAuthenticated]
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

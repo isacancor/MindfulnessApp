@@ -139,7 +139,7 @@ def sesion_list_create(request):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def sesion_detail(request, pk):
@@ -152,7 +152,7 @@ def sesion_detail(request, pk):
         serializer = SesionDetalleSerializer(sesion)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
+    elif request.method in ['PUT', 'PATCH']:
         # Verificar que el usuario es un investigador
         if not request.user.is_investigador():
             return Response(
@@ -214,7 +214,9 @@ def sesion_detail(request, pk):
             
             sesion.save()
         
-        serializer = SesionSerializer(sesion, data=request.data)
+        # Usar partial=True para PATCH
+        partial = request.method == 'PATCH'
+        serializer = SesionSerializer(sesion, data=request.data, partial=partial)
 
         if serializer.is_valid():
             serializer.save()

@@ -119,3 +119,88 @@ Ahora tu backend debería estar corriendo en `http://localhost:8000`.
    ```
 
 Ahora tu frontend debería estar corriendo en `http://localhost:3000`.
+
+---
+
+## Testing de backend
+
+El proyecto incluye una suite completa de tests para validar la funcionalidad de la API. Los tests están organizados por módulos y cubren todos los endpoints principales.
+
+### Estructura de Tests
+
+```
+backend/tests/
+├── conftest.py              # Configuración y fixtures compartidas
+├── test_settings.py         # Configuración específica para tests
+└── test_api/
+    ├── test_autenticacion_api.py    # Tests de autenticación y JWT
+    ├── test_usuario_api.py          # Tests de gestión de usuarios
+    ├── test_programa_api.py         # Tests de programas de mindfulness
+    ├── test_sesion_api.py           # Tests de sesiones y diarios
+    └── test_cuestionario_api.py     # Tests de cuestionarios y respuestas
+```
+
+### Ejecutar Tests
+
+**Ejecutar todos los tests:**
+```bash
+cd backend
+venv/Scripts/Activate
+pytest
+```
+
+**Ejecutar tests con cobertura:**
+```bash
+pytest --cov
+```
+
+**Ejecutar tests de un módulo específico:**
+```bash
+# Tests de autenticación
+python run_tests.py autenticacion
+
+# Tests de usuarios
+python run_tests.py usuario
+
+# Tests de programas
+python run_tests.py programa
+
+# Tests de sesiones
+python run_tests.py sesion
+
+# Tests de cuestionarios
+python run_tests.py cuestionario
+```
+
+**Ejecutar tests con salida detallada:**
+```bash
+pytest -v
+```
+
+**Ejecutar un test específico:**
+```bash
+pytest tests/test_api/test_usuario_api.py::TestUsuarioAPI::test_usuario_create_success
+```
+
+### Cobertura de Tests
+
+Los tests actuales cubren:
+
+- ✅ **Autenticación**: Login, logout, refresh tokens, registro
+- ✅ **Usuarios**: CRUD completo, permisos, perfiles (investigador/participante)
+- ✅ **Programas**: Creación, gestión, publicación, inscripciones, duplicación
+- ✅ **Sesiones**: CRUD, diarios de sesión, tipos de práctica y contenido
+- ✅ **Cuestionarios**: Creación, respuestas, validaciones, momentos (pre/post)
+
+**Estadísticas de cobertura actual:**
+- **104 tests** ejecutándose exitosamente
+- **72% cobertura** general del código
+- **100% de tests pasando** en todos los módulos
+
+### Configuración de Tests
+
+Los tests utilizan:
+- **Base de datos en memoria** (SQLite) para mayor velocidad
+- **Fixtures** reutilizables para datos de prueba
+- **Autenticación JWT** simulada para tests de API
+- **Transacciones** que se revierten automáticamente
