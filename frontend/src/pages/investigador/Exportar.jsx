@@ -36,6 +36,14 @@ const Exportar = () => {
 
         setExportando(true);
         setExito(false);
+        setError(null);
+
+        // Validar si hay participantes
+        if (!programaSeleccionado.participantes?.length) {
+            setError('No hay participantes en este programa para exportar datos.');
+            setExportando(false);
+            return;
+        }
 
         try {
             if (tipoExportacion === 'cuestionarios') {
@@ -56,6 +64,7 @@ const Exportar = () => {
         const programa = programas.find(p => p.id === programaId);
         setProgramaSeleccionado(programa);
         setExito(false);
+        setError(null);
     };
 
     if (loading) {

@@ -3,14 +3,11 @@ import React from 'react';
 const VIDEOS_DISPONIBLES = [
     { value: '', label: 'Sin video de fondo' },
     { value: 'lluvia.mp4', label: 'Lluvia' },
-    { value: 'lluvia2.mp4', label: 'Lluvia 2' },
+    { value: 'naturaleza.mp4', label: 'Naturaleza' },
     { value: 'olas.mp4', label: 'Olas' },
     { value: 'barco.mp4', label: 'Barco' },
     { value: 'sunset.mp4', label: 'Atardecer' },
-    { value: 'lago.mp4', label: 'Lago' },
     { value: 'nubes.mp4', label: 'Nubes' },
-    { value: 'ciudad.mp4', label: 'Ciudad' },
-    { value: 'mountains.mp4', label: 'Montañas' }
 ];
 
 const VideoFondoSelector = ({ value, onChange }) => {

@@ -39,6 +39,7 @@ const Analisis = () => {
         setLoading(true);
         const programa = programas.find(p => p.id === programaId);
         setProgramaSeleccionado(programa);
+        setError(null);
 
         try {
             const responseGenerales = await api.get(`/programas/${programaId}/estadisticas`);

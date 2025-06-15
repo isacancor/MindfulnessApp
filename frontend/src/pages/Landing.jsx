@@ -79,6 +79,9 @@ export default function Landing() {
                 <div className="absolute inset-0 bg-[url('/pattern.svg')] opacity-10"></div>
                 <div className="max-w-4xl mx-auto relative z-10">
                     <div className="mb-4 flex justify-center">
+                        <img src="/src/assets/icon.png" alt="Mindfluence Icon" className="w-36 h-36 mb-4" />
+                    </div>
+                    <div className="mb-4 flex justify-center">
                         <span className="bg-indigo-500/30 text-emerald-300 px-4 py-1.5 rounded-full text-sm font-medium">
                             Investigación en Mindfulness
                         </span>
