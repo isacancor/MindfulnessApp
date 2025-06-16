@@ -170,7 +170,7 @@ const ResponderCuestionario = ({ momento }) => {
                                                 value={i + 1}
                                                 checked={respuestas[index] === i + 1}
                                                 onChange={(e) => handleRespuestaChange(index, parseInt(e.target.value))}
-                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-indigo-300"
+                                                className="bg-white/10 border border-white/20 rounded-xl focus:ring-1 text-white placeholder-purple-200 outline-none"
                                             />
                                         </td>
                                     ))}
@@ -220,7 +220,7 @@ const ResponderCuestionario = ({ momento }) => {
                                     type="checkbox"
                                     checked={respuestas[pregunta.id]?.includes(opcion) || false}
                                     onChange={() => handleRespuestaChange(pregunta.id, opcion, 'checkbox')}
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-indigo-300 rounded"
+                                    className="bg-white/10 border border-white/20 rounded-xl focus:ring-1 text-white placeholder-purple-200 outline-none"
                                 />
                                 <span className="text-white">{opcion}</span>
                             </label>
@@ -281,13 +281,6 @@ const ResponderCuestionario = ({ momento }) => {
                         titleClassName="bg-gradient-to-r from-white via-indigo-200 to-indigo-400"
                         subtitleClassName="text-indigo-200"
                     />
-
-                    {error && (
-                        <ErrorAlert
-                            message={error}
-                            onClose={() => setError(null)}
-                        />
-                    )}
 
                     <form onSubmit={handleSubmit}>
                         {/* Preguntas */}

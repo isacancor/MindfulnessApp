@@ -38,22 +38,22 @@ const Login = () => {
 
     return (
         <BackgroundVideo videoSrc="/videos/barco.mp4">
-            <div className="min-h-screen flex items-center justify-center bg-transparent px-4 sm:px-6 lg:px-8">
+            <div className="min-h-screen flex items-center justify-center bg-transparent px-4 sm:px-6 lg:px-8 py-12">
                 <div className="w-full max-w-md">
-                    <div className="bg-white p-8 rounded-2xl shadow-xl relative">
+                    <div className="bg-gradient-to-br from-emerald-800 to-teal-800 p-6 sm:p-8 rounded-3xl shadow-2xl relative border border-white/10 backdrop-blur-sm">
                         <button
                             onClick={() => navigate('/')}
-                            className="absolute top-6 left-6 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-indigo-600 border border-gray-300/30 hover:border-indigo-300 bg-white/90 hover:bg-indigo-100 focus:outline-none shadow-sm"
+                            className="absolute top-4 sm:top-6 left-4 sm:left-6 p-2 rounded-full transition-all duration-200 text-emerald-200 hover:text-white border border-white/10 hover:border-emerald-300 bg-white/10 hover:bg-white/20 focus:outline-none shadow-sm hover:scale-110"
                             aria-label="Volver atrás"
                         >
                             <ArrowLeft className="h-5 w-5" />
                         </button>
 
-                        <div className="text-center mt-2">
-                            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                        <div className="text-center mt-4 sm:mt-2">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-emerald-200">
                                 Inicia sesión
                             </h2>
-                            <p className="text-gray-500">
+                            <p className="text-emerald-200 text-sm sm:text-base">
                                 Accede a tu cuenta para continuar
                             </p>
                         </div>
@@ -63,45 +63,59 @@ const Login = () => {
                             onClose={() => resetError()}
                         />
 
-                        <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-                            <div>
-                                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+                            <div className="space-y-2">
+                                <label htmlFor="username" className="block text-sm font-medium text-emerald-200">
                                     Nombre de usuario
                                 </label>
-                                <input
-                                    id="username"
-                                    name="username"
-                                    type="text"
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    placeholder="Tu nombre de usuario"
-                                    value={formData.username}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                />
+                                <div className="relative">
+                                    <input
+                                        id="username"
+                                        name="username"
+                                        type="text"
+                                        required
+                                        className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition duration-200 pl-10"
+                                        placeholder="Tu nombre de usuario"
+                                        value={formData.username}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                            <div className="space-y-2">
+                                <label htmlFor="password" className="block text-sm font-medium text-emerald-200">
                                     Contraseña
                                 </label>
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
-                                    placeholder="Tu contraseña"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                />
+                                <div className="relative">
+                                    <input
+                                        id="password"
+                                        name="password"
+                                        type="password"
+                                        required
+                                        className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition duration-200 pl-10"
+                                        placeholder="Tu contraseña"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        disabled={loading}
+                                    />
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg className="h-5 w-5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                </div>
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className={`w-full py-3 px-4 rounded-lg font-medium text-white shadow-md transition duration-200 ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                                className={`w-full py-3 px-4 rounded-xl font-medium text-white shadow-lg transition duration-200 hover:shadow-emerald-500/25 ${loading ? 'bg-emerald-500/50 cursor-not-allowed' : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 hover:-translate-y-0.5'}`}
                             >
                                 {loading ? (
                                     <span className="flex items-center justify-center">
@@ -115,13 +129,13 @@ const Login = () => {
                             </button>
                         </form>
 
-                        <div className="mt-6">
+                        <div className="mt-8">
                             <div className="relative">
                                 <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-gray-300"></div>
+                                    <div className="w-full border-t border-white/10"></div>
                                 </div>
                                 <div className="relative flex justify-center text-sm">
-                                    <span className="px-2 bg-white text-gray-500">
+                                    <span className="px-4 bg-gradient-to-br from-emerald-900 via-teal-800 to-emerald-950 text-emerald-200">
                                         ¿No tienes cuenta?
                                     </span>
                                 </div>
@@ -130,9 +144,12 @@ const Login = () => {
                             <div className="mt-4 text-center">
                                 <Link
                                     to="/register"
-                                    className="font-medium text-indigo-600 hover:text-indigo-500 transition duration-200"
+                                    className="inline-flex items-center font-medium text-emerald-300 hover:text-white transition duration-200 hover:scale-105"
                                 >
                                     Crea una cuenta ahora
+                                    <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                    </svg>
                                 </Link>
                             </div>
                         </div>

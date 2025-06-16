@@ -106,10 +106,10 @@ const RegisterInvestigador = () => {
             <div className="h-screen overflow-y-auto">
                 <div className="min-h-screen flex items-center justify-center bg-transparent px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-2xl">
-                        <div className="bg-white p-8 rounded-2xl shadow-xl relative">
+                        <div className="bg-gradient-to-br from-slate-900 via-purple-900 to-violet-900 p-8 rounded-2xl shadow-xl relative border border-white/10">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="absolute top-6 left-6 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-indigo-600 border border-gray-300/30 hover:border-indigo-300 bg-white/90 hover:bg-indigo-100 focus:outline-none shadow-sm"
+                                className="absolute top-6 left-6 p-2 rounded-full transition-all duration-200 text-purple-200 hover:text-white border border-white/10 hover:border-purple-300 bg-white/10 hover:bg-white/20 focus:outline-none shadow-sm"
                                 aria-label="Volver atrás"
                             >
                                 <ArrowLeft className="h-5 w-5" />
@@ -117,14 +117,14 @@ const RegisterInvestigador = () => {
 
                             <div className="text-center mt-2">
                                 <div className="flex justify-center mb-3">
-                                    <div className="bg-indigo-50 p-3 rounded-lg">
-                                        <BookOpen className="h-6 w-6 text-indigo-600" />
+                                    <div className="bg-purple-500/20 p-3 rounded-lg">
+                                        <BookOpen className="h-6 w-6 text-purple-300" />
                                     </div>
                                 </div>
-                                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                                <h2 className="text-3xl font-bold text-white mb-2">
                                     Registro de Investigador
                                 </h2>
-                                <p className="text-gray-500">
+                                <p className="text-purple-200">
                                     Completa tus datos para crear una cuenta de investigador
                                 </p>
                             </div>
@@ -137,7 +137,7 @@ const RegisterInvestigador = () => {
                             <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="nombre" className="block text-sm font-medium text-purple-200 mb-1">
                                             Nombre *
                                         </label>
                                         <input
@@ -145,7 +145,7 @@ const RegisterInvestigador = () => {
                                             name="nombre"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             placeholder="Tu nombre"
                                             value={formData.nombre}
                                             onChange={handleChange}
@@ -154,7 +154,7 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="apellidos" className="block text-sm font-medium text-purple-200 mb-1">
                                             Apellidos *
                                         </label>
                                         <input
@@ -162,7 +162,7 @@ const RegisterInvestigador = () => {
                                             name="apellidos"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             placeholder="Tus apellidos"
                                             value={formData.apellidos}
                                             onChange={handleChange}
@@ -171,7 +171,7 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="username" className="block text-sm font-medium text-purple-200 mb-1">
                                             Nombre de usuario *
                                         </label>
                                         <input
@@ -179,7 +179,7 @@ const RegisterInvestigador = () => {
                                             name="username"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             placeholder="Tu nombre de usuario"
                                             value={formData.username}
                                             onChange={handleChange}
@@ -188,7 +188,7 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="password" className="block text-sm font-medium text-purple-200 mb-1">
                                             Contraseña *
                                         </label>
                                         <input
@@ -196,7 +196,7 @@ const RegisterInvestigador = () => {
                                             name="password"
                                             type="password"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             placeholder="Tu contraseña"
                                             value={formData.password}
                                             onChange={handleChange}
@@ -205,7 +205,7 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="email" className="block text-sm font-medium text-purple-200 mb-1">
                                             Correo electrónico *
                                         </label>
                                         <input
@@ -213,7 +213,7 @@ const RegisterInvestigador = () => {
                                             name="email"
                                             type="email"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             placeholder="Tu correo electrónico"
                                             value={formData.email}
                                             onChange={handleChange}
@@ -222,7 +222,7 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="telefono" className="block text-sm font-medium text-purple-200 mb-1">
                                             Teléfono *
                                         </label>
                                         <input
@@ -230,7 +230,7 @@ const RegisterInvestigador = () => {
                                             name="telefono"
                                             type="tel"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             placeholder="Tu teléfono"
                                             value={formData.telefono}
                                             onChange={handleChange}
@@ -239,27 +239,27 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="genero" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="genero" className="block text-sm font-medium text-purple-200 mb-1">
                                             Género *
                                         </label>
                                         <select
                                             id="genero"
                                             name="genero"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200 appearance-none"
                                             value={formData.genero}
                                             onChange={handleChange}
                                             disabled={loading}
                                         >
-                                            <option value="">Selecciona tu género</option>
+                                            <option value="" className="bg-indigo-950 text-white">Selecciona tu género</option>
                                             {Object.values(Genero).map(({ value, label }) => (
-                                                <option key={value} value={value}>{label}</option>
+                                                <option key={value} value={value} className="bg-indigo-950 text-white">{label}</option>
                                             ))}
                                         </select>
                                     </div>
 
                                     <div>
-                                        <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-purple-200 mb-1">
                                             Fecha de nacimiento *
                                         </label>
                                         <input
@@ -267,18 +267,18 @@ const RegisterInvestigador = () => {
                                             name="fechaNacimiento"
                                             type="date"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             value={formData.fechaNacimiento}
                                             onChange={handleChange}
                                             disabled={loading}
                                         />
                                         {errorEdad && (
-                                            <p className="mt-1 text-sm text-red-600">{errorEdad}</p>
+                                            <p className="mt-1 text-sm text-red-400">{errorEdad}</p>
                                         )}
                                     </div>
 
                                     <div>
-                                        <label htmlFor="ubicacion" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="ubicacion" className="block text-sm font-medium text-purple-200 mb-1">
                                             Ubicación *
                                         </label>
                                         <input
@@ -286,7 +286,7 @@ const RegisterInvestigador = () => {
                                             name="ubicacion"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             placeholder="País o ciudad"
                                             value={formData.ubicacion}
                                             onChange={handleChange}
@@ -295,14 +295,14 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="experienciaInvestigacion" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="experienciaInvestigacion" className="block text-sm font-medium text-purple-200 mb-1">
                                             Experiencia en investigación *
                                         </label>
                                         <select
                                             id="experienciaInvestigacion"
                                             name="experienciaInvestigacion"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             value={formData.experienciaInvestigacion}
                                             onChange={handleChange}
                                             disabled={loading}
@@ -317,7 +317,7 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="ocupacion" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="ocupacion" className="block text-sm font-medium text-purple-200 mb-1">
                                             Ocupación *
                                         </label>
                                         <input
@@ -325,7 +325,7 @@ const RegisterInvestigador = () => {
                                             name="ocupacion"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-purple-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 outline-none transition duration-200"
                                             placeholder="Tu ocupación"
                                             value={formData.ocupacion}
                                             onChange={handleChange}
@@ -334,30 +334,32 @@ const RegisterInvestigador = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="nivelEducativo" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="nivelEducativo" className="block text-sm font-medium text-purple-200 mb-1">
                                             Nivel educativo *
                                         </label>
                                         <select
                                             id="nivelEducativo"
                                             name="nivelEducativo"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200 appearance-none"
                                             value={formData.nivelEducativo}
                                             onChange={handleChange}
                                             disabled={loading}
                                         >
-                                            <option value="">Selecciona tu nivel educativo</option>
+                                            <option value="" className="bg-indigo-950 text-white">Selecciona tu nivel educativo</option>
                                             {Object.values(NivelEducativo).map(({ value, label }) => (
-                                                <option key={value} value={value}>{label}</option>
+                                                <option key={value} value={value} className="bg-indigo-950 text-white">
+                                                    {label}
+                                                </option>
                                             ))}
                                         </select>
                                     </div>
 
                                     <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-medium text-purple-200 mb-1">
                                             Áreas de interés
                                         </label>
-                                        <div className="p-4 border border-gray-300 rounded-lg">
+                                        <div className="p-4 border border-white/10 rounded-lg bg-white/5">
                                             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                                                 {areasInteresOptions.map((area) => (
                                                     <label key={area} className="flex items-center space-x-2">
@@ -367,10 +369,10 @@ const RegisterInvestigador = () => {
                                                             value={area}
                                                             checked={formData.areasInteres.includes(area)}
                                                             onChange={handleChange}
-                                                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                                            className="h-4 w-4 text-purple-500 focus:ring-purple-500 border-white/20 rounded bg-white/5"
                                                             disabled={loading}
                                                         />
-                                                        <span className="text-sm text-gray-700">{area}</span>
+                                                        <span className="text-sm text-purple-200">{area}</span>
                                                     </label>
                                                 ))}
                                             </div>
@@ -393,26 +395,26 @@ const RegisterInvestigador = () => {
                                                         setErrorTerminos('');
                                                     }
                                                 }}
-                                                className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                                className="mt-1 h-4 w-4 text-purple-500 focus:ring-purple-500 border-white/20 rounded bg-white/5"
                                             />
                                             <div>
-                                                <label htmlFor="aceptaTerminos" className="text-sm text-gray-900 font-medium">
+                                                <label htmlFor="aceptaTerminos" className="text-sm text-white font-medium">
                                                     Acepto los términos, condiciones y el consentimiento informado *
                                                 </label>
-                                                <p className="text-sm text-gray-500 mt-1">
+                                                <p className="text-sm text-purple-200 mt-1">
                                                     Al registrarme, confirmo que he leído y acepto los términos y condiciones, y doy mi consentimiento informado para participar en la plataforma.
                                                 </p>
                                                 <Link
                                                     to="/terminos-servicio"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 mt-2"
+                                                    className="inline-flex items-center text-sm text-purple-300 hover:text-white mt-2"
                                                 >
                                                     <LinkIcon className="h-4 w-4 mr-1" />
                                                     Ver términos y condiciones completos
                                                 </Link>
                                                 {errorTerminos && (
-                                                    <p className="mt-1 text-sm text-red-600">{errorTerminos}</p>
+                                                    <p className="mt-1 text-sm text-red-400">{errorTerminos}</p>
                                                 )}
                                             </div>
                                         </div>
@@ -422,7 +424,7 @@ const RegisterInvestigador = () => {
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400"
+                                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
                                         >
                                             {loading ? 'Registrando...' : 'Registrarse'}
                                         </button>
@@ -433,10 +435,10 @@ const RegisterInvestigador = () => {
                             <div className="mt-6">
                                 <div className="relative">
                                     <div className="absolute inset-0 flex items-center">
-                                        <div className="w-full border-t border-gray-300"></div>
+                                        <div className="w-full border-t border-white/10"></div>
                                     </div>
                                     <div className="relative flex justify-center text-sm">
-                                        <span className="px-2 bg-white text-gray-500">
+                                        <span className="px-2 bg-gradient-to-br from-slate-900 via-purple-900 to-violet-900 text-purple-200">
                                             ¿Ya tienes una cuenta?
                                         </span>
                                     </div>
@@ -445,7 +447,7 @@ const RegisterInvestigador = () => {
                                 <div className="mt-4 text-center">
                                     <Link
                                         to="/login"
-                                        className="font-medium text-indigo-600 hover:text-indigo-500 transition duration-200"
+                                        className="font-medium text-purple-300 hover:text-white transition duration-200"
                                     >
                                         Inicia sesión aquí
                                     </Link>

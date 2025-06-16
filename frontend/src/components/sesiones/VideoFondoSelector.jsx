@@ -13,7 +13,7 @@ const VIDEOS_DISPONIBLES = [
 const VideoFondoSelector = ({ value, onChange }) => {
     return (
         <div>
-            <label htmlFor="video_fondo" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="video_fondo" className="block text-sm font-medium text-white mb-2">
                 Video de Fondo
             </label>
             <select
@@ -21,10 +21,10 @@ const VideoFondoSelector = ({ value, onChange }) => {
                 name="video_fondo"
                 value={value || ''}
                 onChange={onChange}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition duration-200"
+                className="w-full px-4 py-3 rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm text-white focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 outline-none transition duration-200"
             >
                 {VIDEOS_DISPONIBLES.map((video) => (
-                    <option key={video.value} value={video.value}>
+                    <option key={video.value} value={video.value} className="bg-slate-800 text-white">
                         {video.label}
                     </option>
                 ))}

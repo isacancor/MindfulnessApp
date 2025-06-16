@@ -37,7 +37,8 @@ export const prepareSessionFormData = (formData, originalData = null) => {
                     formToSend.append('limpiar_contenido', true);
                     formToSend.append('tipo_contenido_anterior', 'audio');
                 }
-                formToSend.append('contenido_audio', formData.contenido_audio);
+                // Asegurarse de que el archivo se adjunta correctamente
+                formToSend.append('contenido_audio', formData.contenido_audio, formData.contenido_audio.name);
             } else if (formData.contenido_audio && typeof formData.contenido_audio === 'string') {
                 formToSend.append('contenido_audio_existente', formData.contenido_audio);
             }
@@ -49,7 +50,8 @@ export const prepareSessionFormData = (formData, originalData = null) => {
                     formToSend.append('limpiar_contenido', true);
                     formToSend.append('tipo_contenido_anterior', 'video');
                 }
-                formToSend.append('contenido_video', formData.contenido_video);
+                // Asegurarse de que el archivo se adjunta correctamente
+                formToSend.append('contenido_video', formData.contenido_video, formData.contenido_video.name);
             } else if (formData.contenido_video && typeof formData.contenido_video === 'string') {
                 formToSend.append('contenido_video_existente', formData.contenido_video);
             }

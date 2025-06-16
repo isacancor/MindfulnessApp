@@ -87,10 +87,10 @@ const RegisterParticipante = () => {
             <div className="h-screen overflow-y-auto">
                 <div className="min-h-screen flex items-center justify-center bg-transparent px-4 sm:px-6 lg:px-8">
                     <div className="w-full max-w-2xl">
-                        <div className="bg-white p-8 rounded-2xl shadow-xl relative">
+                        <div className="bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 p-8 rounded-2xl shadow-xl relative border border-white/10">
                             <button
                                 onClick={() => navigate(-1)}
-                                className="absolute top-6 left-6 p-2 rounded-full transition-all duration-200 text-gray-500 hover:text-emerald-600 border border-gray-300/30 hover:border-emerald-300 bg-white/90 hover:bg-emerald-100 focus:outline-none shadow-sm"
+                                className="absolute top-6 left-6 p-2 rounded-full transition-all duration-200 text-indigo-200 hover:text-white border border-white/10 hover:border-indigo-300 bg-white/10 hover:bg-white/20 focus:outline-none shadow-sm"
                                 aria-label="Volver atrás"
                             >
                                 <ArrowLeft className="h-5 w-5" />
@@ -98,14 +98,14 @@ const RegisterParticipante = () => {
 
                             <div className="text-center mt-2">
                                 <div className="flex justify-center mb-3">
-                                    <div className="bg-emerald-50 p-3 rounded-lg">
-                                        <Users className="h-6 w-6 text-emerald-600" />
+                                    <div className="bg-indigo-500/20 p-3 rounded-lg">
+                                        <Users className="h-6 w-6 text-indigo-300" />
                                     </div>
                                 </div>
-                                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                                <h2 className="text-3xl font-bold text-white mb-2">
                                     Registro de Participante
                                 </h2>
-                                <p className="text-gray-500">
+                                <p className="text-indigo-200">
                                     Completa tus datos para crear una cuenta de participante
                                 </p>
                             </div>
@@ -118,7 +118,7 @@ const RegisterParticipante = () => {
                             <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="nombre" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Nombre *
                                         </label>
                                         <input
@@ -126,7 +126,7 @@ const RegisterParticipante = () => {
                                             name="nombre"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="Tu nombre"
                                             value={formData.nombre}
                                             onChange={handleChange}
@@ -135,7 +135,7 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="apellidos" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Apellidos *
                                         </label>
                                         <input
@@ -143,7 +143,7 @@ const RegisterParticipante = () => {
                                             name="apellidos"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="Tus apellidos"
                                             value={formData.apellidos}
                                             onChange={handleChange}
@@ -152,7 +152,7 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="username" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Nombre de usuario *
                                         </label>
                                         <input
@@ -160,7 +160,7 @@ const RegisterParticipante = () => {
                                             name="username"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="Tu nombre de usuario"
                                             value={formData.username}
                                             onChange={handleChange}
@@ -169,7 +169,7 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="password" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Contraseña *
                                         </label>
                                         <input
@@ -177,7 +177,7 @@ const RegisterParticipante = () => {
                                             name="password"
                                             type="password"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="Tu contraseña"
                                             value={formData.password}
                                             onChange={handleChange}
@@ -186,7 +186,7 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="email" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Correo electrónico *
                                         </label>
                                         <input
@@ -194,7 +194,7 @@ const RegisterParticipante = () => {
                                             name="email"
                                             type="email"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="Tu correo electrónico"
                                             value={formData.email}
                                             onChange={handleChange}
@@ -203,7 +203,7 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="telefono" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Teléfono *
                                         </label>
                                         <input
@@ -211,7 +211,7 @@ const RegisterParticipante = () => {
                                             name="telefono"
                                             type="tel"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="Tu teléfono"
                                             value={formData.telefono}
                                             onChange={handleChange}
@@ -220,27 +220,27 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="genero" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="genero" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Género *
                                         </label>
                                         <select
                                             id="genero"
                                             name="genero"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200 appearance-none"
                                             value={formData.genero}
                                             onChange={handleChange}
                                             disabled={loading}
                                         >
-                                            <option value="">Selecciona tu género</option>
+                                            <option value="" className="bg-indigo-950 text-white">Selecciona tu género</option>
                                             {Object.values(Genero).map(({ value, label }) => (
-                                                <option key={value} value={value}>{label}</option>
+                                                <option key={value} value={value} className="bg-indigo-950 text-white">{label}</option>
                                             ))}
                                         </select>
                                     </div>
 
                                     <div>
-                                        <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Fecha de nacimiento *
                                         </label>
                                         <input
@@ -248,18 +248,18 @@ const RegisterParticipante = () => {
                                             name="fechaNacimiento"
                                             type="date"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             value={formData.fechaNacimiento}
                                             onChange={handleChange}
                                             disabled={loading}
                                         />
                                         {errorEdad && (
-                                            <p className="mt-1 text-sm text-red-600">{errorEdad}</p>
+                                            <p className="mt-1 text-sm text-red-400">{errorEdad}</p>
                                         )}
                                     </div>
 
                                     <div>
-                                        <label htmlFor="ubicacion" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="ubicacion" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Ubicación *
                                         </label>
                                         <input
@@ -267,7 +267,7 @@ const RegisterParticipante = () => {
                                             name="ubicacion"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="País o ciudad"
                                             value={formData.ubicacion}
                                             onChange={handleChange}
@@ -276,21 +276,21 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="experienciaMindfulness" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="experienciaMindfulness" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Experiencia en Mindfulness *
                                         </label>
                                         <select
                                             id="experienciaMindfulness"
                                             name="experienciaMindfulness"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200 appearance-none"
                                             value={formData.experienciaMindfulness}
                                             onChange={handleChange}
                                             disabled={loading}
                                         >
-                                            <option value="">Selecciona tu experiencia</option>
+                                            <option value="" className="bg-indigo-950 text-white">Selecciona tu experiencia</option>
                                             {Object.values(ExperienciaMindfulness).map(({ value, label }) => (
-                                                <option key={value} value={value}>
+                                                <option key={value} value={value} className="bg-indigo-950 text-white">
                                                     {label}
                                                 </option>
                                             ))}
@@ -298,7 +298,7 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="ocupacion" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="ocupacion" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Ocupación *
                                         </label>
                                         <input
@@ -306,7 +306,7 @@ const RegisterParticipante = () => {
                                             name="ocupacion"
                                             type="text"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="Tu ocupación"
                                             value={formData.ocupacion}
                                             onChange={handleChange}
@@ -315,21 +315,21 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="nivelEducativo" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="nivelEducativo" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Nivel Educativo *
                                         </label>
                                         <select
                                             id="nivelEducativo"
                                             name="nivelEducativo"
                                             required
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200 appearance-none"
                                             value={formData.nivelEducativo}
                                             onChange={handleChange}
                                             disabled={loading}
                                         >
-                                            <option value="">Selecciona tu nivel educativo</option>
+                                            <option value="" className="bg-indigo-950 text-white">Selecciona tu nivel educativo</option>
                                             {Object.values(NivelEducativo).map(({ value, label }) => (
-                                                <option key={value} value={value}>
+                                                <option key={value} value={value} className="bg-indigo-950 text-white">
                                                     {label}
                                                 </option>
                                             ))}
@@ -337,14 +337,14 @@ const RegisterParticipante = () => {
                                     </div>
 
                                     <div className="md:col-span-2">
-                                        <label htmlFor="condicionesSalud" className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label htmlFor="condicionesSalud" className="block text-sm font-medium text-indigo-200 mb-1">
                                             Condiciones de salud relevantes
                                         </label>
                                         <textarea
                                             id="condicionesSalud"
                                             name="condicionesSalud"
                                             rows="3"
-                                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition duration-200"
+                                            className="w-full px-4 py-3 rounded-lg border border-white/10 bg-white/5 text-white placeholder-indigo-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition duration-200"
                                             placeholder="Describe cualquier condición de salud relevante (opcional)"
                                             value={formData.condicionesSalud}
                                             onChange={handleChange}
@@ -368,26 +368,26 @@ const RegisterParticipante = () => {
                                                         setErrorTerminos('');
                                                     }
                                                 }}
-                                                className="mt-1 h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                                                className="mt-1 h-4 w-4 text-indigo-500 focus:ring-indigo-500 border-white/20 rounded bg-white/5"
                                             />
                                             <div>
-                                                <label htmlFor="aceptaTerminos" className="text-sm text-gray-900 font-medium">
+                                                <label htmlFor="aceptaTerminos" className="text-sm text-white font-medium">
                                                     Acepto los términos, condiciones y el consentimiento informado *
                                                 </label>
-                                                <p className="text-sm text-gray-500 mt-1">
+                                                <p className="text-sm text-indigo-200 mt-1">
                                                     Al registrarme, confirmo que he leído y acepto los términos y condiciones, y doy mi consentimiento informado para participar en la plataforma.
                                                 </p>
                                                 <Link
                                                     to="/terminos-servicio"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex items-center text-sm text-emerald-600 hover:text-emerald-500 mt-2"
+                                                    className="inline-flex items-center text-sm text-indigo-300 hover:text-white mt-2"
                                                 >
                                                     <LinkIcon className="h-4 w-4 mr-1" />
                                                     Ver términos y condiciones completos
                                                 </Link>
                                                 {errorTerminos && (
-                                                    <p className="mt-1 text-sm text-red-600">{errorTerminos}</p>
+                                                    <p className="mt-1 text-sm text-red-400">{errorTerminos}</p>
                                                 )}
                                             </div>
                                         </div>
@@ -397,7 +397,7 @@ const RegisterParticipante = () => {
                                         <button
                                             type="submit"
                                             disabled={loading}
-                                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 disabled:bg-emerald-400"
+                                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                                         >
                                             {loading ? 'Registrando...' : 'Registrarse'}
                                         </button>
@@ -408,10 +408,10 @@ const RegisterParticipante = () => {
                             <div className="mt-6">
                                 <div className="relative">
                                     <div className="absolute inset-0 flex items-center">
-                                        <div className="w-full border-t border-gray-300"></div>
+                                        <div className="w-full border-t border-white/10"></div>
                                     </div>
                                     <div className="relative flex justify-center text-sm">
-                                        <span className="px-2 bg-white text-gray-500">
+                                        <span className="px-2 bg-gradient-to-bl from-indigo-950 via-sky-800 to-blue-900 text-indigo-200">
                                             ¿Ya tienes una cuenta?
                                         </span>
                                     </div>
@@ -420,7 +420,7 @@ const RegisterParticipante = () => {
                                 <div className="mt-4 text-center">
                                     <Link
                                         to="/login"
-                                        className="font-medium text-emerald-600 hover:text-emerald-500 transition duration-200"
+                                        className="font-medium text-indigo-300 hover:text-white transition duration-200"
                                     >
                                         Inicia sesión aquí
                                     </Link>

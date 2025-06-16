@@ -57,25 +57,25 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md relative">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-gradient-to-br from-emerald-800 via-teal-800 to-emerald-900 rounded-2xl p-6 w-full max-w-md relative border border-white/10 shadow-2xl">
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                    className="absolute top-4 right-4 text-emerald-200 hover:text-white transition-colors duration-200"
                 >
                     <X className="h-5 w-5" />
                 </button>
 
-                <h2 className="text-xl font-semibold mb-4">Cambiar Contraseña</h2>
+                <h2 className="text-xl font-semibold mb-4 text-white">Cambiar Contraseña</h2>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+                    <div className="mb-4 p-3 bg-red-500/10 border border-red-400/50 text-red-200 rounded-lg backdrop-blur-sm">
                         {error}
                     </div>
                 )}
 
                 {success && (
-                    <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md">
+                    <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-400/50 text-emerald-200 rounded-lg backdrop-blur-sm">
                         Contraseña actualizada exitosamente
                     </div>
                 )}
@@ -83,7 +83,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-emerald-200 mb-1">
                                 Contraseña Actual
                             </label>
                             <input
@@ -91,13 +91,13 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                                 name="old_password"
                                 value={formData.old_password}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-white/10 bg-white/5 text-white placeholder-emerald-200/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition duration-200"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-emerald-200 mb-1">
                                 Nueva Contraseña
                             </label>
                             <input
@@ -105,13 +105,13 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                                 name="new_password"
                                 value={formData.new_password}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-white/10 bg-white/5 text-white placeholder-emerald-200/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition duration-200"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium text-emerald-200 mb-1">
                                 Confirmar Nueva Contraseña
                             </label>
                             <input
@@ -119,14 +119,14 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                                 name="confirm_password"
                                 value={formData.confirm_password}
                                 onChange={handleChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full px-3 py-2 border border-white/10 bg-white/5 text-white placeholder-emerald-200/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition duration-200"
                                 required
                             />
                         </div>
 
                         <button
                             type="submit"
-                            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                            className="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white py-2 px-4 rounded-lg hover:-translate-y-0.5 transition-all duration-200 shadow-lg hover:shadow-emerald-500/25"
                         >
                             Cambiar Contraseña
                         </button>

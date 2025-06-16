@@ -34,7 +34,39 @@ class SesionSerializer(serializers.ModelSerializer):
 
     contenido_temporizador = serializers.IntegerField(required=False, allow_null=True)
     contenido_url = serializers.URLField(required=False, allow_blank=True, allow_null=True)
-    contenido_audio = serializers.FileField(required=False, allow_null=True)
+    contenido_audio = serializers.FileField(required=False, allow_null=True, write_only=True)
+    contenido_video = serializers.FileField(required=False, allow_null=True, write_only=True)
+
+    def validate(self, data):
+        tipo_contenido = data.get('tipo_contenido')
+        
+        if tipo_contenido == TipoContenido.AUDIO:
+            if not data.get('contenido_audio'):
+                raise serializers.ValidationError({'contenido_audio': 'Este campo es requerido para el tipo de contenido audio'})
+        elif tipo_contenido == TipoContenido.VIDEO:
+            if not data.get('contenido_video'):
+                raise serializers.ValidationError({'contenido_video': 'Este campo es requerido para el tipo de contenido video'})
+        elif tipo_contenido == TipoContenido.ENLACE:
+            if not data.get('contenido_url'):
+                raise serializers.ValidationError({'contenido_url': 'Este campo es requerido para el tipo de contenido enlace'})
+        elif tipo_contenido == TipoContenido.TEMPORIZADOR:
+            if not data.get('contenido_temporizador'):
+                data['contenido_temporizador'] = 0
+
+        return data
+
+    def create(self, validated_data):
+        # Manejar el archivo de audio
+        contenido_audio = validated_data.pop('contenido_audio', None)
+        if contenido_audio:
+            validated_data['contenido_audio'] = contenido_audio
+
+        # Manejar el archivo de video
+        contenido_video = validated_data.pop('contenido_video', None)
+        if contenido_video:
+            validated_data['contenido_video'] = contenido_video
+
+        return super().create(validated_data)
 
 class SesionDetalleSerializer(serializers.ModelSerializer):
     disponible = serializers.SerializerMethodField()

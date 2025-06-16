@@ -21,6 +21,7 @@ const VistaPreviaCuestionario = () => {
             try {
                 const response = await api.get(`/cuestionario/${cuestionarioId}/`);
                 setCuestionario(response.data);
+                console.log(response.data);
 
                 // Solo inicializamos respuestas si no es un cuestionario Likert
                 if (response.data.tipo_cuestionario !== 'likert') {
@@ -90,24 +91,24 @@ const VistaPreviaCuestionario = () => {
         if (cuestionario.tipo_cuestionario === 'likert') {
             return (
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-white/10">
+                        <thead className="bg-white/5">
                             <tr>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">
+                                <th className="px-4 py-2 text-left text-sm font-medium text-white">
                                     Pregunta
                                 </th>
                                 {pregunta.etiquetas.map((etiqueta, index) => (
-                                    <th key={index} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
+                                    <th key={index} className="px-4 py-2 text-center text-sm font-medium text-purple-200">
                                         {etiqueta}
                                     </th>
                                 ))}
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="divide-y divide-white/10">
                             {pregunta.textos.map((texto, index) => (
-                                <tr key={index}>
+                                <tr key={index} className="bg-white/5">
                                     <td className="px-4 py-2">
-                                        <span className="text-gray-700">{texto}</span>
+                                        <span className="text-white">{texto}</span>
                                     </td>
                                     {Array.from({ length: 5 }, (_, i) => (
                                         <td key={i} className="px-4 py-2 text-center">
@@ -117,7 +118,7 @@ const VistaPreviaCuestionario = () => {
                                                 value={i + 1}
                                                 checked={respuestas[index] === i + 1}
                                                 onChange={(e) => handleRespuestaChange(index, parseInt(e.target.value))}
-                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                                className="h-4 w-4 bg-white/10 border-white/20 text-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
                                             />
                                         </td>
                                     ))}
@@ -136,7 +137,7 @@ const VistaPreviaCuestionario = () => {
                     <textarea
                         value={respuestas[pregunta.id]}
                         onChange={(e) => handleRespuestaChange(pregunta.id, e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-1 text-white placeholder-purple-200 outline-none"
                         rows="3"
                         placeholder="Escribe tu respuesta aquí..."
                     />
@@ -147,11 +148,11 @@ const VistaPreviaCuestionario = () => {
                     <select
                         value={respuestas[pregunta.id]}
                         onChange={(e) => handleRespuestaChange(pregunta.id, e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl focus:ring-1 text-white placeholder-purple-200 outline-none"
                     >
-                        <option value="">Selecciona una opción</option>
+                        <option value="" className="bg-slate-900 text-white">Selecciona una opción</option>
                         {pregunta.opciones.map((opcion, index) => (
-                            <option key={index} value={opcion}>
+                            <option key={index} value={opcion} className="bg-slate-900 text-white">
                                 {opcion}
                             </option>
                         ))}
@@ -167,9 +168,9 @@ const VistaPreviaCuestionario = () => {
                                     type="checkbox"
                                     checked={respuestas[pregunta.id].includes(opcion)}
                                     onChange={() => handleRespuestaChange(pregunta.id, opcion, 'checkbox')}
-                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                    className="h-4 w-4 bg-white/10 border-white/20 text-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
                                 />
-                                <span className="text-gray-700">{opcion}</span>
+                                <span className="text-white">{opcion}</span>
                             </label>
                         ))}
                     </div>
@@ -204,23 +205,23 @@ const VistaPreviaCuestionario = () => {
             case 'likert-5-puntos':
                 return (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                        <table className="min-w-full divide-y divide-white/10">
+                            <thead className="bg-white/5">
                                 <tr>
-                                    <th className="px-4 py-2 text-left text-sm font-medium text-gray-500">
+                                    <th className="px-4 py-2 text-left text-sm font-medium text-white">
                                         Pregunta
                                     </th>
                                     {pregunta.etiquetas.map((etiqueta, index) => (
-                                        <th key={index} className="px-4 py-2 text-center text-sm font-medium text-gray-500">
+                                        <th key={index} className="px-4 py-2 text-center text-sm font-medium text-purple-200">
                                             {etiqueta}
                                         </th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                <tr>
+                            <tbody className="divide-y divide-white/10">
+                                <tr className="bg-white/5">
                                     <td className="px-4 py-2">
-                                        <span className="text-gray-700">{pregunta.texto}</span>
+                                        <span className="text-white">{pregunta.texto}</span>
                                     </td>
                                     {Array.from({ length: 5 }, (_, i) => (
                                         <td key={i} className="px-4 py-2 text-center">
@@ -230,7 +231,7 @@ const VistaPreviaCuestionario = () => {
                                                 value={i + 1}
                                                 checked={respuestas[pregunta.id] === i + 1}
                                                 onChange={(e) => handleRespuestaChange(pregunta.id, parseInt(e.target.value))}
-                                                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                                className="h-4 w-4 bg-white/10 border-white/20 text-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
                                             />
                                         </td>
                                     ))}
@@ -254,61 +255,69 @@ const VistaPreviaCuestionario = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-violet-900 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-                <div className="bg-white rounded-2xl shadow-xl p-8">
-                    <PageHeader
-                        title={cuestionario?.titulo}
-                        subtitle={cuestionario?.descripcion}
-                        backUrl={`/programas/${id}`}
-                    />
+                <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 blur-xl rounded-2xl"></div>
+                    <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-lg">
+                        <PageHeader
+                            title={cuestionario?.titulo}
+                            subtitle={cuestionario?.descripcion}
+                            backUrl={`/programas/${id}`}
+                            titleClassName="text-white"
+                            subtitleClassName="text-purple-200"
+                        />
 
-                    <ErrorAlert
-                        message={error}
-                        onClose={() => setError(null)}
-                    />
+                        <ErrorAlert
+                            message={error}
+                            onClose={() => setError(null)}
+                        />
 
-                    <form onSubmit={handleSubmit}>
-                        {/* Preguntas */}
-                        <div className="space-y-8">
-                            {cuestionario?.preguntas.map((pregunta, index) => (
-                                <div key={pregunta.id || index} className="border-2 border-indigo-100 rounded-lg p-6 bg-gradient-to-br from-white to-indigo-50">
-                                    <div className="mb-4">
-                                        <h3 className="text-lg font-medium text-gray-900">
-                                            {cuestionario.tipo_cuestionario === 'likert' ? (
-                                                'Completa la siguiente escala Likert'
-                                            ) : (
-                                                `${index + 1}. ${pregunta.texto}`
-                                            )}
-                                        </h3>
+                        <form onSubmit={handleSubmit}>
+                            {/* Preguntas */}
+                            <div className="space-y-8">
+                                {cuestionario?.preguntas.map((pregunta, index) => (
+                                    <div key={pregunta.id || index} className="relative">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 blur-xl rounded-xl"></div>
+                                        <div className="relative bg-white/10 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+                                            <div className="mb-4">
+                                                <h3 className="text-lg font-medium text-white">
+                                                    {cuestionario.tipo_cuestionario === 'likert' ? (
+                                                        'Completa la siguiente escala Likert'
+                                                    ) : (
+                                                        `${index + 1}. ${pregunta.texto}`
+                                                    )}
+                                                </h3>
+                                            </div>
+                                            <div className="mt-4">
+                                                {renderPregunta(pregunta)}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="mt-4">
-                                        {renderPregunta(pregunta)}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Botón de envío */}
-                        {isParticipante() && (
-                            <div className="mt-8 flex justify-end">
-                                <button
-                                    type="submit"
-                                    disabled={enviando}
-                                    className={`flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg transition-colors ${enviando ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'}`}
-                                >
-                                    {enviando ? (
-                                        <>
-                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                            Enviando...
-                                        </>
-                                    ) : (
-                                        'Enviar Respuestas'
-                                    )}
-                                </button>
+                                ))}
                             </div>
-                        )}
-                    </form>
+
+                            {/* Botón de envío */}
+                            {isParticipante() && (
+                                <div className="mt-8 flex justify-end">
+                                    <button
+                                        type="submit"
+                                        disabled={enviando}
+                                        className={`flex items-center px-6 py-3 bg-emerald-500/20 text-emerald-100 rounded-xl transition-all duration-200 border border-emerald-400/30 backdrop-blur-sm ${enviando ? 'opacity-50 cursor-not-allowed' : 'hover:bg-emerald-500/30'}`}
+                                    >
+                                        {enviando ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                                                Enviando...
+                                            </>
+                                        ) : (
+                                            'Enviar Respuestas'
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

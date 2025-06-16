@@ -36,6 +36,11 @@ def validate_video_file(file):
         return True
     return file.name.lower().endswith('.mp4')
 
+def validate_audio_file(file):
+    if not file:
+        return True
+    return file.name.lower().endswith(('.mp3', '.wav', '.ogg', '.m4a'))
+
 @api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
@@ -123,15 +128,27 @@ def sesion_list_create(request):
         elif tipo_contenido == 'temporizador':
             if not request.data.get('contenido_temporizador'):
                 request.data['contenido_temporizador'] = 0
+        elif tipo_contenido == 'audio':
+            audio_file = request.FILES.get('contenido_audio')
+            if audio_file:
+                request.data['contenido_audio'] = audio_file
+            if audio_file and not validate_audio_file(audio_file):
+                return Response({'error': 'Solo se permiten archivos de audio en formato MP3, WAV, OGG o M4A'}, status=status.HTTP_400_BAD_REQUEST)
         elif tipo_contenido == 'video':
             video_file = request.FILES.get('contenido_video')
+            if video_file:
+                request.data['contenido_video'] = video_file
             if video_file and not validate_video_file(video_file):
                 return Response({'error': 'Solo se permiten archivos de video en formato MP4'}, status=status.HTTP_400_BAD_REQUEST)
         
         serializer = SesionSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            try:
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                print("Error al guardar la sesión:", str(e))
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
         # comprobar que el numero de semana no existe y enviar los posibles numeros de semana que quedan disponibles
         if Sesion.objects.filter(programa=programa, semana=request.data.get('semana')).exists():
@@ -182,6 +199,10 @@ def sesion_detail(request, pk):
         elif tipo_contenido == 'temporizador':
             if not request.data.get('contenido_temporizador'):
                 request.data['contenido_temporizador'] = 0
+        elif tipo_contenido == 'audio':
+            audio_file = request.FILES.get('contenido_audio')
+            if audio_file and not validate_audio_file(audio_file):
+                return Response({'error': 'Solo se permiten archivos de audio en formato MP3, WAV, OGG o M4A'}, status=status.HTTP_400_BAD_REQUEST)
         elif tipo_contenido == 'video':
             video_file = request.FILES.get('contenido_video')
             if video_file and not validate_video_file(video_file):
