@@ -78,12 +78,12 @@ def run():
         defaults={
             "username": "bea",
             "nombre": "Beatriz",
-            "apellidos": "Bernárdez",
+            "apellidos": "Bernárdez Jiménez",
             "role": "INVESTIGADOR",
             "is_superuser": True,
             "telefono": "987654321",
             "genero": "femenino",
-            "fechaNacimiento": "1985-05-15",
+            "fechaNacimiento": "1980-01-01",
             "ubicacion": "Sevilla, España",
             "ocupacion": "Profesora e Investigadora",
             "nivelEducativo": "doctorado",
@@ -207,8 +207,8 @@ def run():
             "role": "PARTICIPANTE",
             "telefono": "123456789",
             "genero": "femenino",
-            "fechaNacimiento": "2000-10-30",
-            "ubicacion": "Sevilla, España",
+            "fechaNacimiento": "2000-01-01",
+            "ubicacion": "Badajoz, España",
             "ocupacion": "Estudiante de Ingeniería de Software",
             "nivelEducativo": "universidad",
         }
@@ -343,6 +343,340 @@ def run():
             **sesion_data
         )
 
+    #-----------------------------------------------
+    # Crear programa para estudiantes curso 2023-24
+    programa_estudiantes = Programa.objects.create(
+        nombre="Programa para estudiantes curso 2023-24",
+        descripcion="Programa de mindfulness adaptado para estudiantes de Ingeniería de Software",
+        tipo_contexto="académico",
+        enfoque_metodologico="propio",
+        poblacion_objetivo="Estudiantes de 3º de Ingeniería de Software",
+        duracion_semanas=6,
+        creado_por=inv2,
+        tiene_cuestionarios=True,
+        tiene_diarios=True
+    )
+
+    # Crear sesiones para programa_estudiantes
+    sesiones_programa_estudiantes = [
+        {
+            "titulo": "Introducción y Escaneo Corporal",
+            "descripcion": "En esta semana se llevará a cabo un escaneo corporal diario",
+            "semana": 1,
+            "duracion_estimada": 10,
+            "tipo_practica": "body_scan",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=5mOZMxVKmiY"
+        },
+        {
+            "titulo": "Respiración Cuadrado",
+            "descripcion": "Esta sesión consiste en respirar profundamente siguiente un patrón de cuadrado",
+            "semana": 2,
+            "duracion_estimada": 3,
+            "tipo_practica": "breath",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=bF_1ZiFta-E"
+        },
+        {
+            "titulo": "Respiración fosas nasales",
+            "descripcion": "Simplemente nota la respiración de tus fosas nasales durante hasta que finalice el temporizador",
+            "semana": 3,
+            "duracion_estimada": 8,
+            "tipo_practica": "breath",
+            "tipo_contenido": "temporizador",
+            "contenido_temporizador": 8,
+            "video_fondo": "naturaleza.mp4"
+        },
+        {
+            "titulo": "Emociones",
+            "descripcion": "Siente tus emociones sin juzgarlas",
+            "semana": 4,
+            "duracion_estimada": 6,
+            "tipo_practica": "senses",
+            "tipo_contenido": "temporizador",
+            "contenido_temporizador": 6,
+            "video_fondo": "sunset.mp4"
+        },
+        {
+            "titulo": "Sonidos",
+            "descripcion": "Escucha atentamente",
+            "semana": 5,
+            "duracion_estimada": 5,
+            "tipo_practica": "sounds",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=unCya_-8ECs"
+        },
+        {
+            "titulo": "Final",
+            "descripcion": "Sin descripción",
+            "semana": 6,
+            "duracion_estimada": 10,
+            "tipo_practica": "loving_kindness",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        }
+    ]
+
+    for sesion_data in sesiones_programa_estudiantes:
+        Sesion.objects.create(
+            programa=programa_estudiantes,
+            **sesion_data
+        )
+
+    # Crear cuestionarios para programa_estudiantes
+    preguntas_pre_estudiantes = [
+        {
+            "id": 1,
+            "texto": "¿Qué esperas obtener o mejorar al participar en este programa de mindfulness?",
+            "tipo": "texto"
+        },
+        {
+            "id": 2,
+            "texto": "¿Has practicado mindfulness antes?",
+            "tipo": "select",
+            "opciones": ["Sí", "No"]
+        },
+        {
+            "id": 3,
+            "texto": "¿Qué aspectos de tu vida te gustaría trabajar a través del mindfulness?",
+            "tipo": "checkbox",
+            "opciones": [
+                "Manejo del estrés",
+                "Mejora de la concentración",
+                "Regulación emocional",
+                "Calidad del sueño",
+                "Ansiedad o preocupaciones"
+            ]
+        },
+        {
+            "id": 4,
+            "texto": "¿Qué tan predispuesto/a te sientes a participar activamente en este programa de mindfulness?",
+            "tipo": "calificacion",
+            "estrellas": {
+                "cantidad": 5,
+                "icono": "thumbsup"
+            }
+        }
+    ]
+
+    preguntas_post_estudiantes = [
+        {
+            "etiquetas": [
+                    "Totalmente en desacuerdo",
+                    "En desacuerdo",
+                    "Ni de acuerdo ni en desacuerdo",
+                    "De acuerdo",
+                    "Totalmente de acuerdo"
+                ],
+            "textos": [
+                "El programa de mindfulness cumplió con mis expectativas",
+                "Siento que ahora tengo más herramientas para manejar el estrés",
+                "He notado mejoras en mi concentración y atención durante las actividades académicas",
+                "Recomendaría este programa a otros estudiantes",
+            ]
+        }
+    ]
+
+    # Crear cuestionarios para programa_estudiantes
+    cuestionario_pre_estudiantes = Cuestionario.objects.create(
+        programa=programa_estudiantes,
+        momento='pre',
+        tipo_cuestionario='personalizado',
+        titulo='Cuestionario Inicial',
+        descripcion='Por favor, responde a las siguientes preguntas con total sinceridad (recuerda que las respuestas son anónimas):',
+        preguntas=preguntas_pre_estudiantes
+    )
+
+    cuestionario_post_estudiantes = Cuestionario.objects.create(
+        programa=programa_estudiantes,
+        momento='post',
+        tipo_cuestionario='likert',
+        titulo='Cuestionario final',
+        descripcion='Muchas gracias por tu participación. Ahora solo rellena este cuestionario breve:',
+        preguntas=preguntas_post_estudiantes
+    )
+
+    # Asignar los cuestionarios al programa
+    programa_estudiantes.cuestionario_pre = cuestionario_pre_estudiantes
+    programa_estudiantes.cuestionario_post = cuestionario_post_estudiantes
+    programa_estudiantes.save()
+
+    # Publicar el programa
+    #programa_estudiantes.publicar()
+
+    #-----------------------------------------------
+    # Crear el programa MBSR
+    programa_mbsr = Programa.objects.create(
+        nombre="Programa MBSR 8 Semanas Original",
+        descripcion="Programa de reducción de estrés basado en mindfulness, diseñado por Jon Kabat-Zinn.",
+        tipo_contexto="académico",
+        enfoque_metodologico="MBSR",
+        poblacion_objetivo="Personas interesadas en reducir el estrés y mejorar su bienestar",
+        duracion_semanas=8,
+        creado_por=inv3,
+        tiene_cuestionarios=True,
+        tiene_diarios=True
+    )
+
+    # Crear sesiones para el programa MBSR
+    sesiones_programa_mbsr = [
+        {
+            "titulo": "Semana 1: Introducción y Escaneo Corporal",
+            "descripcion": "Introducción al mindfulness y práctica del escaneo corporal.",
+            "semana": 1,
+            "duracion_estimada": 45,
+            "tipo_practica": "body_scan",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=5mOZMxVKmiY"
+        },
+        {
+            "titulo": "Semana 2: Respiración Cuadrada",
+            "descripcion": "Práctica de respiración profunda siguiendo un patrón cuadrado.",
+            "semana": 2,
+            "duracion_estimada": 3,
+            "tipo_practica": "breath",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=bF_1ZiFta-E"
+        },
+        {
+            "titulo": "Semana 3: Respiración en las Fosas Nasales",
+            "descripcion": "Atención plena a la respiración en las fosas nasales.",
+            "semana": 3,
+            "duracion_estimada": 8,
+            "tipo_practica": "breath",
+            "tipo_contenido": "temporizador",
+            "contenido_temporizador": 8,
+            "video_fondo": "naturaleza.mp4"
+        },
+        {
+            "titulo": "Semana 4: Observación de Emociones",
+            "descripcion": "Reconocimiento y aceptación de las emociones sin juicio.",
+            "semana": 4,
+            "duracion_estimada": 6,
+            "tipo_practica": "senses",
+            "tipo_contenido": "temporizador",
+            "contenido_temporizador": 6,
+            "video_fondo": "sunset.mp4"
+        },
+        {
+            "titulo": "Semana 5: Atención a los Sonidos",
+            "descripcion": "Escucha atenta y consciente de los sonidos presentes.",
+            "semana": 5,
+            "duracion_estimada": 5,
+            "tipo_practica": "sounds",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=unCya_-8ECs"
+        },
+        {
+            "titulo": "Semana 6: Meditación de Bondad Amorosa",
+            "descripcion": "Cultivo de sentimientos de bondad y compasión hacia uno mismo y los demás.",
+            "semana": 6,
+            "duracion_estimada": 10,
+            "tipo_practica": "loving_kindness",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        {
+            "titulo": "Semana 7: Integración de la Práctica",
+            "descripcion": "Integración de las prácticas aprendidas en la vida diaria.",
+            "semana": 7,
+            "duracion_estimada": 45,
+            "tipo_practica": "otro",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=5mOZMxVKmiY"
+        },
+        {
+            "titulo": "Semana 8: Cierre y Planificación Futura",
+            "descripcion": "Reflexión sobre el aprendizaje y planificación de la práctica futura.",
+            "semana": 8,
+            "duracion_estimada": 45,
+            "tipo_practica": "open_awareness",
+            "tipo_contenido": "enlace",
+            "contenido_url": "https://www.youtube.com/watch?v=5mOZMxVKmiY"
+        }
+    ]
+
+    # Crear sesiones en la base de datos
+    for sesion_data in sesiones_programa_mbsr:
+        Sesion.objects.create(
+            programa=programa_mbsr,
+            **sesion_data
+        )
+
+    # Crear cuestionarios para el programa MBSR
+    preguntas_pre_mbsr = [
+        {
+            "id": 1,
+            "texto": "¿Qué esperas conseguir o mejorar al participar en este curso?",
+            "tipo": "texto"
+        },
+        {
+            "id": 2,
+            "texto": "¿Has practicado meditación o mindfulness anteriormente?",
+            "tipo": "select",
+            "opciones": ["Sí, regularmente", "Sí, ocasionalmente", "No, nunca"]
+        },
+        {
+            "id": 3,
+            "texto": "¿Qué prácticas de bienestar o autocuidado utilizas actualmente?",
+            "tipo": "checkbox",
+            "opciones": [
+                "Ejercicio",
+                "Terapia psicológica",
+                "Alimentación saludable",
+                "Cuidado personal",
+                "Relajación"
+            ]
+        }
+    ]
+
+    preguntas_post_mbsr = [
+        {
+            "etiquetas": [
+                "Totalmente en desacuerdo",
+                "En desacuerdo",
+                "Ni de acuerdo ni en desacuerdo",
+                "De acuerdo",
+                "Totalmente de acuerdo"
+            ],
+            "textos": [
+                "El programa de mindfulness cumplió con mis expectativas",
+                "He notado una reducción en mis niveles de estrés",
+                "He mejorado mi concentración y atención en las tareas diarias",
+                "Me siento más conectado/a con mi cuerpo y emociones",
+                "Estoy satisfecho/a con la estructura y duración del programa"
+            ]
+        }
+    ]
+
+    # Crear cuestionarios en la base de datos
+    cuestionario_pre_mbsr = Cuestionario.objects.create(
+        programa=programa_mbsr,
+        momento='pre',
+        tipo_cuestionario='personalizado',
+        titulo='Cuestionario Inicial',
+        descripcion='Por favor, responde a las siguientes preguntas con total sinceridad (recuerda que las respuestas son anónimas):',
+        preguntas=preguntas_pre_mbsr
+    )
+
+    cuestionario_post_mbsr = Cuestionario.objects.create(
+        programa=programa_mbsr,
+        momento='post',
+        tipo_cuestionario='likert',
+        titulo='Cuestionario Final',
+        descripcion='Muchas gracias por tu participación. Ahora solo rellena este cuestionario breve:',
+        preguntas=preguntas_post_mbsr
+    )
+
+    # Asignar los cuestionarios al programa
+    programa_mbsr.cuestionario_pre = cuestionario_pre_mbsr
+    programa_mbsr.cuestionario_post = cuestionario_post_mbsr
+    programa_mbsr.save()
+
+    # Publicar el programa
+    programa_mbsr.publicar()
+
+    #-----------------------------------------------
     # Crear programa para Jon Kabat-Zinn
     programa_jon = Programa.objects.create(
         nombre="MBSR Avanzado",
@@ -372,7 +706,8 @@ def run():
             "duracion_estimada": 60,
             "tipo_practica": "loving_kindness",
             "tipo_contenido": "temporizador",
-            "contenido_temporizador": 30
+            "contenido_temporizador": 30,
+            "video_fondo": "sunset.mp4"
         },
         {
             "titulo": "Mindfulness en la Educación",
@@ -381,7 +716,8 @@ def run():
             "duracion_estimada": 40,
             "tipo_practica": "open_monitoring",
             "tipo_contenido": "temporizador",
-            "contenido_temporizador": 20
+            "contenido_temporizador": 20,
+            "video_fondo": "barco.mp4"
         },
         {
             "titulo": "Atención y Concentración",
@@ -390,7 +726,8 @@ def run():
             "duracion_estimada": 40,
             "tipo_practica": "open_monitoring",
             "tipo_contenido": "temporizador",
-            "contenido_temporizador": 20
+            "contenido_temporizador": 20,
+            "video_fondo": "nubes.mp4"
         },
         {
             "titulo": "Mindfulness y Creatividad",
@@ -408,7 +745,8 @@ def run():
             "duracion_estimada": 40,
             "tipo_practica": "open_monitoring",
             "tipo_contenido": "temporizador",
-            "contenido_temporizador": 20
+            "contenido_temporizador": 20,
+            "video_fondo": "olas.mp4"
         },
         {
             "titulo": "Integración en el Currículo",
@@ -473,7 +811,7 @@ def run():
             **sesion_data
         )
     programa3 = Programa.objects.create(
-        nombre="MBSR Clásico",
+        nombre="MBSR Adaptado",
         descripcion="Programa original de Reducción del Estrés Basado en Mindfulness (MBSR) de 8 semanas.",
         tipo_contexto="clínico",
         enfoque_metodologico="MBSR",
@@ -608,7 +946,7 @@ def run():
 
     # Crear programa 5 borrador - Jon
     programa5 = Programa.objects.create(
-        nombre="prueba",
+        nombre="Programa de prueba",
         descripcion="Programa de 3 semanas para integrar mindfulness en el día a día",
         tipo_contexto="académico",
         enfoque_metodologico="MBSR",
@@ -674,10 +1012,9 @@ def run():
             "id": 3,
             "texto": "Valora tu nivel actual de estrés",
             "tipo": "calificacion",
-            "escala": {
-                "inicio": 1,
-                "fin": 5,
-                "etiquetas": ["Muy bajo", "Bajo", "Medio", "Alto", "Muy alto"]
+            "estrellas": {
+                "cantidad": 5,
+                "icono": "heart"
             }
         },
         {
@@ -809,10 +1146,6 @@ def run():
         programa=programa_jon,
         participante=participantes[2]
     )
-
-
-
-
 
     print("✅ Base de datos poblada con datos de prueba.")
 

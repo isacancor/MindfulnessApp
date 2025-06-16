@@ -329,7 +329,7 @@ const CrearCuestionario = ({ momento }) => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-violet-900 py-8 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-10xl mx-auto">
                 <div className="relative">
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-violet-500/10 blur-xl rounded-2xl"></div>
                     <div className="relative bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-lg">

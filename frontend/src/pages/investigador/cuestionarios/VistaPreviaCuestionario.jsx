@@ -5,6 +5,7 @@ import api from '../../../config/axios';
 import { useAuth } from '../../../context/AuthContext';
 import ErrorAlert from '../../../components/ErrorAlert';
 import PageHeader from '../../../components/layout/PageHeader';
+import LikertTable from '../../../components/LikertTable';
 
 const VistaPreviaCuestionario = () => {
     const { id, cuestionarioId } = useParams();
@@ -21,7 +22,6 @@ const VistaPreviaCuestionario = () => {
             try {
                 const response = await api.get(`/cuestionario/${cuestionarioId}/`);
                 setCuestionario(response.data);
-                console.log(response.data);
 
                 // Solo inicializamos respuestas si no es un cuestionario Likert
                 if (response.data.tipo_cuestionario !== 'likert') {
@@ -90,43 +90,12 @@ const VistaPreviaCuestionario = () => {
         // Si es un cuestionario Likert, renderizamos la tabla especial
         if (cuestionario.tipo_cuestionario === 'likert') {
             return (
-                <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-white/10">
-                        <thead className="bg-white/5">
-                            <tr>
-                                <th className="px-4 py-2 text-left text-sm font-medium text-white">
-                                    Pregunta
-                                </th>
-                                {pregunta.etiquetas.map((etiqueta, index) => (
-                                    <th key={index} className="px-4 py-2 text-center text-sm font-medium text-purple-200">
-                                        {etiqueta}
-                                    </th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/10">
-                            {pregunta.textos.map((texto, index) => (
-                                <tr key={index} className="bg-white/5">
-                                    <td className="px-4 py-2">
-                                        <span className="text-white">{texto}</span>
-                                    </td>
-                                    {Array.from({ length: 5 }, (_, i) => (
-                                        <td key={i} className="px-4 py-2 text-center">
-                                            <input
-                                                type="radio"
-                                                name={`likert-${index}`}
-                                                value={i + 1}
-                                                checked={respuestas[index] === i + 1}
-                                                onChange={(e) => handleRespuestaChange(index, parseInt(e.target.value))}
-                                                className="h-4 w-4 bg-white/10 border-white/20 text-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
-                                            />
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <LikertTable
+                    textos={pregunta.textos}
+                    etiquetas={pregunta.etiquetas}
+                    respuestas={respuestas}
+                    onRespuestaChange={handleRespuestaChange}
+                />
             );
         }
 

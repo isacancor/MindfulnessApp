@@ -98,7 +98,7 @@ export default function Landing() {
                             to="/login"
                             className="flex items-center justify-center gap-2 bg-white text-indigo-600 px-8 py-4 rounded-lg font-semibold hover:bg-indigo-50 transition-all hover:shadow-lg"
                         >
-                            Comenzar ahora <ArrowRight size={18} />
+                            Acceder ya <ArrowRight size={18} />
                         </Link>
                         <Link
                             to="/about"

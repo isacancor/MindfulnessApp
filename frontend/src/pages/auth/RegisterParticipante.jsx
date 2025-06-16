@@ -399,7 +399,7 @@ const RegisterParticipante = () => {
                                             disabled={loading}
                                             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
                                         >
-                                            {loading ? 'Registrando...' : 'Registrarse'}
+                                            {loading ? 'Registrando...' : 'Registrarme'}
                                         </button>
                                     </div>
                                 </div>

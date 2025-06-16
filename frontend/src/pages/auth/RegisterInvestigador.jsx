@@ -426,7 +426,7 @@ const RegisterInvestigador = () => {
                                             disabled={loading}
                                             className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-violet-500 hover:from-purple-600 hover:to-violet-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
                                         >
-                                            {loading ? 'Registrando...' : 'Registrarse'}
+                                            {loading ? 'Registrando...' : 'Registrarme'}
                                         </button>
                                     </div>
                                 </div>
