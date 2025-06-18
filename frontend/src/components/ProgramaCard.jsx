@@ -1,35 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Users, FileText, Edit, Trash2, Send, BookOpen, Clock, UserCheck } from 'lucide-react';
-import api from '../config/axios';
-import PublicarProgramaModal from './modals/PublicarProgramaModal';
-import EliminarProgramaModal from './modals/EliminarProgramaModal';
 
-const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
-    const [showPublicarModal, setShowPublicarModal] = useState(false);
-    const [showEliminarModal, setShowEliminarModal] = useState(false);
+const ProgramaCard = ({ programa }) => {
 
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('es-ES', options);
-    };
-
-    const handlePublicar = async () => {
-        try {
-            await api.post(`/programas/${programa.id}/publicar/`);
-            onUpdate();
-        } catch (error) {
-            console.error('Error al publicar el programa:', error);
-        }
-    };
-
-    const handleEliminar = async () => {
-        try {
-            await api.delete(`/programas/${programa.id}/`);
-            onDelete(programa.id);
-        } catch (error) {
-            console.error('Error al eliminar el programa:', error);
-        }
     };
 
     return (
@@ -99,26 +76,6 @@ const ProgramaCard = ({ programa, onDelete, onUpdate }) => {
                     </div>
                 </div>
             </div>
-
-            <PublicarProgramaModal
-                isOpen={showPublicarModal}
-                onClose={() => setShowPublicarModal(false)}
-                onConfirm={() => {
-                    handlePublicar();
-                    setShowPublicarModal(false);
-                }}
-                programa={programa}
-            />
-
-            <EliminarProgramaModal
-                isOpen={showEliminarModal}
-                onClose={() => setShowEliminarModal(false)}
-                onConfirm={() => {
-                    handleEliminar();
-                    setShowEliminarModal(false);
-                }}
-                programa={programa}
-            />
         </>
     );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlusCircle, Search, SortAsc, Loader2, Sparkles } from 'lucide-react';
+import { PlusCircle, Search, Loader2, Sparkles } from 'lucide-react';
 import api from '../../../config/axios';
 import ProgramaCard from '../../../components/ProgramaCard';
 import InvestigadorLayout from '../../../components/layout/InvestigadorLayout';
@@ -28,10 +28,6 @@ const ListaProgramas = () => {
     useEffect(() => {
         fetchProgramas();
     }, []);
-
-    const handleDelete = (programaId) => {
-        setProgramas(programas.filter(p => p.id !== programaId));
-    };
 
     const programasFiltrados = programas.filter(programa =>
         programa.nombre?.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -175,8 +171,6 @@ const ListaProgramas = () => {
                                     <div className="relative">
                                         <ProgramaCard
                                             programa={programa}
-                                            onDelete={handleDelete}
-                                            onUpdate={fetchProgramas}
                                         />
                                     </div>
                                 </div>

@@ -97,10 +97,10 @@ const CrearSesion = () => {
             }
         } catch (error) {
             console.error('Error al crear la sesión:', error);
-            if (error.message) {
-                setError(error.message);
-            } else if (error.response?.data?.error) {
+            if (error.response?.data?.error) {
                 setError(error.response.data.error);
+            } else if (error.message) {
+                setError(error.message);
             } else if (error.response?.data?.contenido_audio) {
                 setError(error.response.data.contenido_audio[0]);
             } else {

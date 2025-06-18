@@ -7,6 +7,7 @@ import ErrorAlert from '../../../components/ErrorAlert';
 import { EstadoPublicacion } from '../../../constants/enums';
 import PageHeader from '../../../components/layout/PageHeader';
 import { TipoContenido, getEnumLabelByValue } from '../../../constants/enums';
+import DeleteConfirmModal from '../../../components/modals/DeleteConfirmModal';
 
 const DetallePrograma = () => {
     const { id } = useParams();
@@ -16,6 +17,11 @@ const DetallePrograma = () => {
     const [sesiones, setSesiones] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showDeleteProgramaModal, setShowDeleteProgramaModal] = useState(false);
+    const [showDeleteSesionModal, setShowDeleteSesionModal] = useState(false);
+    const [sesionToDelete, setSesionToDelete] = useState(null);
+    const [showDeleteCuestionarioModal, setShowDeleteCuestionarioModal] = useState(false);
+    const [cuestionarioToDelete, setCuestionarioToDelete] = useState(null);
 
     const fetchPrograma = async () => {
         try {
@@ -80,30 +86,26 @@ const DetallePrograma = () => {
     };
 
     const handleEliminarSesion = async (sesionId) => {
-        if (window.confirm('¿Estás seguro de que deseas eliminar esta sesión?')) {
-            try {
-                await api.delete(`/sesiones/${sesionId}/`);
-                // Actualizar la lista de sesiones
-                setSesiones(sesiones.filter(s => s.id !== sesionId));
-            } catch (error) {
-                console.error('Error al eliminar la sesión:', error);
-                if (error.response?.data?.error) {
-                    setError(error.response.data.error);
-                }
+        try {
+            await api.delete(`/sesiones/${sesionId}/`);
+            // Actualizar la lista de sesiones
+            setSesiones(sesiones.filter(s => s.id !== sesionId));
+        } catch (error) {
+            console.error('Error al eliminar la sesión:', error);
+            if (error.response?.data?.error) {
+                setError(error.response.data.error);
             }
         }
     };
 
     const handleEliminarCuestionario = async (cuestionarioId) => {
-        if (window.confirm('¿Estás seguro de que deseas eliminar este cuestionario?')) {
-            try {
-                await api.delete(`/cuestionario/${cuestionarioId}/`);
-                // Actualizar el estado del programa con los datos más recientes
-                const response = await api.get(`/programas/${id}/`);
-                setPrograma(response.data);
-            } catch (err) {
-                console.error('Error al eliminar el cuestionario:', err);
-            }
+        try {
+            await api.delete(`/cuestionario/${cuestionarioId}/`);
+            // Actualizar el estado del programa con los datos más recientes
+            const response = await api.get(`/programas/${id}/`);
+            setPrograma(response.data);
+        } catch (err) {
+            console.error('Error al eliminar el cuestionario:', err);
         }
     };
 
@@ -217,8 +219,8 @@ const DetallePrograma = () => {
                                             Publicar
                                         </button>
                                         <button
-                                            onClick={handleEliminar}
-                                            className="flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm text-rose-300 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-rose-500/20 border border-white/20"
+                                            onClick={() => setShowDeleteProgramaModal(true)}
+                                            className="flex items-center px-6 py-3 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:from-red-600 hover:to-rose-600"
                                         >
                                             <Trash2 className="h-5 w-5 mr-2" />
                                             Eliminar
@@ -353,7 +355,10 @@ const DetallePrograma = () => {
                                                                                 <Edit className="h-4 w-4" />
                                                                             </button>
                                                                             <button
-                                                                                onClick={() => handleEliminarSesion(sesion.id)}
+                                                                                onClick={() => {
+                                                                                    setSesionToDelete(sesion);
+                                                                                    setShowDeleteSesionModal(true);
+                                                                                }}
                                                                                 className="p-1.5 text-purple-300 hover:text-rose-300 hover:bg-rose-500/20 rounded-lg transition-colors"
                                                                                 title="Eliminar sesión"
                                                                             >
@@ -479,7 +484,10 @@ const DetallePrograma = () => {
                                                                             <Edit className="h-4 w-4" />
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => handleEliminarCuestionario(programa.cuestionario_pre.id)}
+                                                                            onClick={() => {
+                                                                                setCuestionarioToDelete(programa.cuestionario_pre);
+                                                                                setShowDeleteCuestionarioModal(true);
+                                                                            }}
                                                                             className="p-1.5 text-purple-300 hover:text-rose-300 hover:bg-rose-500/20 rounded-lg transition-colors"
                                                                             title="Eliminar"
                                                                         >
@@ -528,7 +536,10 @@ const DetallePrograma = () => {
                                                                             <Edit className="h-4 w-4" />
                                                                         </button>
                                                                         <button
-                                                                            onClick={() => handleEliminarCuestionario(programa.cuestionario_post.id)}
+                                                                            onClick={() => {
+                                                                                setCuestionarioToDelete(programa.cuestionario_post);
+                                                                                setShowDeleteCuestionarioModal(true);
+                                                                            }}
                                                                             className="p-1.5 text-purple-300 hover:text-rose-300 hover:bg-rose-500/20 rounded-lg transition-colors"
                                                                             title="Eliminar"
                                                                         >
@@ -551,6 +562,48 @@ const DetallePrograma = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modales de confirmación */}
+            <DeleteConfirmModal
+                isOpen={showDeleteProgramaModal}
+                onClose={() => setShowDeleteProgramaModal(false)}
+                onConfirm={() => {
+                    handleEliminar();
+                    setShowDeleteProgramaModal(false);
+                }}
+                itemType="programa"
+                itemName={programa?.nombre}
+            />
+
+            <DeleteConfirmModal
+                isOpen={showDeleteSesionModal}
+                onClose={() => {
+                    setShowDeleteSesionModal(false);
+                    setSesionToDelete(null);
+                }}
+                onConfirm={() => {
+                    handleEliminarSesion(sesionToDelete.id);
+                    setShowDeleteSesionModal(false);
+                    setSesionToDelete(null);
+                }}
+                itemType="sesion"
+                itemName={sesionToDelete?.titulo}
+            />
+
+            <DeleteConfirmModal
+                isOpen={showDeleteCuestionarioModal}
+                onClose={() => {
+                    setShowDeleteCuestionarioModal(false);
+                    setCuestionarioToDelete(null);
+                }}
+                onConfirm={() => {
+                    handleEliminarCuestionario(cuestionarioToDelete.id);
+                    setShowDeleteCuestionarioModal(false);
+                    setCuestionarioToDelete(null);
+                }}
+                itemType="cuestionario"
+                itemName={cuestionarioToDelete?.titulo}
+            />
         </div>
     );
 };
