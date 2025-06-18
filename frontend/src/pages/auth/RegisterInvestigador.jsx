@@ -307,9 +307,9 @@ const RegisterInvestigador = () => {
                                             onChange={handleChange}
                                             disabled={loading}
                                         >
-                                            <option value="">Selecciona una opción</option>
+                                            <option value="" className="bg-indigo-950 text-white">Selecciona una opción</option>
                                             {Object.values(ExperienciaInvestigacion).map(({ value, label }) => (
-                                                <option key={value} value={value}>
+                                                <option key={value} value={value} className="bg-indigo-950 text-white">
                                                     {label}
                                                 </option>
                                             ))}

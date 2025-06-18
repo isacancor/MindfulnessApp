@@ -10,7 +10,7 @@ from programa.models import Programa, EstadoPublicacion, InscripcionPrograma
 from sesion.models import Sesion
 from cuestionario.models import Cuestionario, RespuestaCuestionario
 
-from datetime import date, timedelta
+psswd = "MindfulnessApp123"
 
 def run():
     print("📦 Poblando base de datos...")
@@ -39,9 +39,10 @@ def run():
             "ubicacion": "Madrid, España",
             "ocupacion": "Investigador en Mindfulness",
             "nivelEducativo": "doctorado",
+            "password": psswd,
         }
     )
-    user_admin.set_password("12")
+    user_admin.set_password(psswd)
     user_admin.save()
     
 
@@ -60,9 +61,10 @@ def run():
             "ubicacion": "Madrid, España",
             "ocupacion": "Investigador en Mindfulness",
             "nivelEducativo": "doctorado",
+            "password": psswd,
         }
     )
-    user_inv.set_password("12")
+    user_inv.set_password(psswd)
     user_inv.save()
     inv, _ = Investigador.objects.get_or_create(
         usuario=user_inv,
@@ -87,9 +89,10 @@ def run():
             "ubicacion": "Sevilla, España",
             "ocupacion": "Profesora e Investigadora",
             "nivelEducativo": "doctorado",
+            "password": psswd,
         }
     )
-    user_inv2.set_password("12")
+    user_inv2.set_password(psswd)
     user_inv2.save()
     inv2, _ = Investigador.objects.get_or_create(
         usuario=user_inv2,
@@ -114,9 +117,10 @@ def run():
             "ubicacion": "New York, Estados Unidos",
             "ocupacion": "Profesor, autor, investigador en medicina",
             "nivelEducativo": "doctorado",
+            "password": psswd,
         }
     )
-    user_inv3.set_password("12")
+    user_inv3.set_password(psswd)
     user_inv3.save()
     inv3, _ = Investigador.objects.get_or_create(
         usuario=user_inv3,
@@ -184,9 +188,10 @@ def run():
                 "ubicacion": p_data["ubicacion"],
                 "ocupacion": p_data["ocupacion"],
                 "nivelEducativo": p_data["nivelEducativo"],
+                "password": psswd,
             }
         )
-        user.set_password(p_data["username"])  # password igual al username
+        user.set_password(psswd)
         user.save()
         participante, _ = Participante.objects.get_or_create(
             usuario=user,
@@ -211,9 +216,10 @@ def run():
             "ubicacion": "Badajoz, España",
             "ocupacion": "Estudiante de Ingeniería de Software",
             "nivelEducativo": "universidad",
+            "password": psswd,
         }
     )
-    yo.set_password("12")
+    yo.set_password(psswd)
     yo.save()
     yopart, _ = Participante.objects.get_or_create(usuario=yo,
         defaults={
@@ -280,9 +286,10 @@ def run():
                 "ubicacion": p_data["ubicacion"],
                 "ocupacion": p_data["ocupacion"],
                 "nivelEducativo": p_data["nivelEducativo"],
+                "password": psswd,
             }
         )
-        user.set_password("12")  # password igual al username
+        user.set_password(psswd)
         user.save()
         
         # Asegurarnos de que se crea el perfil de participante
