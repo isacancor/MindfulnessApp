@@ -410,8 +410,8 @@ def run():
             "semana": 5,
             "duracion_estimada": 5,
             "tipo_practica": "sounds",
-            "tipo_contenido": "enlace",
-            "contenido_url": "https://www.youtube.com/watch?v=unCya_-8ECs"
+            "tipo_contenido": "audio",
+            "contenido_audio": "audio/meditacion1.mp3"
         },
         {
             "titulo": "Final",
@@ -419,8 +419,8 @@ def run():
             "semana": 6,
             "duracion_estimada": 10,
             "tipo_practica": "loving_kindness",
-            "tipo_contenido": "enlace",
-            "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            "tipo_contenido": "video",
+            "contenido_video": "video/meditacion1.mp4"
         }
     ]
 
@@ -571,8 +571,8 @@ def run():
             "semana": 5,
             "duracion_estimada": 5,
             "tipo_practica": "sounds",
-            "tipo_contenido": "enlace",
-            "contenido_url": "https://www.youtube.com/watch?v=unCya_-8ECs"
+            "tipo_contenido": "audio",
+            "contenido_audio": "audio/audio-meditacion1.mp3"
         },
         {
             "titulo": "Semana 6: Meditación de Bondad Amorosa",
@@ -580,8 +580,8 @@ def run():
             "semana": 6,
             "duracion_estimada": 10,
             "tipo_practica": "loving_kindness",
-            "tipo_contenido": "enlace",
-            "contenido_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+            "tipo_contenido": "video",
+            "contenido_video": "video/meditacion1.mp4"
         },
         {
             "titulo": "Semana 7: Integración de la Práctica",
